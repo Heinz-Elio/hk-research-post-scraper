@@ -11,11 +11,12 @@ import time
 import hashlib
 import re
 from typing import List, Dict, Optional
-from urllib.parse import urljoin, urlparse, parse_qs
+from urllib.parse import urljoin
 
 import requests
 from bs4 import BeautifulSoup
 from dateutil import parser as date_parser
+from narwhals import dtypes
 
 # Optional Playwright (for JS-heavy sites: HKBU, Lingnan)
 try:
@@ -41,31 +42,26 @@ PLAYWRIGHT_TIMEOUT = 60000  # ms
 
 # Must look like a research-type post
 RESEARCH_KEYWORDS = [
-    "research assistant", "research associate", "research fellow",
-    "post-doctoral", "postdoctoral", "project assistant",
-    "senior research", "junior research", "research officer",
-    "research support", "technical officer",
+    "research", "technical",
 ]
 
 # Focus on Engineering & Science related posts
 STEM_KEYWORDS = [
     # Broad
-    "engineering", "science", "stem",
+    "engineering", "science",
     # Computer / AI / Data
     "computer", "computing", "software", "artificial intelligence", "machine learning",
-    "deep learning", "data science", "data analytic", "informatics", "information system",
-    "cyber", "robotic", "automation",
+    "deep learning", "data science", "data analytic", "information system", "robotic",
+    "automation",
     # Engineering disciplines
-    "electrical", "electronic", "mechanical", "civil", "chemical engineering",
+    "electronic", "mechanical", "civil",
     "biomedical engineering", "industrial engineering", "systems engineering",
-    "aerospace", "aviation", "materials", "nanotech", "energy",
+    "aerospace", "aviation",
     # Natural sciences
-    "physics", "chemistry", "biology", "biotech", "biochemistry", "microbiology",
-    "environmental science", "earth science", "geology", "mathematics", "statistic",
-    "optics", "photonic", "quantum",
+    "environmental science", "earth science", "geology", "mathematics", "statistic"
     # Applied / interdisciplinary
     "bioinformatics", "computational", "sensor", "signal processing",
-    "control system", "wireless", "semiconductor", "chip", "vlsi",
+    "control system"
 ]
 
 
@@ -104,8 +100,6 @@ def is_research_related(title: str, department: str = "", project: str = "") -> 
 
     # 1. Must look like a research post
     is_research = any(kw in title_l for kw in RESEARCH_KEYWORDS)
-    if not is_research:
-        is_research = any(kw in combined for kw in RESEARCH_KEYWORDS)
     if not is_research:
         return False
 
@@ -190,15 +184,12 @@ def scrape_polyu() -> List[dict]:
     if not soup:
         return posts
 
-    table = soup.find("table")
-    if not table:
-        return posts
-
-    for row in table.find_all("tr")[1:]:
-        tds = row.find_all("td")
+    for row in soup.select("tr.ITS_clickableTableRow"):
+        tds = row.select("td")
         if len(tds) < 5:
             continue
 
+        url_part = row.get("data-href")
         dept = safe_text(tds[0])
         title_cell = tds[1]
         title = safe_text(title_cell)
@@ -209,8 +200,7 @@ def scrape_polyu() -> List[dict]:
         if not is_research_related(title, department=dept, project=project):
             continue
 
-        a = title_cell.find("a")
-        detail_url = urljoin(url, a["href"]) if a and a.get("href") else url
+        detail_url = url.replace("research.php", url_part)
         close_date = parse_date(close_raw)
 
         time.sleep(REQUEST_DELAY)
@@ -241,20 +231,20 @@ def scrape_cityu() -> List[dict]:
     if not soup:
         return posts
 
-    table = soup.find("table")
-    if not table:
-        for a in soup.find_all("a", href=True):
-            title = a.get_text(strip=True)
-            if is_research_related(title):
-                posts.append({
-                    "id": make_id("CityU", hashlib.md5(a["href"].encode()).hexdigest()[:10]),
-                    "title": title,
-                    "close_date": None,
-                    "content": title,
-                    "url": urljoin(url, a["href"]),
-                    "source": "CityU",
-                })
-        return posts
+    table = soup.find("table",id="MainContent_gvJobResearch")
+    # if not table:
+    #     for a in soup.find_all("a", href=True):
+    #         title = a.get_text(strip=True)
+    #         if is_research_related(title):
+    #             posts.append({
+    #                 "id": make_id("CityU", hashlib.md5(a["href"].encode()).hexdigest()[:10]),
+    #                 "title": title,
+    #                 "close_date": None,
+    #                 "content": title,
+    #                 "url": urljoin(url, a["href"]),
+    #                 "source": "CityU",
+    #             })
+    #     return posts
 
     for row in table.find_all("tr")[1:]:
         tds = row.find_all("td")

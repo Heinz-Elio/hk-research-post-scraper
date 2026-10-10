@@ -34,7 +34,7 @@ logging.getLogger("torch").setLevel(logging.ERROR)
 # ==================================================================
 # Config switches
 # ==================================================================
-USE_LOCAL_SUMMARIZER = True          # ← set False to disable model summarization
+USE_LOCAL_SUMMARIZER = False          # ← set False to disable model summarization
 USE_EMBEDDINGS = True                # ← set False to disable embeddings
 
 # Prefer a small instruct model. Change if you have a better one locally.
@@ -207,7 +207,7 @@ def get_embedding(text: str) -> Optional[List[float]]:
     if not HAS_EMBED or not text:
         return None
     text = text[:3000]
-    emb = EMBED_MODEL.encode(text, show_progress_bar=False)
+    emb = EMBED_MODEL.encode(text, show_progress_bar=True)
     return emb.tolist()
 
 
@@ -248,7 +248,7 @@ def run(
     use_summarizer: bool = True,
 ):
     if sources is None:
-        sources = list(SCRAPERS.keys())
+        sources = list(SCRAPERS.keys())[3:]
 
     print(f"[{datetime.now():%Y-%m-%d %H:%M:%S}] Starting scrape")
     print(f"  Sources     : {sources}")

@@ -1,0 +1,9 @@
+# Default ignored files
+/shelf/
+/workspace.xml
+# Editor-based HTTP Client requests
+/httpRequests/
+/hk-research-post-scraper.iml
+/inspectionProfiles/profiles_settings.xml
+/vcs.xml
+/modules.xml
