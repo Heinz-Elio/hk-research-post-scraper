@@ -2,13 +2,15 @@
 Site-specific scrapers for Hong Kong university research posts.
 Each function returns a list of dicts with at least:
     id, title, close_date, content, url, source
+
+Focus: Engineering and Science related research positions only.
 """
 
 import time
 import hashlib
 import re
 from typing import List, Dict, Optional
-from urllib.parse import urljoin, urlparse, parse_qs
+from urllib.parse import urljoin
 
 import requests
 from bs4 import BeautifulSoup
@@ -27,11 +29,33 @@ HEADERS = {
 }
 REQUEST_DELAY = 1.3  # seconds between detail page requests
 
+# Must look like a research-type post
 RESEARCH_KEYWORDS = [
     "research assistant", "research associate", "research fellow",
     "post-doctoral", "postdoctoral", "project assistant",
     "senior research", "junior research", "research officer",
-    "research support", "technical officer",  # sometimes research-related
+    "research support", "technical officer",
+]
+
+# Focus on Engineering & Science related posts
+STEM_KEYWORDS = [
+    # Broad
+    "engineering", "science", "stem",
+    # Computer / AI / Data
+    "computer", "computing", "software", "artificial intelligence", "machine learning",
+    "deep learning", "data science", "data analytic", "informatics", "information system",
+    "cyber", "robotic", "automation",
+    # Engineering disciplines
+    "electrical", "electronic", "mechanical", "civil", "chemical engineering",
+    "biomedical engineering", "industrial engineering", "systems engineering",
+    "aerospace", "aviation", "materials", "nanotech", "energy",
+    # Natural sciences
+    "physics", "chemistry", "biology", "biotech", "biochemistry", "microbiology",
+    "environmental science", "earth science", "geology", "mathematics", "statistic",
+    "optics", "photonic", "quantum",
+    # Applied / interdisciplinary
+    "bioinformatics", "computational", "sensor", "signal processing",
+    "control system", "wireless", "semiconductor", "chip", "vlsi",
 ]
 
 
@@ -52,7 +76,6 @@ def parse_date(text: str) -> Optional[str]:
     if text in ("", "-", "N/A", "Until filled", "Open until filled", "—"):
         return None
     try:
-        # Prefer day-first for many HK sites, but dateutil is smart
         dt = date_parser.parse(text, fuzzy=True, dayfirst=False)
         return dt.date().isoformat()
     except Exception:
@@ -60,8 +83,20 @@ def parse_date(text: str) -> Optional[str]:
 
 
 def is_research_related(title: str) -> bool:
+    """
+    Keep only research-type posts that are related to Engineering or Science.
+    Both conditions must be satisfied.
+    """
     t = title.lower()
-    return any(kw in t for kw in RESEARCH_KEYWORDS)
+
+    # 1. Must look like a research post
+    is_research = any(kw in t for kw in RESEARCH_KEYWORDS)
+    if not is_research:
+        return False
+
+    # 2. Must also match Engineering / Science focus
+    is_stem = any(kw in t for kw in STEM_KEYWORDS)
+    return is_stem
 
 
 def make_id(source: str, ref: str) -> str:
@@ -79,7 +114,6 @@ def safe_text(el) -> str:
 def scrape_hku() -> List[dict]:
     """https://jobs.hku.hk/en/listing/"""
     base = "https://jobs.hku.hk"
-    # Request more items per page
     listing_url = f"{base}/en/listing/?page-items=100"
     posts = []
     soup = fetch(listing_url)
@@ -94,11 +128,9 @@ def scrape_hku() -> List[dict]:
         href = a.get("href") or ""
         detail_url = urljoin(base, href)
 
-        # Ref is usually the numeric part after /job/
         m = re.search(r"/job/(\d+)", href)
         ref = m.group(1) if m else hashlib.md5(href.encode()).hexdigest()[:10]
 
-        # Closing date lives in the same <tr>
         close_date = None
         row = a.find_parent("tr")
         if row:
@@ -106,12 +138,10 @@ def scrape_hku() -> List[dict]:
             if len(tds) >= 4:
                 close_date = parse_date(tds[-1].get_text(strip=True))
 
-        # Detail page for full content
         time.sleep(REQUEST_DELAY)
         detail = fetch(detail_url)
         content = ""
         if detail:
-            # Prefer the main job description block
             main = (
                 detail.select_one(".job-description")
                 or detail.select_one("#content")
@@ -159,7 +189,8 @@ def scrape_polyu() -> List[dict]:
         close_raw = safe_text(tds[3])
         ref = safe_text(tds[4])
 
-        if not is_research_related(title):
+        # Also check department for STEM relevance
+        if not is_research_related(title) and not is_research_related(dept + " " + title):
             continue
 
         a = title_cell.find("a")
@@ -170,7 +201,6 @@ def scrape_polyu() -> List[dict]:
         content = f"Department: {dept}\nProject Title: {project}\n\n"
         detail = fetch(detail_url)
         if detail:
-            # Many PolyU posts are short HTML or link to PDF
             content += detail.get_text("\n", strip=True)[:8000]
 
         posts.append({
@@ -195,10 +225,8 @@ def scrape_cityu() -> List[dict]:
     if not soup:
         return posts
 
-    # The page has a table of research positions
     table = soup.find("table")
     if not table:
-        # fallback: look for any links that look like jobs
         for a in soup.find_all("a", href=True):
             title = a.get_text(strip=True)
             if is_research_related(title):
@@ -218,10 +246,10 @@ def scrape_cityu() -> List[dict]:
             continue
 
         title = safe_text(tds[0])
-        if not is_research_related(title):
+        dept = safe_text(tds[1]) if len(tds) > 1 else ""
+        if not is_research_related(title) and not is_research_related(dept + " " + title):
             continue
 
-        dept = safe_text(tds[1]) if len(tds) > 1 else ""
         close_raw = safe_text(tds[2]) if len(tds) > 2 else ""
         close_date = parse_date(close_raw)
 
@@ -250,11 +278,6 @@ def scrape_cityu() -> List[dict]:
 # 4. CUHK (Taleo)
 # ------------------------------------------------------------------
 def scrape_cuhk() -> List[dict]:
-    """
-    CUHK Taleo non-teaching careers.
-    Note: Taleo is JS-heavy; this scraper gets the initial listing.
-    For very complete results a browser (Playwright) would be better.
-    """
     url = (
         "https://cuhk.taleo.net/careersection/cu_career_non_teach/"
         "jobsearch.ftl?lang=en&portal=8115020119"
@@ -264,7 +287,6 @@ def scrape_cuhk() -> List[dict]:
     if not soup:
         return posts
 
-    # Taleo renders rows with class even/odd
     for row in soup.select("tr.even, tr.odd"):
         title_a = row.select_one("a[href*='jobdetail']")
         if not title_a:
@@ -274,15 +296,12 @@ def scrape_cuhk() -> List[dict]:
             continue
 
         detail_url = urljoin(url, title_a["href"])
-        # Extract job number if possible
         job_num = ""
         tds = row.find_all("td")
         if tds:
             job_num = safe_text(tds[0])
 
         ref = job_num or hashlib.md5(detail_url.encode()).hexdigest()[:10]
-
-        # Closing date is often not in the list view
         close_date = None
 
         time.sleep(REQUEST_DELAY)
@@ -306,11 +325,6 @@ def scrape_cuhk() -> List[dict]:
 # 5. HKUST (Clear Water Bay)
 # ------------------------------------------------------------------
 def scrape_hkust() -> List[dict]:
-    """
-    Official portal: https://hkustcareers.hkust.edu.hk
-    Current openings often redirect into categories.
-    We try the research-support path and the general current-opening page.
-    """
     posts = []
     candidates = [
         "https://hkustcareers.hkust.edu.hk/join-us/current-opening",
@@ -322,18 +336,16 @@ def scrape_hkust() -> List[dict]:
         if not soup:
             continue
 
-        # Look for job cards or links containing research keywords
         for a in soup.find_all("a", href=True):
             title = a.get_text(strip=True)
             if not title or not is_research_related(title):
                 continue
-            if len(title) < 8:  # skip menu items
+            if len(title) < 8:
                 continue
 
             detail_url = urljoin(list_url, a["href"])
             ref = hashlib.md5(detail_url.encode()).hexdigest()[:10]
 
-            # Avoid duplicates
             if any(p["url"] == detail_url for p in posts):
                 continue
 
@@ -346,7 +358,7 @@ def scrape_hkust() -> List[dict]:
             posts.append({
                 "id": make_id("HKUST", ref),
                 "title": title,
-                "close_date": None,  # often not shown on list
+                "close_date": None,
                 "content": content,
                 "url": detail_url,
                 "source": "HKUST",
@@ -359,11 +371,9 @@ def scrape_hkust() -> List[dict]:
 # ------------------------------------------------------------------
 def scrape_hkust_gz() -> List[dict]:
     url = "https://jobs.hkust-gz.edu.cn/"
-    # alternative: https://career.hkust-gz.edu.cn/en/career
     posts = []
     soup = fetch(url)
     if not soup:
-        # try English career portal
         soup = fetch("https://career.hkust-gz.edu.cn/en/career")
         if not soup:
             return posts
@@ -465,7 +475,6 @@ def scrape_lingnan() -> List[dict]:
 # ------------------------------------------------------------------
 def scrape_eduhk() -> List[dict]:
     url = "https://www.eduhk.hk/careers/"
-    # Chinese version sometimes richer: https://www.eduhk.hk/zht/current-openings
     posts = []
     for u in [url, "https://www.eduhk.hk/zht/current-openings"]:
         soup = fetch(u)
@@ -537,7 +546,7 @@ def scrape_hkmu() -> List[dict]:
 
 
 # ------------------------------------------------------------------
-# Registry – used by main script
+# Registry
 # ------------------------------------------------------------------
 SCRAPERS = {
     "HKU": scrape_hku,
