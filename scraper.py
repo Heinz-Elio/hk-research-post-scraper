@@ -4,39 +4,159 @@ Research Post Scraper – Main Orchestrator
 
 - Calls site scrapers from scrapers.py
 - Maintains research_posts.json (active) and outdated_posts.json
+- Optional local model summarization (small instruct model)
 - Optional local embeddings for semantic search
 - Clean separation of concerns
 """
 
 import json
+import re
 from datetime import datetime, date
 from pathlib import Path
 from typing import List, Dict, Optional
 
 from scrapers import SCRAPERS  # all site-specific functions
 
-# ------------------------------------------------------------------
-# Optional embeddings
-# ------------------------------------------------------------------
-try:
-    from sentence_transformers import SentenceTransformer
-    EMBED_MODEL = SentenceTransformer("all-MiniLM-L6-v2")
-    HAS_EMBED = True
-except ImportError:
-    HAS_EMBED = False
-    print("[Info] sentence-transformers not installed → embeddings disabled")
+# ==================================================================
+# Config switches
+# ==================================================================
+USE_LOCAL_SUMMARIZER = True          # ← set False to disable model summarization
+USE_EMBEDDINGS = True                # ← set False to disable embeddings
 
-# ------------------------------------------------------------------
-# Paths & config
-# ------------------------------------------------------------------
+# Prefer a small instruct model. Change if you have a better one locally.
+SUMMARIZER_MODEL = "Qwen/Qwen2.5-1.5B-Instruct"   # good balance
+# Alternatives:
+# SUMMARIZER_MODEL = "meta-llama/Llama-3.2-1B-Instruct"
+# SUMMARIZER_MODEL = "microsoft/Phi-3.5-mini-instruct"
+
+# ==================================================================
+# Optional local summarizer
+# ==================================================================
+HAS_SUMMARIZER = False
+summarizer_pipeline = None
+
+if USE_LOCAL_SUMMARIZER:
+    try:
+        from transformers import pipeline
+        import torch
+
+        device = 0 if torch.cuda.is_available() else -1
+        print(f"[Info] Loading summarizer: {SUMMARIZER_MODEL} (device={'cuda' if device == 0 else 'cpu'})")
+        summarizer_pipeline = pipeline(
+            "text-generation",
+            model=SUMMARIZER_MODEL,
+            device=device,
+            torch_dtype=torch.float16 if device == 0 else torch.float32,
+            max_new_tokens=180,
+        )
+        HAS_SUMMARIZER = True
+        print("[Info] Local summarizer ready")
+    except Exception as e:
+        print(f"[Info] Local summarizer not available → {e}")
+        print("       Falling back to rule-based summary")
+        HAS_SUMMARIZER = False
+
+
+def rule_based_summary(text: str, max_chars: int = 520) -> str:
+    """Fast fallback: clean + truncate."""
+    if not text:
+        return ""
+    # Remove excessive whitespace and common noise
+    text = re.sub(r"\s+", " ", text).strip()
+    # Try to cut at sentence boundary
+    if len(text) <= max_chars:
+        return text
+    cut = text[:max_chars]
+    last_period = max(cut.rfind(". "), cut.rfind("。"), cut.rfind("! "))
+    if last_period > max_chars * 0.6:
+        return cut[: last_period + 1].strip()
+    return cut.strip() + "..."
+
+
+def summarize(text: str, title: str = "") -> str:
+    """
+    Produce a short summary of a research job post.
+    Uses local model if available, otherwise rule-based.
+    """
+    if not text:
+        return ""
+
+    # Always truncate input to keep context reasonable
+    text = text[:3500].strip()
+
+    if not HAS_SUMMARIZER or summarizer_pipeline is None:
+        return rule_based_summary(text)
+
+    prompt = f"""You are a helpful assistant that writes concise summaries of academic research job postings.
+
+Summarize the following research position in 2-4 short sentences.
+Focus on: main role/duties, key requirements (degree, skills, experience), and any important conditions (duration, part-time/full-time).
+Do not invent information. Be factual and neutral.
+
+Title: {title}
+
+Job text:
+{text}
+
+Summary:"""
+
+    try:
+        result = summarizer_pipeline(
+            prompt,
+            max_new_tokens=160,
+            do_sample=False,
+            temperature=0.1,
+            pad_token_id=summarizer_pipeline.tokenizer.eos_token_id,
+        )
+        generated = result[0]["generated_text"]
+        # Extract only the part after "Summary:"
+        if "Summary:" in generated:
+            summary = generated.split("Summary:")[-1].strip()
+        else:
+            summary = generated[len(prompt):].strip()
+
+        # Clean up
+        summary = re.sub(r"\n+", " ", summary).strip()
+        if len(summary) > 700:
+            summary = summary[:700].rsplit(" ", 1)[0] + "..."
+        return summary if summary else rule_based_summary(text)
+    except Exception as e:
+        print(f"  [summarize error] {e}")
+        return rule_based_summary(text)
+
+
+# ==================================================================
+# Optional embeddings
+# ==================================================================
+HAS_EMBED = False
+EMBED_MODEL = None
+
+if USE_EMBEDDINGS:
+    try:
+        from sentence_transformers import SentenceTransformer
+        EMBED_MODEL = SentenceTransformer("all-MiniLM-L6-v2")
+        HAS_EMBED = True
+        print("[Info] Embedding model ready (all-MiniLM-L6-v2)")
+    except ImportError:
+        print("[Info] sentence-transformers not installed → embeddings disabled")
+
+
+def get_embedding(text: str) -> Optional[List[float]]:
+    if not HAS_EMBED or not text:
+        return None
+    text = text[:3000]
+    emb = EMBED_MODEL.encode(text, show_progress_bar=False)
+    return emb.tolist()
+
+
+# ==================================================================
+# Paths & JSON helpers
+# ==================================================================
 DATA_DIR = Path(__file__).parent
 ACTIVE_FILE = DATA_DIR / "research_posts.json"
 OUTDATED_FILE = DATA_DIR / "outdated_posts.json"
 
 
-# ------------------------------------------------------------------
-# JSON helpers
-# ------------------------------------------------------------------
 def load_json(path: Path) -> Dict[str, dict]:
     if not path.exists():
         return {}
@@ -48,7 +168,6 @@ def load_json(path: Path) -> Dict[str, dict]:
 
 
 def save_json(path: Path, data: Dict[str, dict]):
-    # Save as sorted list for human readability
     items = sorted(
         data.values(),
         key=lambda x: (x.get("close_date") or "9999-12-31", x.get("title") or ""),
@@ -58,22 +177,13 @@ def save_json(path: Path, data: Dict[str, dict]):
         json.dump(items, f, ensure_ascii=False, indent=2)
 
 
-def get_embedding(text: str) -> Optional[List[float]]:
-    if not HAS_EMBED or not text:
-        return None
-    # Keep it small
-    text = text[:3500]
-    emb = EMBED_MODEL.encode(text, show_progress_bar=False)
-    return emb.tolist()
-
-
-# ------------------------------------------------------------------
+# ==================================================================
 # Main logic
-# ------------------------------------------------------------------
+# ==================================================================
 def run(
     sources: Optional[List[str]] = None,
     generate_embeddings: bool = True,
-    verbose: bool = True,
+    use_summarizer: bool = True,
 ):
     """
     sources: list of keys from SCRAPERS, or None = all
@@ -82,8 +192,9 @@ def run(
         sources = list(SCRAPERS.keys())
 
     print(f"[{datetime.now():%Y-%m-%d %H:%M:%S}] Starting scrape")
-    print(f"  Sources : {sources}")
-    print(f"  Embeddings: {'ON' if generate_embeddings and HAS_EMBED else 'OFF'}")
+    print(f"  Sources     : {sources}")
+    print(f"  Summarizer  : {'ON (local model)' if use_summarizer and HAS_SUMMARIZER else 'ON (rule-based)' if use_summarizer else 'OFF'}")
+    print(f"  Embeddings  : {'ON' if generate_embeddings and HAS_EMBED else 'OFF'}")
 
     active = load_json(ACTIVE_FILE)
     outdated = load_json(OUTDATED_FILE)
@@ -108,18 +219,36 @@ def run(
                 pid = p["id"]
                 p["scraped_at"] = datetime.now().isoformat(timespec="seconds")
 
-                # Embedding only when content is new or changed
+                # ----- Summarize instead of keeping full content -----
+                full_text = p.get("content") or ""
+                if use_summarizer:
+                    # Only re-summarize if content changed or no summary yet
+                    old = active.get(pid) or outdated.get(pid)
+                    if (
+                        not old
+                        or old.get("content") != full_text
+                        or not old.get("summary")
+                    ):
+                        p["summary"] = summarize(full_text, title=p.get("title", ""))
+                    else:
+                        p["summary"] = old.get("summary")
+                else:
+                    p["summary"] = rule_based_summary(full_text)
+
+                # We no longer store the long content
+                p.pop("content", None)
+
+                # ----- Embedding (prefer summary) -----
                 if generate_embeddings and HAS_EMBED:
                     old = active.get(pid) or outdated.get(pid)
+                    text_for_embed = p.get("title", "") + "\n" + (p.get("summary") or "")
                     need_embed = (
                         not old
-                        or old.get("content") != p.get("content")
+                        or old.get("summary") != p.get("summary")
                         or "embedding" not in old
                     )
                     if need_embed:
-                        p["embedding"] = get_embedding(
-                            p.get("title", "") + "\n" + (p.get("content") or "")[:2000]
-                        )
+                        p["embedding"] = get_embedding(text_for_embed)
                     else:
                         p["embedding"] = old.get("embedding")
 
@@ -159,9 +288,9 @@ def run(
     print("=" * 50)
 
 
-# ------------------------------------------------------------------
+# ==================================================================
 # Optional: simple semantic search helper
-# ------------------------------------------------------------------
+# ==================================================================
 def semantic_search(query: str, top_k: int = 8) -> List[dict]:
     """Return top_k most similar active posts (requires embeddings)."""
     if not HAS_EMBED:
@@ -179,7 +308,6 @@ def semantic_search(query: str, top_k: int = 8) -> List[dict]:
         emb = post.get("embedding")
         if not emb:
             continue
-        # cosine similarity
         import numpy as np
         a = np.array(q_emb)
         b = np.array(emb)
@@ -193,6 +321,7 @@ def semantic_search(query: str, top_k: int = 8) -> List[dict]:
             "id": p["id"],
             "title": p["title"],
             "close_date": p.get("close_date"),
+            "summary": p.get("summary", "")[:200],
             "url": p["url"],
             "source": p["source"],
         }
@@ -200,15 +329,6 @@ def semantic_search(query: str, top_k: int = 8) -> List[dict]:
     ]
 
 
-# ------------------------------------------------------------------
+# ==================================================================
 if __name__ == "__main__":
-    # Example 1: scrape everything
     run()
-
-    # Example 2: only a few reliable sources
-    # run(sources=["HKU", "PolyU", "CityU", "CUHK"])
-
-    # Example 3: after scraping, do a semantic search
-    # results = semantic_search("computer vision deep learning research assistant")
-    # for r in results:
-    #     print(r)
