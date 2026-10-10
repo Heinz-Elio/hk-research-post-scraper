@@ -12,11 +12,24 @@ Research Post Scraper – Main Orchestrator
 
 import json
 import re
+import logging
+import os
 from datetime import datetime, date
 from pathlib import Path
 from typing import List, Dict, Optional
 
 from scrapers import SCRAPERS  # all site-specific functions
+
+# ==================================================================
+# Quiet transformers / huggingface / torch logs
+# ==================================================================
+os.environ["TRANSFORMERS_VERBOSITY"] = "error"
+os.environ["TRANSFORMERS_NO_ADVISORY_WARNINGS"] = "1"
+os.environ["HF_HUB_DISABLE_PROGRESS_BARS"] = "1"
+
+logging.getLogger("transformers").setLevel(logging.ERROR)
+logging.getLogger("huggingface_hub").setLevel(logging.ERROR)
+logging.getLogger("torch").setLevel(logging.ERROR)
 
 # ==================================================================
 # Config switches
