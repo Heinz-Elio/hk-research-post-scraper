@@ -6,6 +6,7 @@ Research Post Scraper – Main Orchestrator
 - Maintains research_posts.json (active) and outdated_posts.json
 - Optional local model summarization (small instruct model)
 - Optional local embeddings for semantic search
+- Classification: work_type, degree_level, department
 - Clean separation of concerns
 """
 
@@ -61,9 +62,7 @@ def rule_based_summary(text: str, max_chars: int = 520) -> str:
     """Fast fallback: clean + truncate."""
     if not text:
         return ""
-    # Remove excessive whitespace and common noise
     text = re.sub(r"\s+", " ", text).strip()
-    # Try to cut at sentence boundary
     if len(text) <= max_chars:
         return text
     cut = text[:max_chars]
@@ -74,14 +73,9 @@ def rule_based_summary(text: str, max_chars: int = 520) -> str:
 
 
 def summarize(text: str, title: str = "") -> str:
-    """
-    Produce a short summary of a research job post.
-    Uses local model if available, otherwise rule-based.
-    """
+    """Produce a short summary of a research job post."""
     if not text:
         return ""
-
-    # Always truncate input to keep context reasonable
     text = text[:3500].strip()
 
     if not HAS_SUMMARIZER or summarizer_pipeline is None:
@@ -109,13 +103,10 @@ Summary:"""
             pad_token_id=summarizer_pipeline.tokenizer.eos_token_id,
         )
         generated = result[0]["generated_text"]
-        # Extract only the part after "Summary:"
         if "Summary:" in generated:
             summary = generated.split("Summary:")[-1].strip()
         else:
             summary = generated[len(prompt):].strip()
-
-        # Clean up
         summary = re.sub(r"\n+", " ", summary).strip()
         if len(summary) > 700:
             summary = summary[:700].rsplit(" ", 1)[0] + "..."
@@ -123,6 +114,64 @@ Summary:"""
     except Exception as e:
         print(f"  [summarize error] {e}")
         return rule_based_summary(text)
+
+
+# ==================================================================
+# Classification extraction
+# ==================================================================
+def extract_work_type(title: str, text: str = "") -> Optional[str]:
+    combined = f"{title} {text}".lower()
+    has_full = bool(re.search(r"\bfull[-\s]?time\b", combined))
+    has_part = bool(re.search(r"\bpart[-\s]?time\b", combined))
+    has_fractional = bool(re.search(r"\bfractional\b", combined))
+    has_hourly = bool(re.search(r"\bhourly[-\s]?paid\b", combined))
+    if has_full and has_part:
+        return "Full-time/Part-time"
+    if has_full:
+        return "Full-time"
+    if has_part or has_fractional or has_hourly:
+        return "Part-time"
+    return None
+
+
+def extract_degree_level(title: str, text: str = "") -> Optional[str]:
+    combined = f"{title} {text}".lower()
+    if re.search(r"\b(ph\.?d|doctor(ate)?|doctoral|dphil)\b", combined):
+        return "Doctor"
+    if re.search(r"\b(master'?s?|mphil|m\.phil|msc|m\.sc|ma\b|m\.a\.)\b", combined):
+        return "Master"
+    if re.search(r"\b(bachelor'?s?|bsc|b\.sc|ba\b|b\.a\.|undergraduate)\b", combined):
+        return "Bachelor"
+    if re.search(r"\b(degree|graduate)\b", combined):
+        return "Any"
+    return None
+
+
+def extract_department(title: str, text: str = "", source: str = "") -> Optional[str]:
+    combined = f"{title}\n{text}"
+    patterns = [
+        r"(?:Department|School|Faculty|Division|Centre|Center|Institute) of ([A-Z][^,\n\.]{5,60})",
+        r"(?:in the |at the )?(Department|School|Faculty|Division) of ([A-Z][^,\n\.]{5,60})",
+        r"([A-Z][A-Za-z& \-]{5,50} Department)",
+        r"([A-Z][A-Za-z& \-]{5,50} School)",
+    ]
+    for pat in patterns:
+        m = re.search(pat, combined)
+        if m:
+            name = m.group(1) if len(m.groups()) == 1 else (m.group(2) if m.lastindex >= 2 else m.group(0))
+            name = name.strip(" .,-")
+            if 5 < len(name) < 70:
+                return name
+    return None
+
+
+def enrich_classification(post: dict) -> dict:
+    title = post.get("title") or ""
+    text = post.get("summary") or post.get("content") or ""
+    post["work_type"] = extract_work_type(title, text)
+    post["degree_level"] = extract_degree_level(title, text)
+    post["department"] = extract_department(title, text, post.get("source", ""))
+    return post
 
 
 # ==================================================================
@@ -185,9 +234,6 @@ def run(
     generate_embeddings: bool = True,
     use_summarizer: bool = True,
 ):
-    """
-    sources: list of keys from SCRAPERS, or None = all
-    """
     if sources is None:
         sources = list(SCRAPERS.keys())
 
@@ -204,7 +250,6 @@ def run(
     updated_count = 0
     moved_count = 0
 
-    # ---------- 1. Scrape ----------
     for name in sources:
         if name not in SCRAPERS:
             print(f"  [Skip] Unknown source: {name}")
@@ -219,10 +264,8 @@ def run(
                 pid = p["id"]
                 p["scraped_at"] = datetime.now().isoformat(timespec="seconds")
 
-                # ----- Summarize instead of keeping full content -----
                 full_text = p.get("content") or ""
                 if use_summarizer:
-                    # Only re-summarize if content changed or no summary yet
                     old = active.get(pid) or outdated.get(pid)
                     if (
                         not old
@@ -235,10 +278,11 @@ def run(
                 else:
                     p["summary"] = rule_based_summary(full_text)
 
-                # We no longer store the long content
                 p.pop("content", None)
 
-                # ----- Embedding (prefer summary) -----
+                # Classification fields
+                p = enrich_classification(p)
+
                 if generate_embeddings and HAS_EMBED:
                     old = active.get(pid) or outdated.get(pid)
                     text_for_embed = p.get("title", "") + "\n" + (p.get("summary") or "")
@@ -262,7 +306,6 @@ def run(
         except Exception as e:
             print(f"  [Error] {name}: {e}")
 
-    # ---------- 2. Move outdated ----------
     to_move = []
     for pid, post in list(active.items()):
         close = post.get("close_date")
@@ -274,7 +317,6 @@ def run(
     for pid in to_move:
         del active[pid]
 
-    # ---------- 3. Persist ----------
     save_json(ACTIVE_FILE, active)
     save_json(OUTDATED_FILE, outdated)
 
@@ -288,11 +330,7 @@ def run(
     print("=" * 50)
 
 
-# ==================================================================
-# Optional: simple semantic search helper
-# ==================================================================
 def semantic_search(query: str, top_k: int = 8) -> List[dict]:
-    """Return top_k most similar active posts (requires embeddings)."""
     if not HAS_EMBED:
         print("Embeddings not available")
         return []
@@ -329,6 +367,5 @@ def semantic_search(query: str, top_k: int = 8) -> List[dict]:
     ]
 
 
-# ==================================================================
 if __name__ == "__main__":
     run()
