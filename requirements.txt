@@ -3,7 +3,11 @@ beautifulsoup4>=4.12.0
 lxml>=5.0.0
 python-dateutil>=2.8.0
 
-# Optional – only needed if you want local embeddings
+# Optional – embeddings
 # sentence-transformers>=2.2.0
 # numpy
-# torch   # or the CPU-only wheel
+
+# Optional – local summarizer (small model)
+# transformers>=4.40.0
+# torch          # CPU version: pip install torch --index-url https://download.pytorch.org/whl/cpu
+# accelerate
