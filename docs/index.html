@@ -208,10 +208,10 @@
   <div id="results"></div>
 
   <script>
-    // Change this path if you host the JSON elsewhere
-    const DATA_URL = "../research_posts.json";
-    // For GitHub Pages raw file you can use:
-    // const DATA_URL = "https://raw.githubusercontent.com/Heinz-Elio/hk-research-post-scraper/main/research_posts.json";
+    // Load JSON from repo (works with GitHub Pages under /docs)
+    const DATA_URL = "https://raw.githubusercontent.com/Heinz-Elio/hk-research-post-scraper/main/research_posts.json";
+    // Local fallback while developing:
+    // const DATA_URL = "../research_posts.json";
 
     let allPosts = [];
 
@@ -222,7 +222,6 @@
         allPosts = await res.json();
         if (!Array.isArray(allPosts)) allPosts = Object.values(allPosts);
 
-        // Populate source filter
         const sources = [...new Set(allPosts.map(p => p.source).filter(Boolean))].sort();
         const sourceSelect = document.getElementById("filter-source");
         sources.forEach(s => {
@@ -232,7 +231,6 @@
           sourceSelect.appendChild(opt);
         });
 
-        // Show last updated
         const latest = allPosts.reduce((max, p) => {
           return (p.scraped_at && p.scraped_at > max) ? p.scraped_at : max;
         }, "");
@@ -242,7 +240,7 @@
         render();
       } catch (err) {
         document.getElementById("results-info").textContent =
-          "Could not load posts. Make sure research_posts.json exists and is accessible.";
+          "Could not load posts. Make sure research_posts.json exists on the main branch.";
         console.error(err);
       }
     }
@@ -272,7 +270,6 @@
         if (sortBy === "scraped_at") {
           return (b.scraped_at || "").localeCompare(a.scraped_at || "");
         }
-        // default: close_date (nulls last)
         const da = a.close_date || "9999-12-31";
         const db = b.close_date || "9999-12-31";
         return da.localeCompare(db);
@@ -326,13 +323,11 @@
         .replace(/"/g, """);
     }
 
-    // Event listeners
     ["filter-source", "filter-work", "filter-degree", "sort-by"].forEach(id => {
       document.getElementById(id).addEventListener("change", render);
     });
     document.getElementById("search").addEventListener("input", render);
 
-    // Init
     loadData();
   </script>
 </body>
