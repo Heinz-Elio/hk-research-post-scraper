@@ -11,3 +11,7 @@ python-dateutil>=2.8.0
 # transformers>=4.40.0
 # torch          # CPU version: pip install torch --index-url https://download.pytorch.org/whl/cpu
 # accelerate
+
+# Optional – Playwright for JS-heavy sites (HKBU, Lingnan)
+# playwright
+# Then run once: playwright install chromium
