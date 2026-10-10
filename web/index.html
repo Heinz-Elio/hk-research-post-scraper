@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HK Research Posts</title>
+  <style>
+    :root {
+      --bg: #f7f8fa;
+      --card: #ffffff;
+      --text: #1a1a1a;
+      --muted: #666;
+      --border: #e2e5ea;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --tag-bg: #eef2ff;
+      --tag-text: #3730a3;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 1.5rem;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    h1 { font-size: 1.5rem; font-weight: 700; }
+
+    .meta { color: var(--muted); font-size: 0.875rem; }
+
+    .btn {
+      display: inline-block;
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+    .btn:hover { background: var(--primary-hover); }
+
+    .filters {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.25rem;
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    label { font-size: 0.8rem; color: var(--muted); margin-right: 0.25rem; }
+
+    select, input[type="search"] {
+      padding: 0.35rem 0.6rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.875rem;
+      background: white;
+    }
+
+    input[type="search"] { min-width: 220px; flex: 1; }
+
+    .results-info {
+      font-size: 0.875rem;
+      color: var(--muted);
+      margin-bottom: 0.75rem;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 0.75rem;
+      transition: box-shadow 0.15s;
+    }
+    .card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: 0.35rem;
+    }
+    .card-title a { color: inherit; text-decoration: none; }
+    .card-title a:hover { color: var(--primary); text-decoration: underline; }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .tag {
+      background: var(--tag-bg);
+      color: var(--tag-text);
+      font-size: 0.75rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      font-weight: 500;
+    }
+
+    .summary {
+      font-size: 0.9rem;
+      color: #333;
+      margin-bottom: 0.5rem;
+    }
+
+    .card-footer {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .empty {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--muted);
+    }
+
+    @media (max-width: 600px) {
+      body { padding: 1rem; }
+      .filter-row { flex-direction: column; align-items: stretch; }
+      input[type="search"] { min-width: 0; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>HK Research Posts</h1>
+      <div class="meta" id="last-updated">Loading...</div>
+    </div>
+    <a class="btn" id="request-update"
+       href="https://github.com/Heinz-Elio/hk-research-post-scraper/issues/new?title=Please%20run%20scraper%20update&body=A%20user%20requested%20a%20fresh%20scrape%20of%20research%20posts."
+       target="_blank" rel="noopener">
+      Request Update
+    </a>
+  </header>
+
+  <section class="filters">
+    <div class="filter-row">
+      <div>
+        <label>Source</label>
+        <select id="filter-source">
+          <option value="">All</option>
+        </select>
+      </div>
+      <div>
+        <label>Work type</label>
+        <select id="filter-work">
+          <option value="">All</option>
+          <option value="Full-time">Full-time</option>
+          <option value="Part-time">Part-time</option>
+          <option value="Full-time/Part-time">Full-time/Part-time</option>
+        </select>
+      </div>
+      <div>
+        <label>Degree</label>
+        <select id="filter-degree">
+          <option value="">All</option>
+          <option value="Doctor">Doctor</option>
+          <option value="Master">Master</option>
+          <option value="Bachelor">Bachelor</option>
+          <option value="Any">Any</option>
+        </select>
+      </div>
+      <div>
+        <label>Sort by</label>
+        <select id="sort-by">
+          <option value="close_date">Closing date</option>
+          <option value="scraped_at">Newest scraped</option>
+          <option value="title">Title</option>
+        </select>
+      </div>
+    </div>
+    <div class="filter-row">
+      <input type="search" id="search" placeholder="Search title or summary..." />
+    </div>
+  </section>
+
+  <div class="results-info" id="results-info">Loading posts...</div>
+  <div id="results"></div>
+
+  <script>
+    // Change this path if you host the JSON elsewhere
+    const DATA_URL = "../research_posts.json";
+    // For GitHub Pages raw file you can use:
+    // const DATA_URL = "https://raw.githubusercontent.com/Heinz-Elio/hk-research-post-scraper/main/research_posts.json";
+
+    let allPosts = [];
+
+    async function loadData() {
+      try {
+        const res = await fetch(DATA_URL);
+        if (!res.ok) throw new Error("Failed to load data");
+        allPosts = await res.json();
+        if (!Array.isArray(allPosts)) allPosts = Object.values(allPosts);
+
+        // Populate source filter
+        const sources = [...new Set(allPosts.map(p => p.source).filter(Boolean))].sort();
+        const sourceSelect = document.getElementById("filter-source");
+        sources.forEach(s => {
+          const opt = document.createElement("option");
+          opt.value = s;
+          opt.textContent = s;
+          sourceSelect.appendChild(opt);
+        });
+
+        // Show last updated
+        const latest = allPosts.reduce((max, p) => {
+          return (p.scraped_at && p.scraped_at > max) ? p.scraped_at : max;
+        }, "");
+        document.getElementById("last-updated").textContent =
+          latest ? `Last scraped: ${latest.replace("T", " ").slice(0, 16)}` : "No data yet";
+
+        render();
+      } catch (err) {
+        document.getElementById("results-info").textContent =
+          "Could not load posts. Make sure research_posts.json exists and is accessible.";
+        console.error(err);
+      }
+    }
+
+    function getFiltered() {
+      const source = document.getElementById("filter-source").value;
+      const work = document.getElementById("filter-work").value;
+      const degree = document.getElementById("filter-degree").value;
+      const q = document.getElementById("search").value.trim().toLowerCase();
+      const sortBy = document.getElementById("sort-by").value;
+
+      let list = allPosts.filter(p => {
+        if (source && p.source !== source) return false;
+        if (work && p.work_type !== work) return false;
+        if (degree && p.degree_level !== degree) return false;
+        if (q) {
+          const hay = ((p.title || "") + " " + (p.summary || "") + " " + (p.department || "")).toLowerCase();
+          if (!hay.includes(q)) return false;
+        }
+        return true;
+      });
+
+      list.sort((a, b) => {
+        if (sortBy === "title") {
+          return (a.title || "").localeCompare(b.title || "");
+        }
+        if (sortBy === "scraped_at") {
+          return (b.scraped_at || "").localeCompare(a.scraped_at || "");
+        }
+        // default: close_date (nulls last)
+        const da = a.close_date || "9999-12-31";
+        const db = b.close_date || "9999-12-31";
+        return da.localeCompare(db);
+      });
+
+      return list;
+    }
+
+    function render() {
+      const list = getFiltered();
+      const container = document.getElementById("results");
+      const info = document.getElementById("results-info");
+
+      info.textContent = `${list.length} post${list.length !== 1 ? "s" : ""}`;
+
+      if (list.length === 0) {
+        container.innerHTML = `<div class="empty">No matching posts</div>`;
+        return;
+      }
+
+      container.innerHTML = list.map(p => {
+        const tags = [
+          p.source,
+          p.work_type,
+          p.degree_level,
+          p.department
+        ].filter(Boolean).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join("");
+
+        const close = p.close_date ? `Close: ${p.close_date}` : "Closing date not specified";
+
+        return `
+          <article class="card">
+            <div class="card-title">
+              <a href="${escapeHtml(p.url || "#")}" target="_blank" rel="noopener">
+                ${escapeHtml(p.title || "Untitled")}
+              </a>
+            </div>
+            <div class="tags">${tags}</div>
+            <div class="summary">${escapeHtml((p.summary || "").slice(0, 320))}${(p.summary || "").length > 320 ? "…" : ""}</div>
+            <div class="card-footer">${close}</div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, "&")
+        .replace(/</g, "<")
+        .replace(/>/g, ">")
+        .replace(/"/g, """);
+    }
+
+    // Event listeners
+    ["filter-source", "filter-work", "filter-degree", "sort-by"].forEach(id => {
+      document.getElementById(id).addEventListener("change", render);
+    });
+    document.getElementById("search").addEventListener("input", render);
+
+    // Init
+    loadData();
+  </script>
+</body>
+</html>
