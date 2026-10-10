@@ -1,31 +1,54 @@
 # HK Research Post Scraper
 
-Lightweight BeautifulSoup-based scraper for **Research Assistant** and related research posts from major Hong Kong universities.
+Lightweight scraper for **Engineering & Science** research posts (Research Assistant, Postdoc, etc.) from major Hong Kong universities.
+
+- BeautifulSoup for static sites
+- **Playwright** for JS-heavy portals (HKBU, Lingnan)
+- Short **summary** (optional local model) instead of full job text
+- Classification: `work_type`, `degree_level`, `department`
+- Active / outdated JSON + optional embeddings for semantic search
+
+## Web front (GitHub Pages)
+
+The simple filter/sort UI lives under **`docs/`** (required folder for Pages):
+
+- Source: [docs/index.html](docs/index.html)
+- Enable Pages: **Settings → Pages → Deploy from branch → `/docs`**
+- Data URL in the page should point at raw JSON, e.g.  
+  `https://raw.githubusercontent.com/Heinz-Elio/hk-research-post-scraper/main/research_posts.json`
+
+After Pages is on, the site is typically:
+
+`https://heinz-elio.github.io/hk-research-post-scraper/`
+
+(Repo is private → Pages may need a Pro plan or public repo depending on your account.)
 
 ## Features
 
-- Separate scrapers per university (`scrapers.py`)
-- Clean main orchestration (`scraper.py`)
-- Saves to `research_posts.json` (active)
-- Automatically moves expired posts to `outdated_posts.json`
-- **Optional local model summarization** (small instruct model) — stores a short `summary` instead of full content
-- Optional local embeddings (`all-MiniLM-L6-v2`) for semantic search
-- Extracts: `id`, `title`, `close_date`, `summary`, `url`, `source`, `scraped_at`
+| Feature | Detail |
+|--------|--------|
+| STEM focus | Keeps Engineering / Science related research posts only |
+| Filter fields | Uses **title + department + project** (not title alone) |
+| Summaries | Optional small local model, else rule-based truncate |
+| Classification | `work_type`, `degree_level`, `department` |
+| Storage | `research_posts.json` (active), `outdated_posts.json` |
+| Embeddings | Optional `all-MiniLM-L6-v2` for semantic search |
+| Request update | Front has a button that opens a GitHub Issue |
 
-## Supported Sources
+## Supported sources
 
-| Key        | University                      | Notes                          |
-|------------|---------------------------------|--------------------------------|
-| HKU        | University of Hong Kong         | Best quality (`class=job-link`)|
-| PolyU      | The Hong Kong Polytechnic Univ. | Research / Project posts       |
-| CityU      | City University of Hong Kong    | Research Positions page        |
-| CUHK       | The Chinese University of HK    | Taleo (limited without JS)     |
-| HKUST      | HKUST Clear Water Bay           | Career portal                  |
-| HKUST-GZ   | HKUST Guangzhou                 |                                |
-| HKBU       | Hong Kong Baptist University    |                                |
-| Lingnan    | Lingnan University              |                                |
-| EdUHK      | The Education University of HK  |                                |
-| HKMU       | Hong Kong Metropolitan Univ.    | Taleo                          |
+| Key | University | Notes |
+|-----|------------|--------|
+| HKU | University of Hong Kong | Table + department |
+| PolyU | PolyU | Research table: dept + project |
+| CityU | CityU | Research positions + dept |
+| CUHK | CUHK | Taleo; department/unit |
+| HKUST | HKUST CWB | teaching-support listing + division |
+| HKUST-GZ | HKUST Guangzhou | Best-effort |
+| HKBU | HKBU | **Playwright** (Oracle Cloud) |
+| Lingnan | Lingnan | **Playwright** (CSOD) |
+| EdUHK | EdUHK | research-support-posts category |
+| HKMU | HKMU | Taleo (limited) |
 
 ## Install
 
@@ -35,16 +58,21 @@ cd hk-research-post-scraper
 pip install -r requirements.txt
 ```
 
-### Optional: Local Summarizer (recommended)
+### Optional: Playwright (HKBU + Lingnan)
+
+```bash
+pip install playwright
+playwright install chromium
+```
+
+### Optional: Local summarizer
 
 ```bash
 pip install transformers accelerate
-# CPU-only torch (recommended if no GPU):
-pip install torch --index-url https://download.pytorch.org/whl/cpu
+pip install torch --index-url https://download.pytorch.org/whl/cpu   # if no GPU
 ```
 
-Default model: `Qwen/Qwen2.5-1.5B-Instruct`  
-You can change it at the top of `scraper.py`.
+Default model: `Qwen/Qwen2.5-1.5B-Instruct` (change in `scraper.py`).
 
 ### Optional: Embeddings
 
@@ -52,60 +80,51 @@ You can change it at the top of `scraper.py`.
 pip install sentence-transformers numpy
 ```
 
-## Config Switches (`scraper.py`)
+## Config (`scraper.py`)
 
 ```python
-USE_LOCAL_SUMMARIZER = True          # set False → pure rule-based summary
+USE_LOCAL_SUMMARIZER = True
 USE_EMBEDDINGS = True
-
 SUMMARIZER_MODEL = "Qwen/Qwen2.5-1.5B-Instruct"
-# Other good small options:
-# "meta-llama/Llama-3.2-1B-Instruct"
-# "microsoft/Phi-3.5-mini-instruct"
 ```
 
-- If the local model is not available / fails to load, it **automatically falls back** to a clean rule-based summary (first ~520 characters, cut at sentence boundary).
-- Full job text is **never stored** — only the short `summary` is kept.
+Verbose transformers logs are suppressed. Device (cuda/cpu) is logged at startup.
 
 ## Usage
 
 ```bash
-# Scrape all sources
 python scraper.py
 ```
-
-Or from Python:
 
 ```python
 from scraper import run, semantic_search
 
-run(sources=["HKU", "PolyU", "CityU"])   # selected sources
-run()                                    # all
+run(sources=["HKU", "PolyU", "CityU", "HKUST"])
+run()  # all sources
 
-# Semantic search (after embeddings generated)
-results = semantic_search("machine learning computer vision research assistant", top_k=5)
-for r in results:
-    print(r)
+results = semantic_search("machine learning research assistant", top_k=5)
 ```
 
-## Output Format (example)
+## Output shape
 
 ```json
 {
   "id": "HKU_537585",
-  "title": "Full-time/Part-time Research Assistant I/II (several posts)",
+  "title": "Research Assistant ...",
   "close_date": "2026-12-12",
-  "summary": "The appointee will support a large-scale multidisciplinary youth mental health project... Requires a Bachelor's degree in psychology or related field...",
-  "url": "https://jobs.hku.hk/en/job/537585/...",
+  "summary": "Short summary of role and requirements...",
+  "work_type": "Full-time",
+  "degree_level": "Master",
+  "department": "Department of Computer Science",
+  "url": "https://...",
   "source": "HKU",
-  "scraped_at": "2026-10-10T18:30:00",
-  "embedding": [0.012, -0.034, ...]   // only if enabled
+  "scraped_at": "2026-10-10T18:30:00"
 }
 ```
 
 ## Notes
 
-- Some sites (especially Taleo-based CUHK / HKMU) are JavaScript-heavy. The current scrapers get the initial HTML listing. For production-grade completeness consider adding Playwright later.
-- Be polite: the scrapers already include a short delay between detail-page requests.
-- Closing dates are parsed when available; many list pages do not show them → `null`.
-- The tool is intended for personal research-job monitoring only. Respect each university’s terms of use.
+- STEM filter uses department/project where the listing provides them; generic titles alone are dropped if no STEM signal.
+- HKBU / Lingnan need Playwright; without it those scrapers skip cleanly.
+- Be polite: delay between detail requests is already set.
+- Personal research-job monitoring only; respect each university’s terms.
