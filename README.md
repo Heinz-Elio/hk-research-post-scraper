@@ -8,8 +8,9 @@ Lightweight BeautifulSoup-based scraper for **Research Assistant** and related r
 - Clean main orchestration (`scraper.py`)
 - Saves to `research_posts.json` (active)
 - Automatically moves expired posts to `outdated_posts.json`
+- **Optional local model summarization** (small instruct model) — stores a short `summary` instead of full content
 - Optional local embeddings (`all-MiniLM-L6-v2`) for semantic search
-- Extracts: `id`, `title`, `close_date`, `content`, `url`, `source`, `scraped_at`
+- Extracts: `id`, `title`, `close_date`, `summary`, `url`, `source`, `scraped_at`
 
 ## Supported Sources
 
@@ -32,10 +33,39 @@ Lightweight BeautifulSoup-based scraper for **Research Assistant** and related r
 git clone https://github.com/Heinz-Elio/hk-research-post-scraper.git
 cd hk-research-post-scraper
 pip install -r requirements.txt
+```
 
-# Optional for embeddings
+### Optional: Local Summarizer (recommended)
+
+```bash
+pip install transformers accelerate
+# CPU-only torch (recommended if no GPU):
+pip install torch --index-url https://download.pytorch.org/whl/cpu
+```
+
+Default model: `Qwen/Qwen2.5-1.5B-Instruct`  
+You can change it at the top of `scraper.py`.
+
+### Optional: Embeddings
+
+```bash
 pip install sentence-transformers numpy
 ```
+
+## Config Switches (`scraper.py`)
+
+```python
+USE_LOCAL_SUMMARIZER = True          # set False → pure rule-based summary
+USE_EMBEDDINGS = True
+
+SUMMARIZER_MODEL = "Qwen/Qwen2.5-1.5B-Instruct"
+# Other good small options:
+# "meta-llama/Llama-3.2-1B-Instruct"
+# "microsoft/Phi-3.5-mini-instruct"
+```
+
+- If the local model is not available / fails to load, it **automatically falls back** to a clean rule-based summary (first ~520 characters, cut at sentence boundary).
+- Full job text is **never stored** — only the short `summary` is kept.
 
 ## Usage
 
@@ -65,7 +95,7 @@ for r in results:
   "id": "HKU_537585",
   "title": "Full-time/Part-time Research Assistant I/II (several posts)",
   "close_date": "2026-12-12",
-  "content": ".... full job description ....",
+  "summary": "The appointee will support a large-scale multidisciplinary youth mental health project... Requires a Bachelor's degree in psychology or related field...",
   "url": "https://jobs.hku.hk/en/job/537585/...",
   "source": "HKU",
   "scraped_at": "2026-10-10T18:30:00",
