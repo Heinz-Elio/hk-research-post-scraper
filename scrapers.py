@@ -16,7 +16,6 @@ from urllib.parse import urljoin
 import requests
 from bs4 import BeautifulSoup
 from dateutil import parser as date_parser
-from narwhals import dtypes
 
 # Optional Playwright (for JS-heavy sites: HKBU, Lingnan)
 try:
@@ -65,14 +64,26 @@ STEM_KEYWORDS = [
 ]
 
 
-def fetch(url: str, timeout: int = 25) -> Optional[BeautifulSoup]:
-    try:
-        r = requests.get(url, headers=HEADERS, timeout=timeout)
-        r.raise_for_status()
-        return BeautifulSoup(r.text, "lxml")
-    except Exception as e:
-        print(f"  [fetch error] {url[:80]}... → {e}")
-        return None
+def fetch(url: str, timeout: int=25, retry=5) -> Optional[BeautifulSoup]:
+    for rt in range(retry):
+        try:
+            r = requests.get(url, headers=HEADERS, timeout=timeout)
+
+            if r.status_code == 202:
+                print('HTTP response:', r.status_code)
+                time.sleep(1)
+                continue
+
+            r.raise_for_status()
+            print('HTTP response:', r.status_code)
+            if r.text:
+                return BeautifulSoup(r.text, "lxml")
+            else:
+                continue
+
+        except Exception as e:
+            print(f"  [fetch error] {url[:80]}... → {e}")
+            return None
 
 
 def parse_date(text: str) -> Optional[str]:
@@ -123,22 +134,22 @@ def safe_text(el) -> str:
 def scrape_hku() -> List[dict]:
     """https://jobs.hku.hk/en/listing/"""
     base = "https://jobs.hku.hk"
-    listing_url = f"{base}/filter/?search-keyword=&category=research%20staff&category=senior%20research%20staff%20%26%20post-doctoral%20fellow&job-mail-subscribe-privacy=agree"
+    listing_url = f"{base}/en/listing/"
     posts = []
     soup = fetch(listing_url)
     if not soup:
         return posts
 
-    table = soup.select("tbody#recent-jobs-content")
-    for tr in table.find_all("tr"):
-        tds = tr.find_all("td")
+    table = soup.select_one("tbody#recent-jobs-content")
+    for tr in table.select("tr"):
+        tds = tr.select("td")
 
-        job_num = safe_text(tds[0].select("span.job-externalJobNo"))
-        title = safe_text(tds[1].select("a.job-link"))
-        href = tds[1].select("a.job-link").get("href") or ""
+        job_num = safe_text(tds[0].select_one("span.job-externalJobNo"))
+        title = safe_text(tds[1].select_one("a.job-link"))
+        href = tds[1].select_one("a.job-link").get("href") or ""
         detail_url = urljoin(base, href)
         dept = safe_text(tds[2])
-        close_date = tds[3].select("time").get_datetime()
+        close_date = tds[3].select_one("time").get("datetime")
 
         if not is_research_related(title, department=dept):
             continue
@@ -147,9 +158,10 @@ def scrape_hku() -> List[dict]:
         detail = fetch(detail_url)
         content = ""
         if detail:
-            main = detail.select_one(".job-details")
+            main = detail.select_one("div#job-content")
             content = main.get_text("\n", strip=True)
 
+        print(job_num, title, close_date, content[:100], detail_url)
         posts.append({
             "id": make_id("HKU", job_num),
             "title": title,
