@@ -97,7 +97,7 @@ def summarize(text: str, title: str = "") -> str:
     prompt = f"""You are a helpful assistant that writes concise summaries of academic research job postings.
 
 Summarize the following research position in 2-4 short sentences.
-Focus on: main role/duties, key requirements (degree, skills, experience), and any important conditions (duration, part-time/full-time).
+Focus on main duties, key requirements (skills, experience), and project domain.
 Do not invent information. Be factual and neutral.
 
 Title: {title}
@@ -217,6 +217,7 @@ def get_embedding(text: str) -> Optional[List[float]]:
 DATA_DIR = Path(__file__).parent
 ACTIVE_FILE = DATA_DIR / "research_posts.json"
 OUTDATED_FILE = DATA_DIR / "outdated_posts.json"
+PUBLIC_FILE = DATA_DIR / "docs" / "research_posts.json"
 
 
 def load_json(path: Path) -> Dict[str, dict]:
@@ -239,6 +240,22 @@ def save_json(path: Path, data: Dict[str, dict]):
         json.dump(items, f, ensure_ascii=False, indent=2)
 
 
+def save_public_json(data):
+    PUBLIC_FILE.parent.mkdir(parents=True, exist_ok=True)
+
+    public_posts = [
+        {
+            key: value
+            for key, value in post.items()
+            if key != "embedding" and key != "content"
+        }
+        for post in data.values()
+    ]
+
+    with open(PUBLIC_FILE, "w", encoding="utf-8") as f:
+        json.dump(public_posts, f, ensure_ascii=False)
+
+
 # ==================================================================
 # Main logic
 # ==================================================================
@@ -248,7 +265,7 @@ def run(
     use_summarizer: bool = True,
 ):
     if sources is None:
-        sources = list(SCRAPERS.keys())#[3:]
+        sources = list(SCRAPERS.keys())#[:1]
 
     print(f"[{datetime.now():%Y-%m-%d %H:%M:%S}] Starting scrape")
     print(f"  Sources     : {sources}")
@@ -332,6 +349,7 @@ def run(
 
     save_json(ACTIVE_FILE, active)
     save_json(OUTDATED_FILE, outdated)
+    save_public_json(active)
 
     print("\n" + "=" * 50)
     print(f"[{datetime.now():%H:%M:%S}] Finished")

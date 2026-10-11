@@ -144,9 +144,50 @@
     }
 
     @media (max-width: 600px) {
-      body { padding: 1rem; }
-      .filter-row { flex-direction: column; align-items: stretch; }
-      input[type="search"] { min-width: 0; }
+      body {
+        padding: 1rem;
+      }
+
+      .filter-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      input[type="search"] {
+        min-width: 0;
+      }
+    }
+
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+
+    .pagination button {
+      padding: 0.5rem 0.9rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: white;
+      color: var(--text);
+      cursor: pointer;
+      font-size: 0.875rem;
+    }
+
+    .pagination button:hover:not(:disabled) {
+      background: var(--tag-bg);
+    }
+
+    .pagination button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    #page-info {
+      color: var(--muted);
+      font-size: 0.875rem;
     }
   </style>
 </head>
@@ -207,13 +248,22 @@
   <div class="results-info" id="results-info">Loading posts...</div>
   <div id="results"></div>
 
+  <nav class="pagination" id="pagination" aria-label="Job listing pages">
+    <button id="prev-page" type="button" disabled>Previous</button>
+    <span id="page-info" aria-live="polite">Page 1 of 1</span>
+    <button id="next-page" type="button" disabled>Next</button>
+  </nav>
+
   <script>
     // Load JSON from repo (works with GitHub Pages under /docs)
-    const DATA_URL = "https://raw.githubusercontent.com/Heinz-Elio/hk-research-post-scraper/main/research_posts.json";
+    const DATA_URL = "./research_posts.json";
     // Local fallback while developing:
     // const DATA_URL = "../research_posts.json";
 
     let allPosts = [];
+
+    const PAGE_SIZE = 20;
+    let currentPage = 1;
 
     async function loadData() {
       try {
@@ -283,32 +333,60 @@
       const container = document.getElementById("results");
       const info = document.getElementById("results-info");
 
-      info.textContent = `${list.length} post${list.length !== 1 ? "s" : ""}`;
+      const totalPages = Math.max(1, Math.ceil(list.length / PAGE_SIZE));
 
-      if (list.length === 0) {
-        container.innerHTML = `<div class="empty">No matching posts</div>`;
+      // Keep the current page valid after filtering.
+      currentPage = Math.min(currentPage, totalPages);
+
+      const start = (currentPage - 1) * PAGE_SIZE;
+      const pagePosts = list.slice(start, start + PAGE_SIZE);
+
+      info.textContent =
+        `${list.length} post${list.length !== 1 ? "s" : ""}`;
+
+      document.getElementById("page-info").textContent =
+        `Page ${currentPage} of ${totalPages}`;
+
+      document.getElementById("prev-page").disabled =
+        currentPage <= 1;
+
+      document.getElementById("next-page").disabled =
+        currentPage >= totalPages;
+
+      if (pagePosts.length === 0) {
+        container.innerHTML =
+          `<div class="empty">No matching posts</div>`;
         return;
       }
 
-      container.innerHTML = list.map(p => {
+      container.innerHTML = pagePosts.map(p => {
         const tags = [
           p.source,
           p.work_type,
           p.degree_level,
           p.department
-        ].filter(Boolean).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join("");
+        ]
+          .filter(Boolean)
+          .map(t => `<span class="tag">${escapeHtml(t)}</span>`)
+          .join("");
 
-        const close = p.close_date ? `Close: ${p.close_date}` : "Closing date not specified";
+        const close = p.close_date
+          ? `Close: ${escapeHtml(p.close_date)}`
+          : "Closing date not specified";
 
         return `
           <article class="card">
             <div class="card-title">
-              <a href="${escapeHtml(p.url || "#")}" target="_blank" rel="noopener">
+              <a href="${escapeHtml(p.url || "#")}"
+                 target="_blank" rel="noopener">
                 ${escapeHtml(p.title || "Untitled")}
               </a>
             </div>
             <div class="tags">${tags}</div>
-            <div class="summary">${escapeHtml((p.summary || "").slice(0, 320))}${(p.summary || "").length > 320 ? "…" : ""}</div>
+            <div class="summary">
+              ${escapeHtml((p.summary || "").slice(0, 320))}
+              ${(p.summary || "").length > 320 ? "…" : ""}
+            </div>
             <div class="card-footer">${close}</div>
           </article>
         `;
@@ -317,16 +395,47 @@
 
     function escapeHtml(str) {
       return String(str)
-        .replace(/&/g, "&")
-        .replace(/</g, "<")
-        .replace(/>/g, ">")
-        .replace(/"/g, '"')
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
     }
 
-    ["filter-source", "filter-work", "filter-degree", "sort-by"].forEach(id => {
-      document.getElementById(id).addEventListener("change", render);
-    });
-    document.getElementById("search").addEventListener("input", render);
+    function resetPageAndRender() {
+      currentPage = 1;
+      render();
+    }
+
+    ["filter-source", "filter-work", "filter-degree", "sort-by"]
+      .forEach(id => {
+        document.getElementById(id)
+          .addEventListener("change", resetPageAndRender);
+      });
+
+    document.getElementById("search")
+      .addEventListener("input", resetPageAndRender);
+
+    document.getElementById("prev-page")
+      .addEventListener("click", () => {
+        if (currentPage > 1) {
+          currentPage--;
+          render();
+        }
+      });
+
+    document.getElementById("next-page")
+      .addEventListener("click", () => {
+        const totalPages = Math.max(
+          1,
+          Math.ceil(getFiltered().length / PAGE_SIZE)
+        );
+
+        if (currentPage < totalPages) {
+          currentPage++;
+          render();
+        }
+      });
 
     loadData();
   </script>

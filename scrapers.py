@@ -114,7 +114,7 @@ def make_id(source: str, ref: str) -> str:
 
 
 def safe_text(el) -> str:
-    return el.get_text(" ", strip=True) if el else ""
+    return el.get_text(strip=True) if el else ""
 
 
 # ------------------------------------------------------------------
@@ -123,28 +123,22 @@ def safe_text(el) -> str:
 def scrape_hku() -> List[dict]:
     """https://jobs.hku.hk/en/listing/"""
     base = "https://jobs.hku.hk"
-    listing_url = f"{base}/en/listing/?page-items=100"
+    listing_url = f"{base}/filter/?search-keyword=&category=research%20staff&category=senior%20research%20staff%20%26%20post-doctoral%20fellow&job-mail-subscribe-privacy=agree"
     posts = []
     soup = fetch(listing_url)
     if not soup:
         return posts
 
-    for a in soup.select("a.job-link"):
-        title = a.get_text(strip=True)
-        href = a.get("href") or ""
+    table = soup.select("tbody#recent-jobs-content")
+    for tr in table.find_all("tr"):
+        tds = tr.find_all("td")
+
+        job_num = safe_text(tds[0].select("span.job-externalJobNo"))
+        title = safe_text(tds[1].select("a.job-link"))
+        href = tds[1].select("a.job-link").get("href") or ""
         detail_url = urljoin(base, href)
-
-        m = re.search(r"/job/(\d+)", href)
-        ref = m.group(1) if m else hashlib.md5(href.encode()).hexdigest()[:10]
-
-        close_date = None
-        dept = ""
-        row = a.find_parent("tr")
-        if row:
-            tds = row.find_all("td")
-            if len(tds) >= 4:
-                dept = tds[2].get_text(strip=True) if len(tds) > 2 else ""
-                close_date = parse_date(tds[-1].get_text(strip=True))
+        dept = safe_text(tds[2])
+        close_date = tds[3].select("time").get_datetime()
 
         if not is_research_related(title, department=dept):
             continue
@@ -153,17 +147,11 @@ def scrape_hku() -> List[dict]:
         detail = fetch(detail_url)
         content = ""
         if detail:
-            main = (
-                detail.select_one(".job-description")
-                or detail.select_one("#content")
-                or detail.select_one("article")
-                or detail.select_one("main")
-                or detail
-            )
+            main = detail.select_one(".job-details")
             content = main.get_text("\n", strip=True)
 
         posts.append({
-            "id": make_id("HKU", ref),
+            "id": make_id("HKU", job_num),
             "title": title,
             "close_date": close_date,
             "content": content,
@@ -186,8 +174,6 @@ def scrape_polyu() -> List[dict]:
 
     for row in soup.select("tr.ITS_clickableTableRow"):
         tds = row.select("td")
-        if len(tds) < 5:
-            continue
 
         url_part = row.get("data-href")
         dept = safe_text(tds[0])
@@ -294,30 +280,30 @@ def scrape_cuhk() -> List[dict]:
         return posts
 
     for row in soup.select("tr.even, tr.odd"):
-        title_a = row.select_one("a[href*='jobdetail']")
-        if not title_a:
-            continue
-        title = title_a.get_text(strip=True)
+        job_num = safe_text(row.select("th span"))
 
         tds = row.find_all("td")
-        job_num = safe_text(tds[0]) if tds else ""
-        dept = safe_text(tds[2]) if len(tds) > 2 else ""
+        a =tds[1].select("a")
+        href = a["href"]
+        title = safe_text(a)
+        dept = safe_text(tds[2].select("span"))
 
         if not is_research_related(title, department=dept):
             continue
 
-        detail_url = urljoin(url, title_a["href"])
-        ref = job_num or hashlib.md5(detail_url.encode()).hexdigest()[:10]
+        detail_url = urljoin(url, href)
         close_date = None
 
         time.sleep(REQUEST_DELAY)
-        content = f"Department/Unit: {dept}\n" if dept else ""
         detail = fetch(detail_url)
+        content = ""
         if detail:
-            content += detail.get_text("\n", strip=True)[:10000]
+            main = detail.select("div#requisitionDescriptionInterface.ID1448.row1 p")
+            content += main.get_text("\n", strip=True)[:10000]
+            close_date = safe_text(detail.select("div#requisitionDescriptionInterface.reqUnpostingDate.row1 span"))
 
         posts.append({
-            "id": make_id("CUHK", ref),
+            "id": make_id("CUHK", job_num),
             "title": title,
             "close_date": close_date,
             "content": content,
