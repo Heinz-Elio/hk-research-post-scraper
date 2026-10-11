@@ -177,7 +177,7 @@
           <option value="">All</option>
           <option value="Full-time">Full-time</option>
           <option value="Part-time">Part-time</option>
-          <option value="Full-time/Part-time">Full-time/Part-time</option>
+          <option value="Contract">Full-time/Part-time</option>
         </select>
       </div>
       <div>
@@ -320,7 +320,7 @@
         .replace(/&/g, "&")
         .replace(/</g, "<")
         .replace(/>/g, ">")
-        .replace(/"/g, """);
+        .replace(/"/g, '"')
     }
 
     ["filter-source", "filter-work", "filter-degree", "sort-by"].forEach(id => {

@@ -72,7 +72,7 @@ pip install transformers accelerate
 pip install torch --index-url https://download.pytorch.org/whl/cpu   # if no GPU
 ```
 
-Default model: `Qwen/Qwen2.5-1.5B-Instruct` (change in `scraper.py`).
+Default model: `Qwen/Qwen2.5-1.5B-Instruct` (change in `main.py`).
 
 ### Optional: Embeddings
 
@@ -80,7 +80,7 @@ Default model: `Qwen/Qwen2.5-1.5B-Instruct` (change in `scraper.py`).
 pip install sentence-transformers numpy
 ```
 
-## Config (`scraper.py`)
+## Config (`main.py`)
 
 ```python
 USE_LOCAL_SUMMARIZER = True
@@ -93,11 +93,11 @@ Verbose transformers logs are suppressed. Device (cuda/cpu) is logged at startup
 ## Usage
 
 ```bash
-python scraper.py
+python main.py
 ```
 
 ```python
-from scraper import run, semantic_search
+from main import run, semantic_search
 
 run(sources=["HKU", "PolyU", "CityU", "HKUST"])
 run()  # all sources
