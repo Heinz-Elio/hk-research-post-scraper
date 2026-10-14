@@ -12,6 +12,7 @@ python-dateutil>=2.8.0
 # torch          # CPU version: pip install torch --index-url https://download.pytorch.org/whl/cpu
 # accelerate
 
-# Optional – Playwright for JS-heavy sites (HKBU, Lingnan)
+# Optional – real browser for bot checks and JS listings (HKU, CityU, CUHK, HKMU, HKBU, Lingnan)
 # playwright
 # Then run once: playwright install chromium
+# Installed Chrome or Edge is used when present, so the Chromium download can be skipped.

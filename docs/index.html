@@ -15,6 +15,7 @@
       --primary-hover: #1d4ed8;
       --tag-bg: #eef2ff;
       --tag-text: #3730a3;
+      --chip-on: #1d4ed8;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -86,6 +87,31 @@
 
     input[type="search"] { min-width: 220px; flex: 1; }
 
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      align-items: center;
+    }
+
+    .chip {
+      border: 1px solid var(--border);
+      background: white;
+      color: var(--text);
+      font-size: 0.75rem;
+      padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    .chip:hover { border-color: var(--primary); color: var(--primary); }
+    .chip.on {
+      background: var(--tag-bg);
+      border-color: var(--primary);
+      color: var(--chip-on);
+    }
+    .chip.tag-btn { font: inherit; }
+
     .results-info {
       font-size: 0.875rem;
       color: var(--muted);
@@ -124,12 +150,19 @@
       padding: 0.15rem 0.5rem;
       border-radius: 999px;
       font-weight: 500;
+      border: none;
+      cursor: default;
     }
+    button.tag {
+      cursor: pointer;
+    }
+    button.tag:hover { background: #dbe4ff; }
 
     .summary {
       font-size: 0.9rem;
       color: #333;
       margin-bottom: 0.5rem;
+      white-space: pre-wrap;
     }
 
     .card-footer {
@@ -144,18 +177,12 @@
     }
 
     @media (max-width: 600px) {
-      body {
-        padding: 1rem;
-      }
-
+      body { padding: 1rem; }
       .filter-row {
         flex-direction: column;
         align-items: stretch;
       }
-
-      input[type="search"] {
-        min-width: 0;
-      }
+      input[type="search"] { min-width: 0; }
     }
 
     .pagination {
@@ -176,19 +203,10 @@
       font-size: 0.875rem;
     }
 
-    .pagination button:hover:not(:disabled) {
-      background: var(--tag-bg);
-    }
+    .pagination button:hover:not(:disabled) { background: var(--tag-bg); }
+    .pagination button:disabled { opacity: 0.45; cursor: not-allowed; }
 
-    .pagination button:disabled {
-      opacity: 0.45;
-      cursor: not-allowed;
-    }
-
-    #page-info {
-      color: var(--muted);
-      font-size: 0.875rem;
-    }
+    #page-info { color: var(--muted); font-size: 0.875rem; }
   </style>
 </head>
 <body>
@@ -218,17 +236,26 @@
           <option value="">All</option>
           <option value="Full-time">Full-time</option>
           <option value="Part-time">Part-time</option>
-          <option value="Contract">Full-time/Part-time</option>
+          <option value="Full-time/Part-time">Full-time/Part-time</option>
         </select>
       </div>
       <div>
-        <label>Degree</label>
-        <select id="filter-degree">
+        <label>I hold</label>
+        <select id="filter-held">
+          <option value="">Any</option>
+          <option value="1">Bachelor</option>
+          <option value="2">Master</option>
+          <option value="3">Doctor</option>
+        </select>
+      </div>
+      <div>
+        <label>Post requires</label>
+        <select id="filter-requires">
           <option value="">All</option>
-          <option value="Doctor">Doctor</option>
-          <option value="Master">Master</option>
-          <option value="Bachelor">Bachelor</option>
-          <option value="Any">Any</option>
+          <option value="bachelor">Bachelor</option>
+          <option value="master">Master</option>
+          <option value="doctor">Doctor</option>
+          <option value="unspecified">Unspecified</option>
         </select>
       </div>
       <div>
@@ -237,11 +264,16 @@
           <option value="close_date">Closing date</option>
           <option value="scraped_at">Newest scraped</option>
           <option value="title">Title</option>
+          <option value="relevance">Relevance</option>
         </select>
       </div>
     </div>
     <div class="filter-row">
-      <input type="search" id="search" placeholder="Search title or summary..." />
+      <input type="search" id="search" placeholder="Search by meaning, title, domain, or summary..." />
+    </div>
+    <div>
+      <label>Domains</label>
+      <div class="chip-row" id="domain-chips"></div>
     </div>
   </section>
 
@@ -254,16 +286,76 @@
     <button id="next-page" type="button" disabled>Next</button>
   </nav>
 
-  <script>
-    // Load JSON from repo (works with GitHub Pages under /docs)
+  <script type="module">
     const DATA_URL = "./research_posts.json";
-    // Local fallback while developing:
-    // const DATA_URL = "../research_posts.json";
+    const EMBED_URL = "./embeddings.json";
 
-    let allPosts = [];
+    const DOMAIN_LABELS = {
+      "ai-ml": "AI / ML",
+      "computer-science": "Computer Science",
+      "data": "Data",
+      "electronics": "Electronics",
+      "robotics": "Robotics",
+      "mechanical": "Mechanical",
+      "civil": "Civil",
+      "biomedical": "Biomedical",
+      "life-science": "Life Science",
+      "chemistry": "Chemistry",
+      "physics": "Physics",
+      "materials": "Materials",
+      "environment": "Environment",
+      "math-stats": "Math / Stats",
+      "industrial": "Industrial / Systems",
+    };
 
     const PAGE_SIZE = 20;
+    let allPosts = [];
     let currentPage = 1;
+    const selectedDomains = new Set();
+    let embedItems = {};
+    let queryVector = null;
+    let lastQuery = "";
+    let embedder = null;
+    let semanticReady = false;
+    let searchTimer = null;
+
+    function degreeRank(post) {
+      if (typeof post.degree_rank === "number") return post.degree_rank;
+      const map = { unspecified: 0, bachelor: 1, master: 2, doctor: 3, Bachelor: 1, Master: 2, Doctor: 3, Any: 0 };
+      return map[post.min_degree] ?? map[post.degree_level] ?? 0;
+    }
+
+    function domainLabel(id) {
+      return DOMAIN_LABELS[id] || id;
+    }
+
+    function dequantize(item) {
+      if (!item || !item.q) return null;
+      const scale = item.scale || 0;
+      return item.q.map((v) => v * scale);
+    }
+
+    function cosine(a, b) {
+      if (!a || !b || a.length !== b.length) return 0;
+      let dot = 0, na = 0, nb = 0;
+      for (let i = 0; i < a.length; i++) {
+        dot += a[i] * b[i];
+        na += a[i] * a[i];
+        nb += b[i] * b[i];
+      }
+      return dot / (Math.sqrt(na) * Math.sqrt(nb) + 1e-9);
+    }
+
+    function keywordScore(post, q) {
+      if (!q) return 0;
+      const domains = (post.domains || []).map(domainLabel).join(" ");
+      const hay = `${post.title || ""} ${post.summary || ""} ${post.department || ""} ${domains}`.toLowerCase();
+      if (hay.includes(q)) return 1;
+      const parts = q.split(/\s+/).filter(Boolean);
+      if (!parts.length) return 0;
+      const hits = parts.filter((w) => hay.includes(w)).length;
+      return hits / parts.length;
+    }
 
     async function loadData() {
       try {
@@ -272,22 +364,46 @@
         allPosts = await res.json();
         if (!Array.isArray(allPosts)) allPosts = Object.values(allPosts);
 
-        const sources = [...new Set(allPosts.map(p => p.source).filter(Boolean))].sort();
+        const sources = [...new Set(allPosts.map((p) => p.source).filter(Boolean))].sort();
         const sourceSelect = document.getElementById("filter-source");
-        sources.forEach(s => {
+        sources.forEach((s) => {
           const opt = document.createElement("option");
           opt.value = s;
           opt.textContent = s;
           sourceSelect.appendChild(opt);
         });
 
+        const domainIds = new Set();
+        allPosts.forEach((p) => (p.domains || []).forEach((d) => domainIds.add(d)));
+        const chipBox = document.getElementById("domain-chips");
+        [...domainIds].sort().forEach((id) => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "chip";
+          btn.dataset.domain = id;
+          btn.textContent = domainLabel(id);
+          btn.addEventListener("click", () => {
+            if (selectedDomains.has(id)) selectedDomains.delete(id);
+            else selectedDomains.add(id);
+            btn.classList.toggle("on", selectedDomains.has(id));
+            resetPageAndRender();
+          });
+          chipBox.appendChild(btn);
+        });
+        if (!domainIds.size) {
+          chipBox.textContent = "No domain tags yet — run the collector migrate.";
+          chipBox.style.color = "var(--muted)";
+          chipBox.style.fontSize = "0.8rem";
+        }
+
         const latest = allPosts.reduce((max, p) => {
-          return (p.scraped_at && p.scraped_at > max) ? p.scraped_at : max;
+          return p.scraped_at && p.scraped_at > max ? p.scraped_at : max;
         }, "");
         document.getElementById("last-updated").textContent =
           latest ? `Last scraped: ${latest.replace("T", " ").slice(0, 16)}` : "No data yet";
 
         render();
+        initSemantic();
       } catch (err) {
         document.getElementById("results-info").textContent =
           "Could not load posts. Make sure research_posts.json exists on the main branch.";
@@ -295,81 +411,140 @@
       }
     }
 
+    async function initSemantic() {
+      const info = document.getElementById("last-updated");
+      try {
+        const res = await fetch(EMBED_URL);
+        if (!res.ok) throw new Error("no embeddings");
+        const data = await res.json();
+        embedItems = data.items || data;
+        if (!Object.keys(embedItems).length) throw new Error("empty embeddings");
+
+        const { pipeline, env } = await import("https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2");
+        env.allowLocalModels = false;
+        embedder = await pipeline("feature-extraction", "Xenova/all-MiniLM-L6-v2");
+        semanticReady = true;
+        info.textContent += " · Semantic search ready";
+        if (document.getElementById("search").value.trim()) {
+          await updateQueryVector();
+          render();
+        }
+      } catch (err) {
+        semanticReady = false;
+        info.textContent += " · Keyword search";
+        console.info("Semantic search unavailable", err);
+      }
+    }
+
+    async function updateQueryVector() {
+      const q = document.getElementById("search").value.trim();
+      lastQuery = q;
+      if (!q || !semanticReady || !embedder) {
+        queryVector = null;
+        return;
+      }
+      const out = await embedder(q, { pooling: "mean", normalize: true });
+      queryVector = Array.from(out.data);
+    }
+
     function getFiltered() {
       const source = document.getElementById("filter-source").value;
       const work = document.getElementById("filter-work").value;
-      const degree = document.getElementById("filter-degree").value;
+      const held = document.getElementById("filter-held").value;
+      const requires = document.getElementById("filter-requires").value;
       const q = document.getElementById("search").value.trim().toLowerCase();
       const sortBy = document.getElementById("sort-by").value;
+      const heldRank = held ? Number(held) : 0;
+      const useSemantic = Boolean(q && semanticReady && queryVector);
 
-      let list = allPosts.filter(p => {
+      let list = allPosts.filter((p) => {
         if (source && p.source !== source) return false;
         if (work && p.work_type !== work) return false;
-        if (degree && p.degree_level !== degree) return false;
-        if (q) {
-          const hay = ((p.title || "") + " " + (p.summary || "") + " " + (p.department || "")).toLowerCase();
-          if (!hay.includes(q)) return false;
+        if (heldRank) {
+          const rank = degreeRank(p);
+          if (rank > heldRank) return false;
         }
+        if (requires) {
+          const md = (p.min_degree || "").toLowerCase();
+          if (requires === "unspecified") {
+            if (md && md !== "unspecified") return false;
+            if (!md && p.degree_level) return false;
+          } else if (md !== requires) {
+            return false;
+          }
+        }
+        if (selectedDomains.size) {
+          const ds = new Set(p.domains || []);
+          let hit = false;
+          selectedDomains.forEach((d) => { if (ds.has(d)) hit = true; });
+          if (!hit) return false;
+        }
+        if (q && !useSemantic && keywordScore(p, q) <= 0) return false;
         return true;
       });
 
-      list.sort((a, b) => {
-        if (sortBy === "title") {
-          return (a.title || "").localeCompare(b.title || "");
-        }
-        if (sortBy === "scraped_at") {
-          return (b.scraped_at || "").localeCompare(a.scraped_at || "");
-        }
+      if (q && useSemantic && sortBy === "relevance") {
+        list = list.map((p) => {
+          const packed = embedItems[p.id];
+          const vec = dequantize(packed);
+          const sem = vec ? cosine(queryVector, vec) : 0;
+          const kw = keywordScore(p, q);
+          return { post: p, score: 0.75 * sem + 0.25 * kw };
+        }).sort((a, b) => b.score - a.score).map((x) => x.post);
+      } else if (q && sortBy === "relevance") {
+        list = list.map((p) => ({ post: p, score: keywordScore(p, q) }))
+          .sort((a, b) => b.score - a.score)
+          .map((x) => x.post);
+      } else {
+        list = sortList(list, sortBy === "relevance" ? "close_date" : sortBy);
+      }
+
+      return list;
+    }
+
+    function sortList(list, sortBy) {
+      const copy = list.slice();
+      copy.sort((a, b) => {
+        if (sortBy === "title") return (a.title || "").localeCompare(b.title || "");
+        if (sortBy === "scraped_at") return (b.scraped_at || "").localeCompare(a.scraped_at || "");
         const da = a.close_date || "9999-12-31";
         const db = b.close_date || "9999-12-31";
         return da.localeCompare(db);
       });
-
-      return list;
+      return copy;
     }
 
     function render() {
       const list = getFiltered();
       const container = document.getElementById("results");
       const info = document.getElementById("results-info");
+      const q = document.getElementById("search").value.trim();
 
       const totalPages = Math.max(1, Math.ceil(list.length / PAGE_SIZE));
-
-      // Keep the current page valid after filtering.
       currentPage = Math.min(currentPage, totalPages);
-
       const start = (currentPage - 1) * PAGE_SIZE;
       const pagePosts = list.slice(start, start + PAGE_SIZE);
 
-      info.textContent =
-        `${list.length} post${list.length !== 1 ? "s" : ""}`;
+      const mode = q && semanticReady && queryVector ? "semantic + filters" : "filters";
+      info.textContent = `${list.length} post${list.length !== 1 ? "s" : ""} (${mode})`;
 
-      document.getElementById("page-info").textContent =
-        `Page ${currentPage} of ${totalPages}`;
-
-      document.getElementById("prev-page").disabled =
-        currentPage <= 1;
-
-      document.getElementById("next-page").disabled =
-        currentPage >= totalPages;
+      document.getElementById("page-info").textContent = `Page ${currentPage} of ${totalPages}`;
+      document.getElementById("prev-page").disabled = currentPage <= 1;
+      document.getElementById("next-page").disabled = currentPage >= totalPages;
 
       if (pagePosts.length === 0) {
-        container.innerHTML =
-          `<div class="empty">No matching posts</div>`;
+        container.innerHTML = `<div class="empty">No matching posts</div>`;
         return;
       }
 
-      container.innerHTML = pagePosts.map(p => {
-        const tags = [
-          p.source,
-          p.work_type,
-          p.degree_level,
-          p.department
-        ]
+      container.innerHTML = pagePosts.map((p) => {
+        const metaTags = [p.source, p.work_type, degreeLabel(p), p.department]
           .filter(Boolean)
-          .map(t => `<span class="tag">${escapeHtml(t)}</span>`)
+          .map((t) => `<span class="tag">${escapeHtml(t)}</span>`)
           .join("");
-
+        const domainTags = (p.domains || [])
+          .map((id) => `<button type="button" class="tag" data-domain="${escapeHtml(id)}">${escapeHtml(domainLabel(id))}</button>`)
+          .join("");
         const close = p.close_date
           ? `Close: ${escapeHtml(p.close_date)}`
           : "Closing date not specified";
@@ -377,20 +552,35 @@
         return `
           <article class="card">
             <div class="card-title">
-              <a href="${escapeHtml(p.url || "#")}"
-                 target="_blank" rel="noopener">
+              <a href="${escapeHtml(p.url || "#")}" target="_blank" rel="noopener">
                 ${escapeHtml(p.title || "Untitled")}
               </a>
             </div>
-            <div class="tags">${tags}</div>
-            <div class="summary">
-              ${escapeHtml((p.summary || "").slice(0, 320))}
-              ${(p.summary || "").length > 320 ? "…" : ""}
-            </div>
+            <div class="tags">${metaTags}${domainTags}</div>
+            <div class="summary">${escapeHtml(p.summary || "")}</div>
             <div class="card-footer">${close}</div>
           </article>
         `;
       }).join("");
+
+      container.querySelectorAll("button.tag[data-domain]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const id = btn.getAttribute("data-domain");
+          selectedDomains.add(id);
+          const chip = document.querySelector(`#domain-chips .chip[data-domain="${CSS.escape(id)}"]`);
+          if (chip) chip.classList.add("on");
+          resetPageAndRender();
+        });
+      });
+    }
+
+    function degreeLabel(p) {
+      const md = p.min_degree;
+      if (md && md !== "unspecified") {
+        const pretty = { bachelor: "Bachelor+", master: "Master+", doctor: "Doctor" };
+        return pretty[md] || md;
+      }
+      return p.degree_level || "";
     }
 
     function escapeHtml(str) {
@@ -407,35 +597,42 @@
       render();
     }
 
-    ["filter-source", "filter-work", "filter-degree", "sort-by"]
-      .forEach(id => {
-        document.getElementById(id)
-          .addEventListener("change", resetPageAndRender);
+    ["filter-source", "filter-work", "filter-held", "filter-requires", "sort-by"]
+      .forEach((id) => {
+        document.getElementById(id).addEventListener("change", resetPageAndRender);
       });
 
-    document.getElementById("search")
-      .addEventListener("input", resetPageAndRender);
+    document.getElementById("sort-by").addEventListener("change", () => {
+      document.getElementById("sort-by").dataset.user = "1";
+    });
 
-    document.getElementById("prev-page")
-      .addEventListener("click", () => {
-        if (currentPage > 1) {
-          currentPage--;
-          render();
-        }
-      });
+    document.getElementById("search").addEventListener("input", () => {
+      const sort = document.getElementById("sort-by");
+      const q = document.getElementById("search").value.trim();
+      if (!sort.dataset.user) {
+        sort.value = q ? "relevance" : "close_date";
+      }
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(async () => {
+        await updateQueryVector();
+        resetPageAndRender();
+      }, 280);
+    });
 
-    document.getElementById("next-page")
-      .addEventListener("click", () => {
-        const totalPages = Math.max(
-          1,
-          Math.ceil(getFiltered().length / PAGE_SIZE)
-        );
+    document.getElementById("prev-page").addEventListener("click", () => {
+      if (currentPage > 1) {
+        currentPage--;
+        render();
+      }
+    });
 
-        if (currentPage < totalPages) {
-          currentPage++;
-          render();
-        }
-      });
+    document.getElementById("next-page").addEventListener("click", () => {
+      const totalPages = Math.max(1, Math.ceil(getFiltered().length / PAGE_SIZE));
+      if (currentPage < totalPages) {
+        currentPage++;
+        render();
+      }
+    });
 
     loadData();
   </script>
