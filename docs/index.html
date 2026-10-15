@@ -57,6 +57,20 @@
       transition: background 0.15s;
     }
     .btn:hover { background: var(--primary-hover); }
+    .btn:disabled { opacity: 0.6; cursor: wait; }
+
+    .update-form {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .honey {
+      position: absolute;
+      left: -9999px;
+      height: 0;
+      width: 0;
+      opacity: 0;
+    }
 
     .filters {
       background: var(--card);
@@ -215,11 +229,11 @@
       <h1>HK Research Posts</h1>
       <div class="meta" id="last-updated">Loading...</div>
     </div>
-    <a class="btn" id="request-update"
-       href="https://github.com/Heinz-Elio/hk-research-post-scraper/issues/new?title=Please%20run%20scraper%20update&body=A%20user%20requested%20a%20fresh%20scrape%20of%20research%20posts."
-       target="_blank" rel="noopener">
-      Request Update
-    </a>
+    <form id="request-update" class="update-form">
+      <input class="honey" type="text" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <button class="btn" type="submit">Request Update</button>
+      <span class="meta" id="update-status" role="status"></span>
+    </form>
   </header>
 
   <section class="filters">
@@ -635,6 +649,40 @@
     });
 
     loadData();
+
+    const UPDATE_ENDPOINT = "https://formsubmit.co/ajax/ac48761bb21d39f3bd60b0bd93065f06";
+
+    document.getElementById("request-update").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const form = event.currentTarget;
+      if (form._honey && form._honey.value) return;
+      const button = form.querySelector("button");
+      const status = document.getElementById("update-status");
+      button.disabled = true;
+      status.textContent = "Sending…";
+      try {
+        const res = await fetch(UPDATE_ENDPOINT, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+          },
+          body: JSON.stringify({
+            _subject: "HK research posts update request",
+            _template: "table",
+            message: "Please run a fresh scrape of the research posts."
+          })
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.message || "Request failed");
+        status.textContent = data.message || "Request sent.";
+      } catch (err) {
+        status.textContent = "Could not send the request.";
+        console.error(err);
+      } finally {
+        button.disabled = false;
+      }
+    });
   </script>
 </body>
 </html>

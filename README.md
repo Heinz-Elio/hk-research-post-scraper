@@ -34,7 +34,7 @@ After Pages is on, the site is typically:
 | Storage | `research_posts.json` (active), `outdated_posts.json` |
 | Embeddings | Quantized vectors in `docs/embeddings.json` (not in the listing JSON) |
 | Semantic search | Pages: MiniLM in the browser; CLI: `python main.py --search "..."` |
-| Request update | Front has a button that opens a GitHub Issue |
+| Request update | Button sends a note through FormSubmit. No GitHub account |
 
 ## Supported sources
 
