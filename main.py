@@ -27,7 +27,7 @@ from embeddings_store import (
     text_for_embed,
     upsert_vector,
 )
-from sources import SCRAPERS
+from sources import SCRAPERS, SOURCE_NAMES
 from taxonomy import enrich_classification
 
 # ==================================================================
@@ -77,47 +77,197 @@ if USE_LOCAL_SUMMARIZER:
         HAS_SUMMARIZER = False
 
 
-def rule_based_summary(text: str) -> str:
-    """Full job text, cleaned. Never stop in the middle of a sentence."""
-    if not text:
-        return ""
-    text = text.replace("\r\n", "\n").replace("\r", "\n")
-    text = re.sub(r"[ \t]+", " ", text)
-    text = re.sub(r"\n{3,}", "\n\n", text).strip()
+_SECTION_HEADS = [
+    ("Project", re.compile(r"^(?:project(?:\s+title)?|research\s+project)\b\s*:?\s*(.*)$", re.I)),
+    ("Duties", re.compile(r"^(?:duties|responsibilities|job\s+duties)\b\s*:?\s*(.*)$", re.I)),
+    ("Requirements", re.compile(r"^(?:requirements?|qualifications?|entry\s+requirements)\b\s*:?\s*(.*)$", re.I)),
+    ("Contact", re.compile(r"^(?:contacts?|enquir(?:y|ies)|how\s+to\s+apply)\b\s*:?\s*(.*)$", re.I)),
+    ("Salary", re.compile(r"^(?:salary|remuneration)\b\s*:?\s*(.*)$", re.I)),
+    ("Appointment", re.compile(r"^(?:appointment(?:\s+period)?|duration)\b\s*:?\s*(.*)$", re.I)),
+    ("Conditions", re.compile(r"^conditions(?:\s+of\s+service)?\b\s*:?\s*(.*)$", re.I)),
+]
+_CONTACT_LINE = re.compile(r"\b(invited to contact|please contact|for enquir)", re.I)
+_CLOSE_LINE = re.compile(r"^the closing date\b", re.I)
+_EMAIL_RE = re.compile(r"[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}")
+_PHONE_RE = re.compile(r"(?:\+?852[\s\-]?)?\d{4}[\s\-]\d{4}")
+_SKIP_LINE = re.compile(
+    r"^(apply now|printable version|skip to|posting date|share\b|menu\b)",
+    re.I,
+)
+
+
+def _clean_line(text: str) -> str:
+    text = re.sub(r"\s+", " ", text or "").strip(" \t:-")
     return text
 
 
-def _complete_sentences(text: str) -> str:
-    text = re.sub(r"\s+", " ", text).strip()
-    text = re.sub(r"\.{3,}$|…$", "", text).strip()
-    if not text or text[-1] in ".!?。":
-        return text
-    cut = max(text.rfind(". "), text.rfind("。"), text.rfind("! "), text.rfind("? "))
-    if cut > 40:
-        return text[: cut + 1].strip()
-    return text
+def _section_text(chunks: List[str]) -> str:
+    parts: List[str] = []
+    for part in chunks:
+        part = _clean_line(part)
+        if not part or _SKIP_LINE.match(part):
+            continue
+        # A layout break can split a word across lines ("Fello" / "w,").
+        if parts and re.match(r"^[a-z]{1,2}(?:,|\.|\s)", part) and parts[-1][-1].isalpha():
+            parts[-1] = parts[-1] + part
+        else:
+            parts.append(part)
+    text = " ".join(parts)
+    text = re.sub(r"\s+([,.;:])", r"\1", text)
+    return text.strip()
 
 
-def summarize(text: str, title: str = "") -> str:
-    if not text:
-        return ""
-    text = rule_based_summary(text)
+def _split_sections(text: str) -> Dict[str, str]:
+    found: Dict[str, List[str]] = {}
+    current = None
+    last_plain = ""
+    for raw in (text or "").replace("\r\n", "\n").replace("\r", "\n").splitlines():
+        line = raw.strip()
+        if not line or _SKIP_LINE.match(line) or _CLOSE_LINE.match(line):
+            continue
+        probe = line[1:-1].strip() if line.startswith("[") and line.endswith("]") else line
+        matched = False
+        for label, pattern in _SECTION_HEADS:
+            hit = pattern.match(probe)
+            if not hit:
+                continue
+            found.setdefault(label, [])
+            rest = (hit.group(1) or "").strip()
+            if rest:
+                if label == "Appointment" and last_plain:
+                    found[label].append(f"{last_plain}: {rest}")
+                else:
+                    found[label].append(rest)
+                # The heading line already holds the value. Don't swallow the next lines.
+                current = None
+            else:
+                current = label
+            matched = True
+            break
+        if matched:
+            continue
+        dept = re.match(r"^department\s*:\s*(.+)$", line, re.I)
+        if dept and "Department" not in found:
+            found["Department"] = [dept.group(1)]
+            current = None
+            continue
+        if _CONTACT_LINE.search(line):
+            current = "Contact"
+            found.setdefault("Contact", []).append(line)
+            continue
+        if current:
+            found.setdefault(current, []).append(line)
+        else:
+            last_plain = line
+    sections = {}
+    for label, parts in found.items():
+        if label == "Appointment":
+            bits = [_clean_line(part) for part in parts]
+            text = "; ".join(bit for bit in bits if bit)
+        else:
+            text = _section_text(parts)
+        if text:
+            sections[label] = text
+    return sections
 
-    if not HAS_SUMMARIZER or summarizer_pipeline is None:
-        return rule_based_summary(text)
 
-    prompt = f"""You are a helpful assistant that writes concise summaries of academic research job postings.
+def _contacts(text: str, section: str) -> str:
+    section = _clean_line(section)
+    blob = text or ""
+    emails = []
+    for email in _EMAIL_RE.findall(blob):
+        if email.lower().endswith((".png", ".jpg", ".gif")):
+            continue
+        if "example.com" in email.lower() or email.startswith("["):
+            continue
+        if email not in emails:
+            emails.append(email)
+    phones = []
+    if re.search(r"tel|phone|enquir|contact", blob, re.I):
+        for phone in _PHONE_RE.findall(blob):
+            if phone not in phones:
+                phones.append(phone)
+    extra = []
+    haystack = section.lower()
+    for bit in emails + phones:
+        if bit.lower() not in haystack:
+            extra.append(bit)
+    if section and extra:
+        return f"{section}; " + "; ".join(extra)
+    if section:
+        return section
+    return "; ".join(extra)
 
-Write a complete summary of the research position.
-Cover the duties, the requirements, and the project domain.
-Finish the last sentence. Do not stop mid-sentence and do not invent information.
 
-Title: {title}
+def fact_summary(
+    text: str,
+    *,
+    title: str = "",
+    university: str = "",
+    department: str = "",
+    project: str = "",
+    close_date: str = "",
+    url: str = "",
+) -> str:
+    """Bullet list of facts taken from the scrape. Does not invent a university or contact."""
+    sections = _split_sections(text)
+    department = _clean_line(department) or sections.get("Department", "")
+    project = _clean_line(project) or sections.get("Project", "")
+    contact = _contacts(text, sections.get("Contact", ""))
+    items = []
 
-Job text:
-{text}
+    def add(label: str, value: str) -> None:
+        value = _clean_line(value)
+        if value:
+            items.append(f"- {label}: {value}")
 
-Summary:"""
+    add("University", university)
+    add("Department", department)
+    add("Project", project)
+    add("Duties", sections.get("Duties", ""))
+    add("Requirements", sections.get("Requirements", ""))
+    add("Appointment", sections.get("Appointment", ""))
+    add("Salary", sections.get("Salary", ""))
+    add("Conditions", sections.get("Conditions", ""))
+    add("Contact", contact)
+    add("Closing date", close_date)
+    if not contact and url:
+        add("Apply", url)
+    if not items and title:
+        add("Post", title)
+    return "\n".join(items)
+
+
+def summarize(
+    text: str,
+    title: str = "",
+    university: str = "",
+    department: str = "",
+    project: str = "",
+    close_date: str = "",
+    url: str = "",
+) -> str:
+    facts = fact_summary(
+        text,
+        title=title,
+        university=university,
+        department=department,
+        project=project,
+        close_date=close_date,
+        url=url,
+    )
+    if not text or not HAS_SUMMARIZER or summarizer_pipeline is None:
+        return facts
+
+    prompt = f"""You rewrite academic job facts into a bullet list.
+Use only the facts below. Keep the university name exactly as given.
+Include project domain, main duties, key requirements, and contact when they are present.
+Do not invent names, emails, dates, or placeholders.
+One fact per line, each line starting with "- ".
+
+{facts}
+
+List:"""
 
     try:
         result = summarizer_pipeline(
@@ -128,16 +278,17 @@ Summary:"""
             pad_token_id=summarizer_pipeline.tokenizer.eos_token_id,
         )
         generated = result[0]["generated_text"]
-        if "Summary:" in generated:
-            summary = generated.split("Summary:")[-1].strip()
-        else:
-            summary = generated[len(prompt) :].strip()
-        summary = re.sub(r"\n+", " ", summary).strip()
-        summary = _complete_sentences(summary)
-        return summary if summary else rule_based_summary(text)
+        summary = generated.split("List:")[-1].strip() if "List:" in generated else generated[len(prompt):].strip()
+        lines = [line.strip() for line in summary.splitlines() if line.strip().startswith("- ")]
+        joined = "\n".join(lines)
+        if university and university not in joined:
+            return facts
+        if re.search(r"\[[^\]]*(university|email|contact|deadline)", joined, re.I):
+            return facts
+        return joined or facts
     except Exception as e:
         print(f"  [summarize error] {e}")
-        return rule_based_summary(text)
+        return facts
 
 
 # ==================================================================
@@ -217,7 +368,26 @@ def harvest_embeddings(posts: Dict[str, dict], store: dict) -> None:
 
 def backfill_posts(posts: Dict[str, dict]) -> None:
     for post in posts.values():
-        enrich_classification(post)
+        university = SOURCE_NAMES.get(post.get("source") or "", post.get("source") or "")
+        summary = post.get("summary") or ""
+        # Older model summaries invented the school and the contact. Keep only
+        # text that is already a fact list, or a scrape that has real headings.
+        invented = bool(re.search(r"\[University Name\]|XYZ University|\[email|\[contact|\[deadline", summary, re.I))
+        has_headings = bool(re.search(r"(?m)^(Duties|Requirements|Qualifications|Project(?: Title)?|Department)\b", summary))
+        if not summary.startswith("- University:"):
+            post["summary"] = fact_summary(
+                summary if has_headings and not invented else "",
+                title=post.get("title") or "",
+                university=university,
+                department=post.get("department") or "",
+                project=post.get("project") or "",
+                close_date=post.get("close_date") or "",
+                url=post.get("url") or "",
+            )
+        # A list that only names the school has no requirements text. Leave the
+        # degree and domain fields already stored on the post.
+        if post.get("content") or re.search(r"(?m)^- Requirements:", post.get("summary") or ""):
+            enrich_classification(post)
 
 
 # ==================================================================
@@ -267,14 +437,25 @@ def run(
                     p["scraped_at"] = datetime.now().isoformat(timespec="seconds")
 
                     full_text = p.get("content") or ""
-                    if use_summarizer:
-                        old = active.get(pid) or outdated.get(pid)
-                        if not old or old.get("content") != full_text or not old.get("summary"):
-                            p["summary"] = summarize(full_text, title=p.get("title", ""))
-                        else:
-                            p["summary"] = old.get("summary")
+                    university = SOURCE_NAMES.get(p.get("source") or name, name)
+                    old = active.get(pid) or outdated.get(pid)
+                    if (
+                        use_summarizer
+                        and old
+                        and old.get("content") == full_text
+                        and (old.get("summary") or "").startswith("- University:")
+                    ):
+                        p["summary"] = old.get("summary")
                     else:
-                        p["summary"] = rule_based_summary(full_text)
+                        p["summary"] = summarize(
+                            full_text,
+                            title=p.get("title", ""),
+                            university=university,
+                            department=p.get("department") or "",
+                            project=p.get("project") or "",
+                            close_date=p.get("close_date") or "",
+                            url=p.get("url") or "",
+                        )
 
                     p = enrich_classification(p)
                     p.pop("content", None)

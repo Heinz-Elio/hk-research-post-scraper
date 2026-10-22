@@ -172,11 +172,16 @@
     }
     button.tag:hover { background: #dbe4ff; }
 
-    .summary {
+    .summary, .summary-list {
       font-size: 0.9rem;
       color: #333;
       margin-bottom: 0.5rem;
-      white-space: pre-wrap;
+    }
+    .summary { white-space: pre-wrap; }
+    .summary-list {
+      margin: 0 0 0.5rem 1.1rem;
+      display: grid;
+      gap: 0.25rem;
     }
 
     .card-footer {
@@ -571,7 +576,7 @@
               </a>
             </div>
             <div class="tags">${metaTags}${domainTags}</div>
-            <div class="summary">${escapeHtml(p.summary || "")}</div>
+            ${summaryHtml(p.summary)}
             <div class="card-footer">${close}</div>
           </article>
         `;
@@ -595,6 +600,15 @@
         return pretty[md] || md;
       }
       return p.degree_level || "";
+    }
+
+    function summaryHtml(text) {
+      const lines = String(text || "").split("\n").map((line) => line.trim()).filter(Boolean);
+      const items = lines.filter((line) => line.startsWith("- "));
+      if (items.length && items.length === lines.length) {
+        return `<ul class="summary-list">${items.map((line) => `<li>${escapeHtml(line.slice(2))}</li>`).join("")}</ul>`;
+      }
+      return `<div class="summary">${escapeHtml(text || "")}</div>`;
     }
 
     function escapeHtml(str) {

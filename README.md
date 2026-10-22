@@ -131,7 +131,7 @@ results = semantic_search("machine learning research assistant", top_k=5)
   "id": "HKU_537585",
   "title": "Research Assistant ...",
   "close_date": "2026-12-12",
-  "summary": "Short summary of role and requirements...",
+  "summary": "- University: University of Hong Kong\n- Project: ...\n- Requirements: ...\n- Contact: name@hku.hk",
   "work_type": "Full-time",
   "min_degree": "master",
   "degree_rank": 2,
