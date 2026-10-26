@@ -17,6 +17,7 @@ import re
 import ssl
 import time
 from typing import List, Optional, Protocol
+from urllib.parse import urljoin
 
 import requests
 from bs4 import BeautifulSoup
@@ -137,7 +138,24 @@ def _ready(soup: Optional[BeautifulSoup], wait_for: Optional[str]) -> bool:
         return False
     if wait_for and not soup.select(wait_for):
         return False
+    # An empty shell (Interfolio, PeopleSoft) is not the job page yet.
+    if len(soup.get_text(" ", strip=True)) < 80:
+        return False
     return True
+
+
+def _expand_frame(soup: Optional[BeautifulSoup], page_url: str, timeout: int, retry: int) -> Optional[BeautifulSoup]:
+    """PeopleSoft wraps the job text in a frameset. The wrapper page itself is empty."""
+    if not soup:
+        return soup
+    frame = soup.find("frame", attrs={"name": "TargetContent"})
+    src = (frame.get("src") if frame else "") or ""
+    if not src or len(soup.get_text(" ", strip=True)) > 400:
+        return soup
+    inner = _fetch_http(urljoin(page_url, src), timeout=timeout, retry=max(retry, 1))
+    if inner and len(inner.get_text(" ", strip=True)) > 200:
+        return inner
+    return soup
 
 
 def fetch(
@@ -147,16 +165,18 @@ def fetch(
     wait_for: Optional[str] = None,
 ) -> Optional[BeautifulSoup]:
     """HTTP first. A real browser is used when the site shows a bot check or the waited-for element is missing."""
-    soup = _fetch_http(url, timeout=timeout, retry=retry)
+    soup = _expand_frame(_fetch_http(url, timeout=timeout, retry=retry), url, timeout, retry)
     if _ready(soup, wait_for):
         return soup
 
-    rendered = _fetch_browser(url, wait_for=wait_for)
+    rendered = _expand_frame(_fetch_browser(url, wait_for=wait_for), url, timeout, retry)
     if _ready(rendered, wait_for):
         _sync_cookies()
-        # Later pages on this host can stay on plain HTTP.
-        retried = _fetch_http(url, timeout=timeout, retry=1)
-        if _ready(retried, wait_for):
+        # Later pages on this host can stay on plain HTTP, but only when that
+        # response actually contains the job. A cookie wall is longer than the
+        # empty shell and would otherwise replace the rendered page.
+        retried = _expand_frame(_fetch_http(url, timeout=timeout, retry=1), url, timeout, retry)
+        if _ready(retried, wait_for) and len(job_content(retried)) > 80:
             return retried
         return rendered
     return rendered or soup
@@ -267,7 +287,8 @@ def _fetch_browser(url: str, wait_for: Optional[str] = None) -> Optional[Beautif
                 """() => {
                     const text = document.body ? document.body.innerText : '';
                     const blocked = document.querySelector('#challenge-container, iframe#main-iframe');
-                    return !blocked && text.length > 200;
+                    const cookieOnly = /cookie preference center/i.test(text) && text.length < 4000;
+                    return !blocked && !cookieOnly && text.length > 400;
                 }""",
                 timeout=30000,
             )

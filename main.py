@@ -84,14 +84,27 @@ _SECTION_HEADS = [
     ("Contact", re.compile(r"^(?:contacts?|enquir(?:y|ies)|how\s+to\s+apply)\b\s*:?\s*(.*)$", re.I)),
     ("Salary", re.compile(r"^(?:salary|remuneration)\b\s*:?\s*(.*)$", re.I)),
     ("Appointment", re.compile(r"^(?:appointment(?:\s+period)?|duration)\b\s*:?\s*(.*)$", re.I)),
-    ("Conditions", re.compile(r"^conditions(?:\s+of\s+service)?\b\s*:?\s*(.*)$", re.I)),
+    ("Conditions", re.compile(r"^(?:conditions(?:\s+of\s+service)?|what\s+we\s+offer|benefits)\b\s*:?\s*(.*)$", re.I)),
 ]
+# "Duties and Responsibilities" is one heading. The words after Duties are not the duty text.
+_COMPOUND_HEAD = re.compile(
+    r"^(?:and|&|/)\s+(?:duties|responsibilities|requirements?|qualifications?)\s*$",
+    re.I,
+)
 _CONTACT_LINE = re.compile(r"\b(invited to contact|please contact|for enquir)", re.I)
 _CLOSE_LINE = re.compile(r"^the closing date\b", re.I)
+_END_LINE = re.compile(
+    r"^(?:advertised\b|applications close\b|back to search results\b|whatsapp\b|facebook\b|linkedin\b)",
+    re.I,
+)
 _EMAIL_RE = re.compile(r"[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}")
 _PHONE_RE = re.compile(r"(?:\+?852[\s\-]?)?\d{4}[\s\-]\d{4}")
 _SKIP_LINE = re.compile(
-    r"^(apply now|printable version|skip to|posting date|share\b|menu\b)",
+    r"^(apply now|printable version|skip to|posting date|share\b|menu\b|return to previous page)\b",
+    re.I,
+)
+_META_LINE = re.compile(
+    r"^(?:ref\.?|work type|department|categories|job title|job id|job description|job posting details|hong kong)\b",
     re.I,
 )
 
@@ -123,7 +136,9 @@ def _split_sections(text: str) -> Dict[str, str]:
     last_plain = ""
     for raw in (text or "").replace("\r\n", "\n").replace("\r", "\n").splitlines():
         line = raw.strip()
-        if not line or _SKIP_LINE.match(line) or _CLOSE_LINE.match(line):
+        if not line or _SKIP_LINE.match(line) or _CLOSE_LINE.match(line) or _END_LINE.match(line):
+            if _END_LINE.match(line):
+                current = None
             continue
         probe = line[1:-1].strip() if line.startswith("[") and line.endswith("]") else line
         matched = False
@@ -132,7 +147,9 @@ def _split_sections(text: str) -> Dict[str, str]:
             if not hit:
                 continue
             found.setdefault(label, [])
-            rest = (hit.group(1) or "").strip()
+            rest = (hit.group(1) or "").strip(" :")
+            if _COMPOUND_HEAD.match(rest):
+                rest = ""
             if rest:
                 if label == "Appointment" and last_plain:
                     found[label].append(f"{last_plain}: {rest}")
@@ -199,6 +216,33 @@ def _contacts(text: str, section: str) -> str:
     return "; ".join(extra)
 
 
+def _narrative(text: str) -> str:
+    """Prose from a page that has no Duties or Requirements heading."""
+    kept: List[str] = []
+    skip_value = False
+    for raw in (text or "").replace("\r\n", "\n").replace("\r", "\n").splitlines():
+        line = raw.strip()
+        if not line or _SKIP_LINE.match(line) or _CLOSE_LINE.match(line) or _END_LINE.match(line):
+            continue
+        if _META_LINE.match(line) or _CONTACT_LINE.search(line):
+            # "Department:" is on its own line and the name follows.
+            skip_value = line.endswith(":") or ":" not in line
+            continue
+        if skip_value:
+            skip_value = False
+            if len(_clean_line(line)) < 90:
+                continue
+        probe = line[1:-1].strip() if line.startswith("[") and line.endswith("]") else line
+        if any(pattern.match(probe) for _, pattern in _SECTION_HEADS):
+            break
+        if re.match(r"^(?:how to apply|contacts?|enquir(?:y|ies))\b", probe, re.I):
+            break
+        if len(_clean_line(line)) < 40:
+            continue
+        kept.append(line)
+    return _section_text(kept)[:1000]
+
+
 def fact_summary(
     text: str,
     *,
@@ -224,6 +268,8 @@ def fact_summary(
     add("University", university)
     add("Department", department)
     add("Project", project)
+    if not sections.get("Duties") and not sections.get("Requirements"):
+        add("Description", _narrative(text))
     add("Duties", sections.get("Duties", ""))
     add("Requirements", sections.get("Requirements", ""))
     add("Appointment", sections.get("Appointment", ""))
@@ -284,6 +330,16 @@ List:"""
         if university and university not in joined:
             return facts
         if re.search(r"\[[^\]]*(university|email|contact|deadline)", joined, re.I):
+            return facts
+        labels = re.findall(r"(?m)^-\s*([^:]+):", joined)
+        junk = {"what we offer", "advertised", "applications close", "back to search results"}
+        if any(label.strip().lower() in junk for label in labels):
+            return facts
+        if re.search(r"(?m)^- Duties:\s*and Responsibilities\s*$", joined):
+            return facts
+        def has_body(blob: str) -> bool:
+            return bool(re.search(r"(?m)^- (?:Duties|Requirements|Description):", blob))
+        if has_body(facts) and not has_body(joined):
             return facts
         return joined or facts
     except Exception as e:
