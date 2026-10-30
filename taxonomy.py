@@ -305,6 +305,75 @@ def extract_min_degree(title: str, text: str = "") -> Tuple[str, int]:
     return "unspecified", 0
 
 
+# A tool mention is not the research field. "statistical software such as SPSS"
+# and "experiment programming with E-Prime" are social-science methods.
+_CS_TOOL = re.compile(
+    r"statistical software|software such as|software, such as|software \(e\.g\.?|"
+    r"experiment programming|programming with e-prime|microsoft office|"
+    r"programming and monitoring|syntax-based software|programming platforms",
+    re.I,
+)
+# "degree in economics, social science, computer science or related" lists an
+# acceptable background. It does not make the post a computer-science post.
+_CS_DEGREE_LIST = re.compile(
+    r"(?:degree|bachelor|master|disciplin).{0,100}computer science",
+    re.I,
+)
+_CS_OTHER_FIELD = re.compile(
+    r"social science|economics|psychology|sociology|social work|criminolog",
+    re.I,
+)
+_MATERIALS_DOCS = re.compile(
+    r"(?:dissemination|reading|teaching|course|reference|training|publicity|supplementary) materials?",
+    re.I,
+)
+# "Prior experience in machine learning is a plus" is an optional skill.
+_OPTIONAL_SKILL = re.compile(
+    r"(?:is|are|would be) (?:a |an )?(?:plus|advantage)",
+    re.I,
+)
+# SPSS, Stata, or "statistical software" is a method, not a mathematics post.
+_STATS_TOOL = re.compile(
+    r"statistical (?:software|programs?|packages?|analysis with)",
+    re.I,
+)
+
+
+def _domain_excluded(domain_id: str, phrase: str, hay: str, index: int) -> bool:
+    window = hay[max(0, index - 120) : index + len(phrase) + 80]
+    if domain_id == "computer-science":
+        if phrase in {"software", "programming", "computing"} and _CS_TOOL.search(window):
+            return True
+        if phrase == "computing" and re.search(
+            r"computing related.{0,60}(?:accounting|finance|economics)", window
+        ):
+            return True
+        if (
+            phrase == "computer science"
+            and _CS_DEGREE_LIST.search(window)
+            and _CS_OTHER_FIELD.search(window)
+        ):
+            return True
+    if domain_id == "ai-ml" and _OPTIONAL_SKILL.search(window):
+        return True
+    if domain_id == "math-stats" and phrase == "statistic" and _STATS_TOOL.search(window):
+        return True
+    if domain_id == "materials" and phrase == "material" and _MATERIALS_DOCS.search(window):
+        return True
+    return False
+
+
+def _phrase_matches(domain_id: str, phrase: str, hay: str) -> bool:
+    start = 0
+    while True:
+        index = hay.find(phrase, start)
+        if index < 0:
+            return False
+        if not _domain_excluded(domain_id, phrase, hay, index):
+            return True
+        start = index + len(phrase)
+
+
 def extract_domains(
     title: str = "",
     department: str = "",
@@ -316,7 +385,7 @@ def extract_domains(
     ).lower()
     tags: List[str] = []
     for did, _label, phrases in DOMAIN_TAXONOMY:
-        if any(p in hay for p in phrases):
+        if any(_phrase_matches(did, phrase, hay) for phrase in phrases):
             tags.append(did)
     return tags
 

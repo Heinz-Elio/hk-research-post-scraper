@@ -202,6 +202,10 @@ def _contacts(text: str, section: str) -> str:
     phones = []
     if re.search(r"tel|phone|enquir|contact", blob, re.I):
         for phone in _PHONE_RE.findall(blob):
+            parts = re.split(r"[\s\-]", phone.strip())
+            # 2026-2027 is an academic year, not a telephone number.
+            if len(parts) == 2 and all(re.fullmatch(r"(?:19|20)\d{2}", part) for part in parts):
+                continue
             if phone not in phones:
                 phones.append(phone)
     extra = []

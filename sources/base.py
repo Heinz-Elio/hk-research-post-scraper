@@ -16,6 +16,7 @@ import atexit
 import re
 import ssl
 import time
+from datetime import datetime, timedelta, timezone
 from typing import List, Optional, Protocol
 from urllib.parse import urljoin
 
@@ -194,8 +195,9 @@ def _fetch_http(url: str, timeout: int = 25, retry: int = 3) -> Optional[Beautif
 
             r.raise_for_status()
             print("HTTP response:", r.status_code)
-            if r.text:
-                soup = BeautifulSoup(r.text, "lxml")
+            html = _decode_html(r)
+            if html:
+                soup = BeautifulSoup(html, "lxml")
                 if is_challenge_page(soup):
                     print("HTTP response:", r.status_code, "(bot check)")
                     return None
@@ -340,6 +342,39 @@ def _looks_like_challenge(text: str) -> bool:
     return "awswafintegration" in low or "_incapsula_resource" in low or "challenge-container" in low
 
 
+def _decode_html(response) -> str:
+    """Career pages are UTF-8. A missing charset must not be read as Latin-1."""
+    raw = response.content or b""
+    if not raw:
+        return ""
+    ctype = (response.headers.get("content-type") or "").lower()
+    if "utf-8" in ctype or "utf8" in ctype:
+        return raw.decode("utf-8", errors="replace")
+    try:
+        return raw.decode("utf-8")
+    except UnicodeDecodeError:
+        encoding = response.encoding or "utf-8"
+        return raw.decode(encoding, errors="replace")
+
+
+_MOJIBAKE_RUN = re.compile(r"(?:[\u00c0-\u00ff][\u0080-\u00bf]{1,3})+")
+
+
+def repair_mojibake(text: str) -> str:
+    """UTF-8 bytes that were decoded as Latin-1, e.g. 「正好生活計劃」."""
+    if not text or not _MOJIBAKE_RUN.search(text):
+        return text
+
+    def fix(match) -> str:
+        chunk = match.group(0)
+        try:
+            return chunk.encode("latin-1").decode("utf-8")
+        except (UnicodeEncodeError, UnicodeDecodeError):
+            return chunk
+
+    return _MOJIBAKE_RUN.sub(fix, text)
+
+
 def job_content(soup: Optional[BeautifulSoup]) -> str:
     """Text of the job description element, not the site chrome."""
     if not soup or is_challenge_page(soup):
@@ -349,23 +384,72 @@ def job_content(soup: Optional[BeautifulSoup]) -> str:
         if node:
             text = node.get_text("\n", strip=True)
             if len(text) > 40:
-                return text
+                return repair_mojibake(text)
     root = soup.select_one("main") or soup.body
     if not root:
         return ""
     for junk in root.select("header, footer, nav, script, style, noscript"):
         junk.decompose()
-    return root.get_text("\n", strip=True)
+    return repair_mojibake(root.get_text("\n", strip=True))
+
+
+_HKT = timezone(timedelta(hours=8))
+_SLASH_DATE = re.compile(r"\b(\d{1,2})/(\d{1,2})/(\d{4})\b")
+_ISO_STAMP = re.compile(
+    r"\b(\d{4}-\d{2}-\d{2})[T ](\d{2}:\d{2}(?::\d{2})?)(Z|[+-]\d{2}:?\d{2})?\b"
+)
+_OPEN_ENDED = re.compile(
+    r"until filled|open until|is/are filled|to be filled|until the position",
+    re.I,
+)
 
 
 def parse_date(text: str) -> Optional[str]:
+    """Calendar date as YYYY-MM-DD.
+
+    Hong Kong career pages write day/month/year (20/11/2026) or a month name
+    (26 November 2026, Nov 13, 2026). A timestamp such as 2026-11-13T15:55:00Z
+    is the same closing instant in Hong Kong time.
+    """
     if not text:
         return None
-    text = text.strip()
-    if text in ("", "-", "N/A", "Until filled", "Open until filled", "—"):
+    text = repair_mojibake(text).strip()
+    if text in ("", "-", "N/A", "—"):
         return None
+
+    slashes = list(_SLASH_DATE.finditer(text))
+    if slashes:
+        # Two dates in one cell: the later one is the closing date.
+        day, month, year = (int(part) for part in slashes[-1].groups())
+        try:
+            return datetime(year, month, day).date().isoformat()
+        except ValueError:
+            return None
+
+    stamp = _ISO_STAMP.search(text)
+    if stamp:
+        raw = f"{stamp.group(1)}T{stamp.group(2)}"
+        if len(stamp.group(2)) == 5:
+            raw += ":00"
+        tz = stamp.group(3) or ""
+        if tz == "Z":
+            raw += "+00:00"
+        elif tz:
+            raw += tz
+        try:
+            dt = datetime.fromisoformat(raw)
+        except ValueError:
+            return stamp.group(1)
+        if dt.tzinfo:
+            dt = dt.astimezone(_HKT)
+        return dt.date().isoformat()
+
+    if _OPEN_ENDED.search(text):
+        return None
+
     try:
-        dt = date_parser.parse(text, fuzzy=True, dayfirst=False)
+        # Month names stay unambiguous. Numeric leftovers are day-first.
+        dt = date_parser.parse(text, fuzzy=True, dayfirst=True)
         return dt.date().isoformat()
     except Exception:
         return None

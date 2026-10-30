@@ -8,6 +8,7 @@ from sources.base import (
     is_research_related,
     job_content,
     make_post,
+    parse_date,
     safe_text,
 )
 
@@ -52,7 +53,9 @@ def scrape() -> List[dict]:
         detail = fetch(detail_url)
         content = job_content(detail)
         if detail:
-            close_date = safe_text(detail.select_one(".reqUnpostingDate span, span.reqUnpostingDate"))
+            close_date = parse_date(
+                safe_text(detail.select_one(".reqUnpostingDate span, span.reqUnpostingDate"))
+            )
 
         posts.append(
             make_post(

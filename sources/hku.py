@@ -8,6 +8,7 @@ from sources.base import (
     is_research_related,
     job_content,
     make_post,
+    parse_date,
     safe_text,
 )
 
@@ -50,7 +51,10 @@ def scrape() -> List[dict]:
         seen.add(detail_url)
         dept = safe_text(tds[2])
         close_el = tds[3].select_one("time")
-        close_date = close_el.get("datetime") if close_el else None
+        close_raw = ""
+        if close_el:
+            close_raw = close_el.get("datetime") or safe_text(close_el)
+        close_date = parse_date(close_raw)
 
         if not is_research_related(title, department=dept):
             continue
