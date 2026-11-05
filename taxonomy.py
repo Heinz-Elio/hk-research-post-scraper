@@ -40,6 +40,7 @@ DOMAIN_TAXONOMY: List[Tuple[str, str, List[str]]] = [
             "reinforcement learning",
             "generative ai",
             "large language model",
+            "ai",
         ],
     ),
     (
@@ -64,6 +65,8 @@ DOMAIN_TAXONOMY: List[Tuple[str, str, List[str]]] = [
         [
             "data science",
             "data analytic",
+            "data analyst",
+            "analytics",
             "big data",
             "data mining",
             "database",
@@ -123,7 +126,11 @@ DOMAIN_TAXONOMY: List[Tuple[str, str, List[str]]] = [
             "geotechnical",
             "construction",
             "transportation engineering",
+            "transport",
             "urban planning",
+            "geospatial",
+            "geographic information",
+            "gis",
         ],
     ),
     (
@@ -214,6 +221,25 @@ DOMAIN_TAXONOMY: List[Tuple[str, str, List[str]]] = [
             "systems engineering",
             "logistics",
             "supply chain",
+        ],
+    ),
+    (
+        "health",
+        "Health",
+        [
+            "medicine",
+            "medical",
+            "clinical",
+            "nursing",
+            "nurse",
+            "veterinary",
+            "public health",
+            "rehabilitation",
+            "health care",
+            "healthcare",
+            "oncology",
+            "epidemiolog",
+            "pharmacy",
         ],
     ),
 ]
@@ -334,12 +360,34 @@ _OPTIONAL_SKILL = re.compile(
 )
 # SPSS, Stata, or "statistical software" is a method, not a mathematics post.
 _STATS_TOOL = re.compile(
-    r"statistical (?:software|programs?|packages?|analysis with)",
+    r"statistical (?:software|programs?|packages?|analysis with)"
+    r"|spss|stata|\bsas\b|research methods|knowledge of statistics|statistics and",
+    re.I,
+)
+_BENEFIT_CLINIC = re.compile(
+    r"medical and dental|fringe benefits|campus clinic",
+    re.I,
+)
+_GENERIC_ENVIRONMENT = re.compile(
+    r"\b(?:work|learning|changing|office|team|living|physical|competitive|research)\s+environments?\b",
+    re.I,
+)
+_RESEARCH_MATERIALS = re.compile(
+    r"(?:dissemination|reading|teaching|course|reference|training|publicity|supplementary|"
+    r"consent|stimulus|interview|preparing|research)\s+materials?",
     re.I,
 )
 
 
+_UNIT_NAME = re.compile(
+    r"(?:department|school|division|faculty|institute|thrust|centre|center)\s+of\s+(?:[\w&-]+\s+){0,4}$"
+)
+
+
 def _domain_excluded(domain_id: str, phrase: str, hay: str, index: int) -> bool:
+    # The department name is the field, even when the advert also mentions SPSS or benefits.
+    if _UNIT_NAME.search(hay[max(0, index - 60) : index]):
+        return False
     window = hay[max(0, index - 120) : index + len(phrase) + 80]
     if domain_id == "computer-science":
         if phrase in {"software", "programming", "computing"} and _CS_TOOL.search(window):
@@ -358,20 +406,38 @@ def _domain_excluded(domain_id: str, phrase: str, hay: str, index: int) -> bool:
         return True
     if domain_id == "math-stats" and phrase == "statistic" and _STATS_TOOL.search(window):
         return True
-    if domain_id == "materials" and phrase == "material" and _MATERIALS_DOCS.search(window):
+    if domain_id == "materials" and phrase == "material" and (
+        _MATERIALS_DOCS.search(window) or _RESEARCH_MATERIALS.search(window)
+    ):
+        return True
+    if domain_id == "environment" and phrase == "environment" and _GENERIC_ENVIRONMENT.search(window):
+        return True
+    if domain_id == "health" and _BENEFIT_CLINIC.search(window):
         return True
     return False
 
 
-def _phrase_matches(domain_id: str, phrase: str, hay: str) -> bool:
+def _phrase_indexes(hay: str, phrase: str) -> List[int]:
+    """Word-start matches. 'informatics' does not hit inside 'bioinformatics'."""
+    if re.search(r"[a-z]", phrase):
+        end = r"(?![a-z0-9])" if re.fullmatch(r"[a-z0-9]{1,3}", phrase) else ""
+        pattern = r"(?<![a-z0-9])" + re.escape(phrase) + end
+        return [match.start() for match in re.finditer(pattern, hay)]
+    indexes = []
     start = 0
     while True:
         index = hay.find(phrase, start)
         if index < 0:
-            return False
+            return indexes
+        indexes.append(index)
+        start = index + len(phrase)
+
+
+def _phrase_matches(domain_id: str, phrase: str, hay: str) -> bool:
+    for index in _phrase_indexes(hay, phrase):
         if not _domain_excluded(domain_id, phrase, hay, index):
             return True
-        start = index + len(phrase)
+    return False
 
 
 def extract_domains(

@@ -86,20 +86,98 @@ def finish_listing(source: str, posts: List[dict]) -> None:
     data[source] = fingerprint
     _LISTING_HASH_PATH.write_text(json.dumps(data, indent=2), encoding="utf-8")
 
-RESEARCH_KEYWORDS = [
-    "research",
-    "technical",
-    "post-doc",
-    "postdoc",
-    "postdoctoral",
-    # Chinese equivalents used on HKUST(GZ). They do not occur in English
-    # listings, so the other schools keep the same matches.
-    "研究助理",
-    "博士后",
-    "博士後",
-    "技术助理",
-    "技術助理",
-]
+# A research appointment in the title. Discipline is not required: a research
+# assistant in history is still a research post. HKU appends a pay grade,
+# "(at the rank of ...)", which is not the job.
+_RANK = re.compile(
+    r"\((?:at the rank of|holding the functional title of)\s*[^)]*\)",
+    re.I,
+)
+_RESEARCH_ROLE = re.compile(
+    r"research\s+assistants?"
+    r"|research\s+associates?"
+    r"|research\s+officers?"
+    r"|research\s+fellows?"
+    r"|research\s+engineers?"
+    r"|research\s+scientists?"
+    r"|research\s+professors?"
+    r"|research\s+nurses?"
+    r"|clinical\s+research"
+    r"|post[-\s]?doctoral"
+    r"|post[-\s]?docs?\b"
+    r"|\bresearchers?\b"
+    r"|project\s+fellows?"
+    r"|data\s+analysts?"
+    r"|data\s+scientists?"
+    r"|研究助理|博士后|博士後|博后|研究员|研究員|副研究员",
+    re.I,
+)
+# Project assistant/associate is a research grade in academic departments.
+# The same words are also used for admissions and college admin posts.
+_PROJECT_SUPPORT = re.compile(
+    r"project\s+(?:assistants?|associates?)",
+    re.I,
+)
+_ADMIN_OFFICE = re.compile(
+    r"office of|admissions|institutional advancement|financial aid|"
+    r"undergraduate studies|\bcollege\b|human resources|finance office|registry",
+    re.I,
+)
+# Grants managers, clerks, and admissions staff are not research posts,
+# even when the office name contains "research".
+_ADMIN_ROLE = re.compile(
+    r"executive\s+(?:assistant|officer)s?"
+    r"|administrative\s+(?:officer|assistant|manager)s?"
+    r"|\bclerks?\b"
+    r"|clerical"
+    r"|admissions"
+    r"|human\s+resources"
+    r"|finance\s+(?:officer|manager)s?"
+    r"|financial\s+(?:officer|manager)s?"
+    r"|\baccountants?\b"
+    r"|receptionist"
+    r"|secretar(?:y|ial)"
+    r"|librarians?|library\s+assistants?"
+    r"|programme\s+officers?"
+    r"|program\s+officers?"
+    r"|public\s+(?:affairs|engagement)"
+    r"|student\s+services"
+    r"|teaching\s+assistants?"
+    r"|\b(?:senior\s+|assistant\s+|deputy\s+)?(?:general\s+)?managers?\b"
+    r"|\bheads?\b"
+    r"|行政(?:专员|主任|助理)|人事|财务|会计|文员|秘书",
+    re.I,
+)
+_TECHNICAL_ROLE = re.compile(
+    r"technical\s+(?:officer|assistant|manager)s?"
+    r"|\btechnicians?\b"
+    r"|\bscientists?\b"
+    r"|scientific\s+officers?"
+    r"|技术助理|技術助理|技术专员|技術專員|工程师|工程師",
+    re.I,
+)
+_PROJECT_LEAD = re.compile(
+    r"project\s+(?:officer|coordinator|co-ordinator)s?",
+    re.I,
+)
+_FACILITIES_ENGINEER = re.compile(r"设施|维护|维修|物业|保洁|清洁")
+_LAB_UNIT = re.compile(r"\blaborator(?:y|ies)\b|\blabs?\b|实验室", re.I)
+# Used only for technical / scientist / engineer titles, not as a gate on
+# research assistants. Bare "science" is omitted so "science park" and
+# "social sciences" do not qualify a technician.
+_DISCIPLINE = re.compile(
+    r"artificial intelligence|\bmachine learning\b|\bdeep learning\b|\bai\b"
+    r"|data science|analytics|statistic|bioinformatic"
+    r"|computer|computing|software|informatic|algorithm"
+    r"|engineering|robotic|electronic|mechanical|biomedical"
+    r"|physics|chemistr|biolog|bioscience|life science|neuro"
+    r"|mathematic|geograph|geospatial|\bgis\b|transport|urban"
+    r"|environment|climate|energy|optical|photonic|quantum"
+    r"|medicin|clinical|nurs|health|veterinary|pharmac|computational|material|\bbrain\b"
+    r"|生物|物理|化学|医学|计算机|數據|数据|人工智能|算法|机械|電子|电子|光电|嵌入式|电路",
+    re.I,
+)
+_RESEARCH_WORD = re.compile(r"research|研究", re.I)
 
 CONTENT_SELECTORS = [
     "div.ITS_Content_RichTextEditor",
@@ -111,44 +189,6 @@ CONTENT_SELECTORS = [
     "#cityu-content",
     "div#content",
 ]
-
-STEM_KEYWORDS = [
-    "engineering",
-    "science",
-    "computer",
-    "computing",
-    "software",
-    "artificial intelligence",
-    "machine learning",
-    "deep learning",
-    "data science",
-    "data analytic",
-    "information system",
-    "robotic",
-    "automation",
-    "electronic",
-    "mechanical",
-    "civil",
-    "biomedical engineering",
-    "industrial engineering",
-    "systems engineering",
-    "aerospace",
-    "aviation",
-    "environmental science",
-    "earth science",
-    "geology",
-    "mathematics",
-    "statistic",
-    "bioinformatics",
-    "computational",
-    "sensor",
-    "signal processing",
-    "control system",
-    # Chinese engineering titles on HKUST(GZ), e.g. 研究助理（嵌入式开发工程师）.
-    "工程师",
-    "工程師",
-]
-
 
 class Source(Protocol):
     KEY: str
@@ -570,17 +610,52 @@ def parse_date(text: str) -> Optional[str]:
         return None
 
 
-def is_research_related(title: str, department: str = "", project: str = "") -> bool:
-    title_l = (title or "").lower()
-    dept_l = (department or "").lower()
-    project_l = (project or "").lower()
-    combined = f"{title_l} {dept_l} {project_l}"
+def _role_title(title: str) -> str:
+    text = _RANK.sub(" ", title or "")
+    return re.sub(r"\s+", " ", text.replace("\xa0", " ")).strip()
 
-    is_research = any(kw in title_l for kw in RESEARCH_KEYWORDS)
-    if not is_research:
+
+def is_research_related(
+    title: str,
+    department: str = "",
+    project: str = "",
+    description: str = "",
+) -> bool:
+    """True for research appointments, including outside STEM.
+
+    Research assistant, research associate/officer/fellow, postdoc, research
+    engineer/scientist, project fellow, and data analyst pass on the title.
+    Project assistant/associate pass unless the post sits in an admin office.
+    Technical and engineer titles still need a discipline, a lab, or a
+    research word. Clerks, executive officers, admissions, HR, and finance do not.
+    """
+    role = _role_title(title)
+    if not role:
         return False
-
-    return any(kw in combined for kw in STEM_KEYWORDS)
+    # A combined title can offer either a research grade or an admin grade
+    # ("Research Assistant / Research Administrative Assistant"). The research
+    # grade is enough. Admin words only reject a title that has no research grade.
+    if _RESEARCH_ROLE.search(role):
+        return True
+    if _ADMIN_ROLE.search(role) or re.search(r"\badministration\b", role, re.I):
+        return False
+    place = f"{role} {department or ''}"
+    if _PROJECT_SUPPORT.search(role) and not _ADMIN_OFFICE.search(place):
+        return True
+    if _PROJECT_LEAD.search(role) and _RESEARCH_WORD.search(role):
+        return True
+    if _TECHNICAL_ROLE.search(role) and not _FACILITIES_ENGINEER.search(role):
+        if _DISCIPLINE.search(role) or _RESEARCH_WORD.search(role):
+            return True
+        # "Technical Officer（测试工程师）" is lab engineering support.
+        if re.search(r"technical\s+(?:officer|assistant)|技术专员|技術專員|技术助理|技術助理", role, re.I) and re.search(
+            r"工程师|工程師", role
+        ):
+            return True
+        context = " ".join(part for part in (department, project, description) if part)
+        if _DISCIPLINE.search(context) or _LAB_UNIT.search(context):
+            return True
+    return False
 
 
 def make_id(source: str, ref: str) -> str:

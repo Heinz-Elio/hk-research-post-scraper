@@ -1,6 +1,6 @@
 # HK Research Post Scraper
 
-Collector for **Engineering & Science** research posts (Research Assistant, Postdoc, etc.) scraped **directly from university career pages** — not job boards.
+Collector for research posts (Research Assistant, Postdoc, research associate/officer, data analyst, and similar grades) scraped **directly from university career pages** — not job boards. Appointments are kept across disciplines. Clerical and admin grades are left out.
 
 - Plugin scrapers under `sources/` (copy `_template.py` to add a school or org)
 - **Minimum academic requirement** (`min_degree` / `degree_rank`) and **domain tags**
@@ -27,9 +27,9 @@ After Pages is on, the site is typically:
 | Feature | Detail |
 |--------|--------|
 | School pages | Direct scrape of each university career site |
-| STEM focus | Keeps Engineering / Science related research posts only |
+| Research grades | Keeps research appointments in any discipline; drops clerks, executive officers, admissions, HR, and finance |
 | Min degree | Lowest stated requirement; UI **I hold** hides posts above your level |
-| Domain tags | Controlled tags (AI/ML, CS, electronics, …), searchable and clickable |
+| Domain tags | Controlled tags (AI/ML, CS, health, …). Incidental words such as SPSS or "research materials" are not tagged |
 | Summaries | Optional small local model, else rule-based truncate |
 | Storage | `research_posts.json` (active), `outdated_posts.json` |
 | Embeddings | Quantized vectors in `docs/embeddings.json` (not in the listing JSON) |
@@ -72,7 +72,7 @@ pip install -r requirements.txt
 
 Plain HTTP cannot pass AWS WAF (HKU) or Incapsula (CityU detail pages). When that happens, `fetch()` opens the same URL in Chrome, Edge, or Chromium, waits until the bot check clears or the job rows appear, then copies the cookies back so later pages can stay on HTTP.
 
-CUHK, HKMU, HKBU, Lingnan and HKUST(GZ) use their public JSON APIs and do not need a browser. HKUST(GZ) titles are often Chinese (`研究助理`, `博士后`, `技术助理`); those words are recognised alongside the English research terms. The English STEM keyword list is unchanged.
+CUHK, HKMU, HKBU, Lingnan and HKUST(GZ) use their public JSON APIs and do not need a browser. A post is kept when the title is a research appointment (research assistant/associate/officer/fellow, postdoc, research engineer or scientist, project assistant/associate, data analyst), including Chinese titles such as `研究助理` and `博士后`. Technical and engineer titles still need a discipline or a research word. Clerks, executive officers, admissions, HR, and finance titles are left out.
 
 ```bash
 pip install playwright
@@ -150,7 +150,7 @@ results = semantic_search("machine learning research assistant", top_k=5)
 
 ## Notes
 
-- STEM filter uses department/project where the listing provides them; generic titles alone are dropped if no STEM signal. HKMU titles such as "Research Assistant I/II (N&HS)" need the department name.
+- Research appointments are kept across disciplines. HKMU titles such as "Research Assistant I/II (N&HS)" match on the title. Admin roles still drop.
 - HKUST(GZ) keeps an empty closing date when the API's offline date is the open-ended sentinel `3000-01-02`. HKBU and Lingnan do the same when the source publishes no deadline.
 - Be polite: delay between detail requests is already set. Lingnan's careers host asks for a 10-second crawl delay; the scraper hits that host once per run.
 - Personal research-job monitoring only; respect each university’s terms.

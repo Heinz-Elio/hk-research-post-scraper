@@ -120,7 +120,7 @@ def scrape() -> List[dict]:
         if not title or not job_id or len(title) < 8:
             continue
         dept = _department(title, short)
-        if not is_research_related(title, department=dept or short):
+        if not is_research_related(title, department=dept, description=short):
             continue
         chosen.append((job_id, title, dept, short))
 
