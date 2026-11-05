@@ -1,81 +1,73 @@
+"""CUHK non-teaching jobs via the Taleo REST board.
+
+POST https://cuhk.taleo.net/careersection/rest/jobboard/searchjobs
+portal 8115020119. Columns are contest number, title, department.
+"""
+
 import time
 from typing import List
-from urllib.parse import urljoin
 
 from sources.base import (
     REQUEST_DELAY,
     ListingUnchanged,
-    fetch,
     finish_listing,
     is_research_related,
-    job_content,
     make_post,
     parse_date,
-    safe_text,
     same_listing,
 )
+from sources.taleo import detail_url, fetch_detail, search_jobs
 
 KEY = "CUHK"
 NAME = "Chinese University of Hong Kong"
 
+_HOST = "https://cuhk.taleo.net"
+_PORTAL = "8115020119"
+_SECTION = "cu_career_non_teach"
+
 
 def scrape() -> List[dict]:
-    url = (
-        "https://cuhk.taleo.net/careersection/cu_career_non_teach/"
-        "jobsearch.ftl?lang=en&portal=8115020119"
-    )
     posts: List[dict] = []
-    soup = fetch(url, wait_for="tr.even, tr.odd")
-    if not soup:
-        return posts
-
-    rows = soup.select("tr.even, tr.odd")
-    if not rows:
-        print("  [CUHK] Taleo listing has no job rows in the static HTML")
+    rows = search_jobs(_HOST, _PORTAL)
+    if rows is None:
+        print("  [CUHK] Taleo job search returned no data")
         return posts
 
     jobs = []
     for row in rows:
-        job_num = safe_text(row.select_one("th span"))
-        tds = row.find_all("td")
-        if len(tds) < 3:
+        columns = row.get("column") or []
+        if len(columns) < 3:
             continue
-        a = tds[1].select_one("a")
-        if not a or not a.get("href"):
+        ref = str(row.get("contestNo") or columns[0] or "").strip()
+        title = str(columns[1] or "").replace("\xa0", " ").strip()
+        dept = str(columns[2] or "").replace("\xa0", " ").strip()
+        if not ref or not title:
             continue
-        href = a["href"]
-        title = safe_text(a)
-        dept = safe_text(tds[2].select_one("span"))
-
         if not is_research_related(title, department=dept):
             continue
+        jobs.append((ref, title, dept, detail_url(_HOST, _SECTION, ref)))
 
-        detail_url = urljoin(url, href)
-        jobs.append((job_num, title, dept, detail_url))
-
-    listing_rows = [f"{ref}|{title}|{dept}|{detail}" for ref, title, dept, detail in jobs]
+    print(f"  [CUHK] {len(rows)} listings, {len(jobs)} match the research filter")
+    listing_rows = [f"{ref}|{title}|{dept}|{url}" for ref, title, dept, url in jobs]
     if same_listing(KEY, listing_rows):
         return ListingUnchanged()
 
-    for job_num, title, dept, detail_url in jobs:
-        close_date = None
+    for ref, title, dept, url in jobs:
         time.sleep(REQUEST_DELAY)
-        detail = fetch(detail_url)
-        content = job_content(detail)
-        if detail:
-            close_date = parse_date(
-                safe_text(detail.select_one(".reqUnpostingDate span, span.reqUnpostingDate"))
-            )
-
+        detail = fetch_detail(url) or {}
+        close_date = parse_date(detail.get("unposting_date") or "")
+        content = detail.get("description") or ""
+        if not dept:
+            dept = detail.get("organization") or ""
         posts.append(
             make_post(
                 source=KEY,
-                ref=job_num,
-                title=title,
-                url=detail_url,
+                ref=ref,
+                title=detail.get("title") or title,
+                url=url,
                 content=content,
                 close_date=close_date,
-                department=dept,
+                department=dept or None,
             )
         )
     finish_listing(KEY, posts)

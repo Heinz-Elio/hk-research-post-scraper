@@ -92,6 +92,13 @@ RESEARCH_KEYWORDS = [
     "post-doc",
     "postdoc",
     "postdoctoral",
+    # Chinese equivalents used on HKUST(GZ). They do not occur in English
+    # listings, so the other schools keep the same matches.
+    "研究助理",
+    "博士后",
+    "博士後",
+    "技术助理",
+    "技術助理",
 ]
 
 CONTENT_SELECTORS = [
@@ -137,6 +144,9 @@ STEM_KEYWORDS = [
     "sensor",
     "signal processing",
     "control system",
+    # Chinese engineering titles on HKUST(GZ), e.g. 研究助理（嵌入式开发工程师）.
+    "工程师",
+    "工程師",
 ]
 
 
@@ -415,6 +425,69 @@ def repair_mojibake(text: str) -> str:
             return chunk
 
     return _MOJIBAKE_RUN.sub(fix, text)
+
+
+def html_to_text(html: str) -> str:
+    """Visible text of an HTML fragment from a JSON job description."""
+    if not html or not str(html).strip():
+        return ""
+    soup = BeautifulSoup(str(html), "lxml")
+    for junk in soup.select("script, style"):
+        junk.decompose()
+    return repair_mojibake(soup.get_text("\n", strip=True)).replace("\xa0", " ")
+
+
+def api_request(
+    method: str,
+    url: str,
+    *,
+    json_body=None,
+    extra_headers: Optional[dict] = None,
+    timeout: int = 30,
+    expect: str = "json",
+    pause: float = 1,
+):
+    """One JSON or text call on the shared session.
+
+    Career JSON APIs do not need a browser. Returns None when the response
+    is an error page or cannot be decoded.
+    """
+    headers = dict(HEADERS)
+    if expect == "json":
+        headers["Accept"] = "application/json"
+    if extra_headers:
+        headers.update(extra_headers)
+    last_error = None
+    for attempt in range(2):
+        try:
+            response = _SESSION.request(
+                method,
+                url,
+                headers=headers,
+                json=json_body,
+                timeout=timeout,
+            )
+            if response.status_code in (429, 503) and attempt == 0:
+                time.sleep(max(REQUEST_DELAY * 2, pause))
+                continue
+            if response.status_code >= 400:
+                print(f"  [http] {response.status_code} {url[:90]}")
+                return None
+            if expect == "text":
+                return _decode_html(response)
+            ctype = (response.headers.get("content-type") or "").lower()
+            body = response.text.lstrip()
+            if "json" not in ctype and not body.startswith(("{", "[")):
+                print(f"  [http] not json {url[:90]}")
+                return None
+            return response.json()
+        except Exception as e:
+            last_error = e
+            print(f"  [http] {url[:80]} → {e}")
+            time.sleep(pause)
+    if last_error:
+        print(f"  [http] give up {url[:80]}")
+    return None
 
 
 def job_content(soup: Optional[BeautifulSoup]) -> str:

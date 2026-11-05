@@ -43,13 +43,13 @@ After Pages is on, the site is typically:
 | HKU | University of Hong Kong | Table + department |
 | PolyU | PolyU | Research table: dept + project |
 | CityU | CityU | Research positions + dept |
-| CUHK | CUHK | Taleo; department/unit |
+| CUHK | CUHK | Taleo REST; department/unit |
 | HKUST | HKUST CWB | teaching-support listing + division |
-| HKUST-GZ | HKUST Guangzhou | Best-effort |
-| HKBU | HKBU | **Playwright** (Oracle Cloud) |
-| Lingnan | Lingnan | **Playwright** (CSOD) |
+| HKUST-GZ | HKUST Guangzhou | Career JSON API; Chinese titles included |
+| HKBU | HKBU | Oracle Recruiting Cloud REST |
+| Lingnan | Lingnan | CSOD job-search API (research-support category) |
 | EdUHK | EdUHK | research-support-posts category |
-| HKMU | HKMU | Taleo (limited) |
+| HKMU | HKMU | Taleo REST; department is part of the STEM check |
 
 ## Add another school or organisation
 
@@ -68,9 +68,11 @@ cd hk-research-post-scraper
 pip install -r requirements.txt
 ```
 
-### Optional: Playwright (bot checks and JS listings)
+### Optional: Playwright (bot checks)
 
-Plain HTTP cannot pass AWS WAF (HKU) or Incapsula (CityU detail pages), and Taleo (CUHK, HKMU) draws the job table only after JavaScript runs. When that happens, `fetch()` opens the same URL in Chrome, Edge, or Chromium, waits until the bot check clears or the job rows appear, then copies the cookies back so later pages can stay on HTTP.
+Plain HTTP cannot pass AWS WAF (HKU) or Incapsula (CityU detail pages). When that happens, `fetch()` opens the same URL in Chrome, Edge, or Chromium, waits until the bot check clears or the job rows appear, then copies the cookies back so later pages can stay on HTTP.
+
+CUHK, HKMU, HKBU, Lingnan and HKUST(GZ) use their public JSON APIs and do not need a browser. HKUST(GZ) titles are often Chinese (`研究助理`, `博士后`, `技术助理`); those words are recognised alongside the English research terms. The English STEM keyword list is unchanged.
 
 ```bash
 pip install playwright
@@ -148,7 +150,7 @@ results = semantic_search("machine learning research assistant", top_k=5)
 
 ## Notes
 
-- STEM filter uses department/project where the listing provides them; generic titles alone are dropped if no STEM signal.
-- HKBU / Lingnan need Playwright; without it those scrapers skip cleanly.
-- Be polite: delay between detail requests is already set.
+- STEM filter uses department/project where the listing provides them; generic titles alone are dropped if no STEM signal. HKMU titles such as "Research Assistant I/II (N&HS)" need the department name.
+- HKUST(GZ) keeps an empty closing date when the API's offline date is the open-ended sentinel `3000-01-02`. HKBU and Lingnan do the same when the source publishes no deadline.
+- Be polite: delay between detail requests is already set. Lingnan's careers host asks for a 10-second crawl delay; the scraper hits that host once per run.
 - Personal research-job monitoring only; respect each university’s terms.
