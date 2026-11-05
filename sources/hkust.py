@@ -5,11 +5,14 @@ from urllib.parse import urljoin
 
 from sources.base import (
     REQUEST_DELAY,
+    ListingUnchanged,
     fetch,
+    finish_listing,
     is_research_related,
     job_content,
     make_post,
     parse_date,
+    same_listing,
 )
 
 KEY = "HKUST"
@@ -57,6 +60,7 @@ def scrape() -> List[dict]:
         return posts
 
     seen = set()
+    jobs = []
     for card in cards:
         fields = _card_fields(card)
         title = fields["title"]
@@ -73,7 +77,16 @@ def scrape() -> List[dict]:
 
         ref = fields["job_id"] or hashlib.md5(detail_url.encode()).hexdigest()[:10]
         card_text = card.get_text("\n", strip=True)
+        jobs.append((ref, title, fields["dept"], fields["close_date"], detail_url, card_text))
 
+    listing_rows = [
+        f"{ref}|{title}|{dept}|{close}|{detail}"
+        for ref, title, dept, close, detail, _card in jobs
+    ]
+    if same_listing(KEY, listing_rows):
+        return ListingUnchanged()
+
+    for ref, title, dept, close_date, detail_url, card_text in jobs:
         time.sleep(REQUEST_DELAY)
         detail = fetch(detail_url)
         body = job_content(detail)
@@ -86,8 +99,9 @@ def scrape() -> List[dict]:
                 title=title,
                 url=detail_url,
                 content=content,
-                close_date=fields["close_date"],
-                department=fields["dept"] or None,
+                close_date=close_date,
+                department=dept or None,
             )
         )
+    finish_listing(KEY, posts)
     return posts

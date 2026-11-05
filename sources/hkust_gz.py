@@ -3,7 +3,16 @@ import time
 from typing import List
 from urllib.parse import urljoin
 
-from sources.base import REQUEST_DELAY, fetch, is_research_related, job_content, make_post
+from sources.base import (
+    REQUEST_DELAY,
+    ListingUnchanged,
+    fetch,
+    finish_listing,
+    is_research_related,
+    job_content,
+    make_post,
+    same_listing,
+)
 
 KEY = "HKUST-GZ"
 NAME = "HKUST Guangzhou"
@@ -18,13 +27,19 @@ def scrape() -> List[dict]:
         if not soup:
             return posts
 
+    jobs = []
     for a in soup.find_all("a", href=True):
         title = a.get_text(strip=True)
         if not is_research_related(title):
             continue
         detail_url = urljoin(url, a["href"])
         ref = hashlib.md5(detail_url.encode()).hexdigest()[:10]
+        jobs.append((ref, title, detail_url))
 
+    if same_listing(KEY, [f"{ref}|{title}|{detail}" for ref, title, detail in jobs]):
+        return ListingUnchanged()
+
+    for ref, title, detail_url in jobs:
         time.sleep(REQUEST_DELAY)
         content = job_content(fetch(detail_url))
 
@@ -37,4 +52,5 @@ def scrape() -> List[dict]:
                 content=content,
             )
         )
+    finish_listing(KEY, posts)
     return posts

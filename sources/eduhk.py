@@ -2,7 +2,15 @@ import hashlib
 from typing import List
 from urllib.parse import urljoin
 
-from sources.base import fetch, is_research_related, make_post, parse_date
+from sources.base import (
+    ListingUnchanged,
+    fetch,
+    finish_listing,
+    is_research_related,
+    make_post,
+    parse_date,
+    same_listing,
+)
 
 KEY = "EdUHK"
 NAME = "Education University of Hong Kong"
@@ -30,6 +38,7 @@ def scrape() -> List[dict]:
         return posts
 
     seen = set()
+    chosen = []
     for item in items:
         link = item.select_one("a.job__title-name")
         if not link or not link.get("href"):
@@ -48,7 +57,16 @@ def scrape() -> List[dict]:
         ref = _dd(item, "ref") or hashlib.md5(detail_url.encode()).hexdigest()[:10]
         close_date = parse_date(_dd(item, "close date"))
         content = item.get_text("\n", strip=True)
+        chosen.append((ref, title, dept, close_date, detail_url, content))
 
+    listing_rows = [
+        f"{ref}|{title}|{dept}|{close}|{detail}"
+        for ref, title, dept, close, detail, _content in chosen
+    ]
+    if same_listing(KEY, listing_rows):
+        return ListingUnchanged()
+
+    for ref, title, dept, close_date, detail_url, content in chosen:
         posts.append(
             make_post(
                 source=KEY,
@@ -60,4 +78,5 @@ def scrape() -> List[dict]:
                 department=dept or None,
             )
         )
+    finish_listing(KEY, posts)
     return posts

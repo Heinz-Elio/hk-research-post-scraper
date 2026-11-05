@@ -4,12 +4,15 @@ from typing import List
 
 from sources.base import (
     REQUEST_DELAY,
+    ListingUnchanged,
     fetch,
+    finish_listing,
     is_research_related,
     job_content,
     make_post,
     parse_date,
     safe_text,
+    same_listing,
 )
 
 KEY = "PolyU"
@@ -24,6 +27,7 @@ def scrape() -> List[dict]:
     if not soup:
         return posts
 
+    jobs = []
     for row in soup.select("tr.ITS_clickableTableRow"):
         tds = row.select("td")
         if len(tds) < 5:
@@ -42,8 +46,17 @@ def scrape() -> List[dict]:
             continue
 
         detail_url = url.replace("research.php", url_part)
-        close_date = parse_date(close_raw)
+        jobs.append((ref, title, dept, project, close_raw, detail_url))
 
+    rows = [
+        f"{ref}|{title}|{dept}|{project}|{close}|{detail}"
+        for ref, title, dept, project, close, detail in jobs
+    ]
+    if same_listing(KEY, rows):
+        return ListingUnchanged()
+
+    for ref, title, dept, project, close_raw, detail_url in jobs:
+        close_date = parse_date(close_raw)
         time.sleep(REQUEST_DELAY)
         detail = fetch(detail_url)
         body = job_content(detail)
@@ -62,4 +75,5 @@ def scrape() -> List[dict]:
                 project=project,
             )
         )
+    finish_listing(KEY, posts)
     return posts

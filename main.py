@@ -28,6 +28,7 @@ from embeddings_store import (
     upsert_vector,
 )
 from sources import SCRAPERS, SOURCE_NAMES
+from sources.base import ListingUnchanged
 from taxonomy import enrich_classification
 
 # ==================================================================
@@ -490,6 +491,9 @@ def run(
             print(f"\n→ Scraping {name} ...")
             try:
                 posts = SCRAPERS[name]()
+                if isinstance(posts, ListingUnchanged):
+                    print("  Listing unchanged; kept the stored posts")
+                    continue
                 print(f"  Found {len(posts)} research-related posts")
 
                 for p in posts:

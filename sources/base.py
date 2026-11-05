@@ -13,10 +13,13 @@ Optional listing hints: close_date, department, project
 from __future__ import annotations
 
 import atexit
+import hashlib
+import json
 import re
 import ssl
 import time
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 from typing import List, Optional, Protocol
 from urllib.parse import urljoin
 
@@ -43,6 +46,45 @@ HEADERS = {
 }
 REQUEST_DELAY = 1.3
 PLAYWRIGHT_TIMEOUT = 60000
+
+_LISTING_HASH_PATH = Path(__file__).resolve().parent.parent / "listing_hashes.json"
+_PENDING_LISTING: dict = {}
+
+
+class ListingUnchanged:
+    """The job list hash matches the last successful scrape, so detail pages were skipped."""
+
+
+def _read_listing_hashes() -> dict:
+    if not _LISTING_HASH_PATH.exists():
+        return {}
+    try:
+        data = json.loads(_LISTING_HASH_PATH.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
+def same_listing(source: str, rows: List[str]) -> bool:
+    """True when this listing's jobs match the last run. Detail pages can be skipped."""
+    fingerprint = hashlib.sha256("\n".join(rows).encode("utf-8")).hexdigest()
+    _PENDING_LISTING[source] = fingerprint
+    if _read_listing_hashes().get(source) == fingerprint:
+        print(f"  [{source}] listing unchanged")
+        return True
+    return False
+
+
+def finish_listing(source: str, posts: List[dict]) -> None:
+    """Remember the listing hash after detail text was actually collected."""
+    fingerprint = _PENDING_LISTING.get(source)
+    if not fingerprint:
+        return
+    if posts and all(len((post.get("content") or "").strip()) < 120 for post in posts):
+        return
+    data = _read_listing_hashes()
+    data[source] = fingerprint
+    _LISTING_HASH_PATH.write_text(json.dumps(data, indent=2), encoding="utf-8")
 
 RESEARCH_KEYWORDS = [
     "research",

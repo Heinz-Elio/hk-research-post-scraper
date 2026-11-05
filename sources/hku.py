@@ -4,12 +4,15 @@ from urllib.parse import urljoin
 
 from sources.base import (
     REQUEST_DELAY,
+    ListingUnchanged,
     fetch,
+    finish_listing,
     is_research_related,
     job_content,
     make_post,
     parse_date,
     safe_text,
+    same_listing,
 )
 
 KEY = "HKU"
@@ -35,6 +38,7 @@ def scrape() -> List[dict]:
         return posts
 
     seen = set()
+    jobs = []
     for tr in rows:
         tds = tr.select("td")
         if len(tds) < 4:
@@ -54,11 +58,20 @@ def scrape() -> List[dict]:
         close_raw = ""
         if close_el:
             close_raw = close_el.get("datetime") or safe_text(close_el)
-        close_date = parse_date(close_raw)
 
         if not is_research_related(title, department=dept):
             continue
+        jobs.append((job_num, title, dept, close_raw, detail_url))
 
+    listing_rows = [
+        f"{ref}|{title}|{dept}|{close}|{detail}"
+        for ref, title, dept, close, detail in jobs
+    ]
+    if same_listing(KEY, listing_rows):
+        return ListingUnchanged()
+
+    for job_num, title, dept, close_raw, detail_url in jobs:
+        close_date = parse_date(close_raw)
         time.sleep(REQUEST_DELAY)
         detail = fetch(detail_url)
         content = job_content(detail)
@@ -74,4 +87,5 @@ def scrape() -> List[dict]:
                 department=dept,
             )
         )
+    finish_listing(KEY, posts)
     return posts

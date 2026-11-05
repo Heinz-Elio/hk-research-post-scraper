@@ -5,12 +5,15 @@ from urllib.parse import urljoin
 
 from sources.base import (
     REQUEST_DELAY,
+    ListingUnchanged,
     fetch,
+    finish_listing,
     is_research_related,
     job_content,
     make_post,
     parse_date,
     safe_text,
+    same_listing,
 )
 
 KEY = "CityU"
@@ -29,7 +32,7 @@ def scrape() -> List[dict]:
     if not table:
         return posts
 
-    warned_blocked = False
+    jobs = []
     for row in table.find_all("tr")[1:]:
         tds = row.find_all("td")
         if len(tds) < 2:
@@ -41,14 +44,20 @@ def scrape() -> List[dict]:
             continue
 
         close_raw = safe_text(tds[2]) if len(tds) > 2 else ""
-        close_date = parse_date(close_raw)
-
         a = tds[0].find("a", href=True)
         if not a or not a.get("href") or a["href"].startswith("javascript:"):
             continue
         detail_url = urljoin(url, a["href"])
         ref = a["href"].split("=")[-1] or hashlib.md5(title.encode()).hexdigest()[:8]
+        jobs.append((ref, title, dept, close_raw, detail_url))
 
+    rows = [f"{ref}|{title}|{dept}|{close}|{detail}" for ref, title, dept, close, detail in jobs]
+    if same_listing(KEY, rows):
+        return ListingUnchanged()
+
+    warned_blocked = False
+    for ref, title, dept, close_raw, detail_url in jobs:
+        close_date = parse_date(close_raw)
         time.sleep(REQUEST_DELAY)
         detail = fetch(detail_url)
         body = job_content(detail)
@@ -68,4 +77,5 @@ def scrape() -> List[dict]:
                 department=dept,
             )
         )
+    finish_listing(KEY, posts)
     return posts

@@ -204,6 +204,7 @@
       input[type="search"] { min-width: 0; }
     }
 
+    #results { scroll-margin-top: 12px; }
     .pagination {
       display: flex;
       justify-content: center;
@@ -647,19 +648,19 @@
       }, 280);
     });
 
+    function showPage(page) {
+      currentPage = page;
+      render();
+      document.getElementById("results").scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
     document.getElementById("prev-page").addEventListener("click", () => {
-      if (currentPage > 1) {
-        currentPage--;
-        render();
-      }
+      if (currentPage > 1) showPage(currentPage - 1);
     });
 
     document.getElementById("next-page").addEventListener("click", () => {
       const totalPages = Math.max(1, Math.ceil(getFiltered().length / PAGE_SIZE));
-      if (currentPage < totalPages) {
-        currentPage++;
-        render();
-      }
+      if (currentPage < totalPages) showPage(currentPage + 1);
     });
 
     loadData();

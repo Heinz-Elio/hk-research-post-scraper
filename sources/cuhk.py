@@ -4,12 +4,15 @@ from urllib.parse import urljoin
 
 from sources.base import (
     REQUEST_DELAY,
+    ListingUnchanged,
     fetch,
+    finish_listing,
     is_research_related,
     job_content,
     make_post,
     parse_date,
     safe_text,
+    same_listing,
 )
 
 KEY = "CUHK"
@@ -31,6 +34,7 @@ def scrape() -> List[dict]:
         print("  [CUHK] Taleo listing has no job rows in the static HTML")
         return posts
 
+    jobs = []
     for row in rows:
         job_num = safe_text(row.select_one("th span"))
         tds = row.find_all("td")
@@ -47,8 +51,14 @@ def scrape() -> List[dict]:
             continue
 
         detail_url = urljoin(url, href)
-        close_date = None
+        jobs.append((job_num, title, dept, detail_url))
 
+    listing_rows = [f"{ref}|{title}|{dept}|{detail}" for ref, title, dept, detail in jobs]
+    if same_listing(KEY, listing_rows):
+        return ListingUnchanged()
+
+    for job_num, title, dept, detail_url in jobs:
+        close_date = None
         time.sleep(REQUEST_DELAY)
         detail = fetch(detail_url)
         content = job_content(detail)
@@ -68,4 +78,5 @@ def scrape() -> List[dict]:
                 department=dept,
             )
         )
+    finish_listing(KEY, posts)
     return posts
