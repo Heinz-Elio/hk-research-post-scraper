@@ -156,12 +156,28 @@ def commit_listing_hashes() -> None:
 
 
 def prepare_posts(posts: List[dict]) -> List[dict]:
-    """Fill date_type, date_note and possibly_stale from the advertisement text."""
+    """Drop clerk grades found in the ad, then fill date fields.
+
+    The listing filter already sees clerk wording in the title. Some ads only
+    name the clerk grade in the body ("at the rank of Clerk", "Clerk grade").
+    """
     from sources.dates import refine_dates
 
+    kept: List[dict] = []
     for post in posts or []:
-        if isinstance(post, dict):
-            refine_dates(post)
+        if not isinstance(post, dict):
+            continue
+        if not is_research_related(
+            post.get("title") or "",
+            department=post.get("department") or "",
+            project=post.get("project") or "",
+            description=post.get("content") or "",
+        ):
+            continue
+        refine_dates(post)
+        kept.append(post)
+    if isinstance(posts, list):
+        posts[:] = kept
     return posts
 
 # A research appointment in the title. Discipline is not required: a research
@@ -257,6 +273,22 @@ _DISCIPLINE = re.compile(
     re.I,
 )
 _RESEARCH_WORD = re.compile(r"research|研究", re.I)
+# A clerk grade excludes the post even when the functional title is a research
+# or project grade. The pay-grade parenthesis is stripped for other checks,
+# so clerk wording has to be read from the raw title.
+_CLERK_WORD = re.compile(
+    r"\bclerks?\b|\bclerical\b|文員|文员|文書|文书",
+    re.I,
+)
+_CLERK_RANK = re.compile(
+    r"at the rank of\s+(?:[^.\n]{0,50})?(?:\bclerks?\b|\bclerical\b)"
+    r"|holding the functional title of\s+(?:[^.\n]{0,50})?(?:\bclerks?\b|\bclerical\b)"
+    r"|\bclerks?(?:\s+(?:[ivx]+|\d+))?\s+grades?\b"
+    r"|\bclerical\s+grades?\b"
+    r"|(?:文員|文员|文書|文书)\s*職[級级衔銜]"
+    r"|職[級级衔銜]\s*(?:為|为|是)?\s*(?:文員|文员|文書|文书)",
+    re.I,
+)
 
 CONTENT_SELECTORS = [
     "div.ITS_Content_RichTextEditor",
@@ -709,8 +741,17 @@ def is_research_related(
     Project assistant/associate pass unless the post sits in an admin office.
     Technical and engineer titles still need a discipline, a lab, or a
     research word. Clerks, executive officers, admissions, HR, and finance do not.
+    A clerk or clerical grade anywhere in the title, including inside
+    "(at the rank of Clerk)", excludes the post. The same grade named in the
+    advertisement ("Clerk grade", "文員職級") does too.
     """
-    role = _role_title(title)
+    raw_title = title or ""
+    if _CLERK_WORD.search(raw_title) or _CLERK_RANK.search(raw_title):
+        return False
+    rank_blob = "\n".join(part for part in (description, project) if part)
+    if rank_blob and _CLERK_RANK.search(rank_blob):
+        return False
+    role = _role_title(raw_title)
     if not role:
         return False
     # A combined title can offer either a research grade or an admin grade

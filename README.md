@@ -155,7 +155,7 @@ results = semantic_search("machine learning research assistant", top_k=5)
 
 ## Notes
 
-- Research appointments are kept across disciplines. Admin roles still drop. HKMU titles such as "Research Assistant I/II (N&HS)" match on the title.
+- Research appointments are kept across disciplines. Admin roles still drop. A clerk or clerical grade in the title or in the advertisement ("at the rank of Clerk", "Clerk grade", 文員/文员/文書) drops the post even when the functional title is a project or research grade. HKMU titles such as "Research Assistant I/II (N&HS)" match on the title.
 - A listing hash is stored only after the JSON save, and never for an empty listing. `--force` re-fetches anyway. PolyU's screening date is `date_type: review_start` and does not move a post to outdated while the post is still listed.
 - HKUST(GZ) keeps an empty closing date when the API's offline date is the open-ended sentinel `3000-01-02`. HKBU and Lingnan do the same when the source publishes no deadline.
 - Be polite: delay between detail requests is already set. Lingnan's careers host asks for a 10-second crawl delay; the scraper hits that host once per run.

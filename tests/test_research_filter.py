@@ -93,9 +93,43 @@ def test_admin_and_non_research_titles_are_excluded():
         ),
         ("行政专员（AI）", "Office of Student Affairs"),
         ("Laboratory Manager (at the rank of Technical Manager)", "Faculty of Medicine"),
+        ("Project Assistant (at the rank of Clerk)", "Department of Ophthalmology"),
+        ("Project Assistant (at the rank of Clerk I/II)", "Department of Computing"),
+        ("Research Assistant (at the rank of Clerk II)", "Department of History"),
+        ("Clerk I/II", "Faculty of Arts"),
+        ("Clerical Officer", "Registry"),
+        ("Senior Clerk", "Department of Physics"),
+        ("文員", "Department of Computing"),
+        ("文员", ""),
+        ("文書主任", "Faculty of Engineering"),
+        ("Project Executive（文員職級）", "School of Nursing"),
     ]
     for title, dept in dropped:
         assert is_research_related(title, department=dept) is False, title
+
+
+def test_clerk_grade_in_the_advertisement_is_excluded():
+    assert is_research_related(
+        "Research Assistant",
+        department="Department of Computing",
+        description="The appointee will serve at the rank of Clerk II for twelve months.",
+    ) is False
+    assert is_research_related(
+        "Project Associate",
+        department="Department of Social Work",
+        description="Appointment will be on the Clerk grade.",
+    ) is False
+    assert is_research_related(
+        "研究助理",
+        department="Thrust of Smart Manufacturing",
+        description="以文員職級聘任，協助實驗室工作。",
+    ) is False
+    # A mention of someone else's clerk duties is not this post's grade.
+    assert is_research_related(
+        "Research Assistant",
+        department="Department of History",
+        description="Liaise with the departmental clerk about room bookings and archives.",
+    )
 
 
 def test_domain_tags_ignore_incidental_words():
