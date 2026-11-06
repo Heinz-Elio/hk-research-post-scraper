@@ -11,7 +11,9 @@ from sources.base import (
     is_research_related,
     job_content,
     make_post,
+    note_counts,
     parse_date,
+    prepare_posts,
     same_listing,
 )
 
@@ -27,6 +29,7 @@ def _card_fields(card) -> dict:
     job_id = ""
     dept = ""
     close_date = None
+    open_date = None
     for p in card.select("p"):
         text = p.get_text(" ", strip=True)
         low = text.lower()
@@ -35,7 +38,7 @@ def _card_fields(card) -> dict:
         elif "apply by" in low:
             close_date = parse_date(text.split(":")[-1].strip())
         elif "open date" in low:
-            continue
+            open_date = parse_date(text.split(":")[-1].strip())
         elif not dept and text and "date" not in low:
             dept = text
     return {
@@ -44,6 +47,7 @@ def _card_fields(card) -> dict:
         "job_id": job_id,
         "dept": dept,
         "close_date": close_date,
+        "open_date": open_date,
     }
 
 
@@ -52,11 +56,13 @@ def scrape() -> List[dict]:
     posts: List[dict] = []
     soup = fetch(list_url)
     if not soup:
+        note_counts(KEY, 0, 0)
         return posts
 
     cards = soup.select("div.job-card")
     if not cards:
         print("  [HKUST] no div.job-card on the listing page")
+        note_counts(KEY, 0, 0)
         return posts
 
     seen = set()
@@ -77,16 +83,20 @@ def scrape() -> List[dict]:
 
         ref = fields["job_id"] or hashlib.md5(detail_url.encode()).hexdigest()[:10]
         card_text = card.get_text("\n", strip=True)
-        jobs.append((ref, title, fields["dept"], fields["close_date"], detail_url, card_text))
+        jobs.append(
+            (ref, title, fields["dept"], fields["close_date"], fields["open_date"], detail_url, card_text)
+        )
 
+    print(f"  [HKUST] {len(cards)} cards, {len(jobs)} match the research filter")
+    note_counts(KEY, len(cards), len(jobs))
     listing_rows = [
         f"{ref}|{title}|{dept}|{close}|{detail}"
-        for ref, title, dept, close, detail, _card in jobs
+        for ref, title, dept, close, _opened, detail, _card in jobs
     ]
     if same_listing(KEY, listing_rows):
         return ListingUnchanged()
 
-    for ref, title, dept, close_date, detail_url, card_text in jobs:
+    for ref, title, dept, close_date, open_date, detail_url, card_text in jobs:
         time.sleep(REQUEST_DELAY)
         detail = fetch(detail_url)
         body = job_content(detail)
@@ -101,7 +111,9 @@ def scrape() -> List[dict]:
                 content=content,
                 close_date=close_date,
                 department=dept or None,
+                open_date=open_date,
             )
         )
+    prepare_posts(posts)
     finish_listing(KEY, posts)
     return posts

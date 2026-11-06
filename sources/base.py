@@ -49,10 +49,49 @@ PLAYWRIGHT_TIMEOUT = 60000
 
 _LISTING_HASH_PATH = Path(__file__).resolve().parent.parent / "listing_hashes.json"
 _PENDING_LISTING: dict = {}
+_READY_LISTING: dict = {}
+_LISTING_COUNTS: dict = {}
+_FORCE_RESCRAPE = False
+_EMPTY_STORED: set = set()
+# SHA-256 of "". A run that parsed no kept rows used to store this and then
+# skip the source forever. It is never a successful listing fingerprint.
+EMPTY_LISTING_HASH = hashlib.sha256(b"").hexdigest()
+_MIN_SAVED_CONTENT = 80
 
 
 class ListingUnchanged:
     """The job list hash matches the last successful scrape, so detail pages were skipped."""
+
+
+def set_listing_hash_path(path: Path) -> None:
+    """Point the hash file somewhere other than the repo (dry-run / tests)."""
+    global _LISTING_HASH_PATH
+    _LISTING_HASH_PATH = Path(path)
+
+
+def configure_run(*, force: bool = False, sources_with_no_posts=None) -> None:
+    """Reset per-run listing-hash state.
+
+    ``force`` is the --force / --ignore-hashes switch. Sources with no active
+    posts are re-scraped even when the stored hash matches, so a hash written
+    before the JSON was saved cannot stick at zero posts.
+    """
+    global _FORCE_RESCRAPE
+    _FORCE_RESCRAPE = bool(force)
+    _EMPTY_STORED.clear()
+    _EMPTY_STORED.update(sources_with_no_posts or ())
+    _PENDING_LISTING.clear()
+    _READY_LISTING.clear()
+    _LISTING_COUNTS.clear()
+
+
+def note_counts(source: str, listed: int, kept: int) -> None:
+    """How many listing rows were seen, and how many passed the research filter."""
+    _LISTING_COUNTS[source] = {"listed": int(listed), "kept": int(kept)}
+
+
+def listing_counts() -> dict:
+    return dict(_LISTING_COUNTS)
 
 
 def _read_listing_hashes() -> dict:
@@ -66,40 +105,190 @@ def _read_listing_hashes() -> dict:
 
 
 def same_listing(source: str, rows: List[str]) -> bool:
-    """True when this listing's jobs match the last run. Detail pages can be skipped."""
+    """True when this listing's jobs match the last run. Detail pages can be skipped.
+
+    An empty row list, the empty-string fingerprint, and a source with no
+    stored posts are never treated as unchanged.
+    """
     fingerprint = hashlib.sha256("\n".join(rows).encode("utf-8")).hexdigest()
     _PENDING_LISTING[source] = fingerprint
-    if _read_listing_hashes().get(source) == fingerprint:
+    if _FORCE_RESCRAPE or source in _EMPTY_STORED:
+        return False
+    if not rows or fingerprint == EMPTY_LISTING_HASH:
+        return False
+    stored = _read_listing_hashes().get(source)
+    if not stored or stored == EMPTY_LISTING_HASH:
+        return False
+    if stored == fingerprint:
         print(f"  [{source}] listing unchanged")
         return True
     return False
 
 
 def finish_listing(source: str, posts: List[dict]) -> None:
-    """Remember the listing hash after detail text was actually collected."""
+    """Remember a fingerprint to write only after the JSON save succeeds.
+
+    Does not touch ``listing_hashes.json``. Empty results, the empty-string
+    fingerprint, and scrapes whose detail text never arrived are dropped.
+    """
     fingerprint = _PENDING_LISTING.get(source)
-    if not fingerprint:
+    if not fingerprint or fingerprint == EMPTY_LISTING_HASH:
         return
-    if posts and all(len((post.get("content") or "").strip()) < 120 for post in posts):
+    if not posts:
+        return
+    if all(len((post.get("content") or "").strip()) < _MIN_SAVED_CONTENT for post in posts):
+        return
+    _READY_LISTING[source] = fingerprint
+
+
+def commit_listing_hashes() -> None:
+    """Write hashes for listings whose posts were just saved."""
+    if not _READY_LISTING:
         return
     data = _read_listing_hashes()
-    data[source] = fingerprint
-    _LISTING_HASH_PATH.write_text(json.dumps(data, indent=2), encoding="utf-8")
+    data.update(_READY_LISTING)
+    _LISTING_HASH_PATH.parent.mkdir(parents=True, exist_ok=True)
+    _LISTING_HASH_PATH.write_text(
+        json.dumps(data, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    _READY_LISTING.clear()
 
-RESEARCH_KEYWORDS = [
-    "research",
-    "technical",
-    "post-doc",
-    "postdoc",
-    "postdoctoral",
-    # Chinese equivalents used on HKUST(GZ). They do not occur in English
-    # listings, so the other schools keep the same matches.
-    "研究助理",
-    "博士后",
-    "博士後",
-    "技术助理",
-    "技術助理",
-]
+
+def prepare_posts(posts: List[dict]) -> List[dict]:
+    """Drop clerk grades found in the ad, then fill date fields.
+
+    The listing filter already sees clerk wording in the title. Some ads only
+    name the clerk grade in the body ("at the rank of Clerk", "Clerk grade").
+    """
+    from sources.dates import refine_dates
+
+    kept: List[dict] = []
+    for post in posts or []:
+        if not isinstance(post, dict):
+            continue
+        if not is_research_related(
+            post.get("title") or "",
+            department=post.get("department") or "",
+            project=post.get("project") or "",
+            description=post.get("content") or "",
+        ):
+            continue
+        refine_dates(post)
+        kept.append(post)
+    if isinstance(posts, list):
+        posts[:] = kept
+    return posts
+
+# A research appointment in the title. Discipline is not required: a research
+# assistant in history is still a research post. HKU appends a pay grade,
+# "(at the rank of ...)", which is not the job.
+_RANK = re.compile(
+    r"\((?:at the rank of|holding the functional title of)\s*[^)]*\)",
+    re.I,
+)
+_RESEARCH_ROLE = re.compile(
+    r"research\s+assistants?"
+    r"|research\s+associates?"
+    r"|research\s+officers?"
+    r"|research\s+fellows?"
+    r"|research\s+engineers?"
+    r"|research\s+scientists?"
+    r"|research\s+professors?"
+    r"|research\s+nurses?"
+    r"|clinical\s+research"
+    r"|post[-\s]?doctoral"
+    r"|post[-\s]?docs?\b"
+    r"|\bresearchers?\b"
+    r"|project\s+fellows?"
+    r"|data\s+analysts?"
+    r"|data\s+scientists?"
+    r"|research\s+analysts?"
+    r"|研究助理|博士后|博士後|博后|研究员|研究員|副研究员",
+    re.I,
+)
+# Project assistant/associate is a research grade in academic departments.
+# The same words are also used for admissions and college admin posts.
+_PROJECT_SUPPORT = re.compile(
+    r"project\s+(?:assistants?|associates?)",
+    re.I,
+)
+_ADMIN_OFFICE = re.compile(
+    r"office of|admissions|institutional advancement|financial aid|"
+    r"undergraduate studies|\bcollege\b|human resources|finance office|registry",
+    re.I,
+)
+# Grants managers, clerks, and admissions staff are not research posts,
+# even when the office name contains "research".
+_ADMIN_ROLE = re.compile(
+    r"executive\s+(?:assistant|officer)s?"
+    r"|administrative\s+(?:officer|assistant|manager)s?"
+    r"|\bclerks?\b"
+    r"|clerical"
+    r"|admissions"
+    r"|human\s+resources"
+    r"|finance\s+(?:officer|manager)s?"
+    r"|financial\s+(?:officer|manager)s?"
+    r"|\baccountants?\b"
+    r"|receptionist"
+    r"|secretar(?:y|ial)"
+    r"|librarians?|library\s+assistants?"
+    r"|programme\s+officers?"
+    r"|program\s+officers?"
+    r"|public\s+(?:affairs|engagement)"
+    r"|student\s+services"
+    r"|teaching\s+assistants?"
+    r"|\b(?:senior\s+|assistant\s+|deputy\s+)?(?:general\s+)?managers?\b"
+    r"|\bheads?\b"
+    r"|行政(?:专员|主任|助理)|人事|财务|会计|文员|秘书",
+    re.I,
+)
+_TECHNICAL_ROLE = re.compile(
+    r"technical\s+(?:officer|assistant|manager)s?"
+    r"|\btechnicians?\b"
+    r"|\bscientists?\b"
+    r"|scientific\s+officers?"
+    r"|技术助理|技術助理|技术专员|技術專員|工程师|工程師",
+    re.I,
+)
+_PROJECT_LEAD = re.compile(
+    r"project\s+(?:officer|coordinator|co-ordinator)s?",
+    re.I,
+)
+_FACILITIES_ENGINEER = re.compile(r"设施|维护|维修|物业|保洁|清洁")
+_LAB_UNIT = re.compile(r"\blaborator(?:y|ies)\b|\blabs?\b|实验室", re.I)
+# Used only for technical / scientist / engineer titles, not as a gate on
+# research assistants. Bare "science" is omitted so "science park" and
+# "social sciences" do not qualify a technician.
+_DISCIPLINE = re.compile(
+    r"artificial intelligence|\bmachine learning\b|\bdeep learning\b|\bai\b"
+    r"|data science|analytics|statistic|bioinformatic"
+    r"|computer|computing|software|informatic|algorithm"
+    r"|engineering|robotic|electronic|mechanical|biomedical"
+    r"|physics|chemistr|biolog|bioscience|life science|neuro"
+    r"|mathematic|geograph|geospatial|\bgis\b|transport|urban"
+    r"|environment|climate|energy|optical|photonic|quantum"
+    r"|medicin|clinical|nurs|health|veterinary|pharmac|computational|material|\bbrain\b"
+    r"|生物|物理|化学|医学|计算机|數據|数据|人工智能|算法|机械|電子|电子|光电|嵌入式|电路",
+    re.I,
+)
+_RESEARCH_WORD = re.compile(r"research|研究", re.I)
+# A clerk grade excludes the post even when the functional title is a research
+# or project grade. The pay-grade parenthesis is stripped for other checks,
+# so clerk wording has to be read from the raw title.
+_CLERK_WORD = re.compile(
+    r"\bclerks?\b|\bclerical\b|文員|文员|文書|文书",
+    re.I,
+)
+_CLERK_RANK = re.compile(
+    r"at the rank of\s+(?:[^.\n]{0,50})?(?:\bclerks?\b|\bclerical\b)"
+    r"|holding the functional title of\s+(?:[^.\n]{0,50})?(?:\bclerks?\b|\bclerical\b)"
+    r"|\bclerks?(?:\s+(?:[ivx]+|\d+))?\s+grades?\b"
+    r"|\bclerical\s+grades?\b"
+    r"|(?:文員|文员|文書|文书)\s*職[級级衔銜]"
+    r"|職[級级衔銜]\s*(?:為|为|是)?\s*(?:文員|文员|文書|文书)",
+    re.I,
+)
 
 CONTENT_SELECTORS = [
     "div.ITS_Content_RichTextEditor",
@@ -111,44 +300,6 @@ CONTENT_SELECTORS = [
     "#cityu-content",
     "div#content",
 ]
-
-STEM_KEYWORDS = [
-    "engineering",
-    "science",
-    "computer",
-    "computing",
-    "software",
-    "artificial intelligence",
-    "machine learning",
-    "deep learning",
-    "data science",
-    "data analytic",
-    "information system",
-    "robotic",
-    "automation",
-    "electronic",
-    "mechanical",
-    "civil",
-    "biomedical engineering",
-    "industrial engineering",
-    "systems engineering",
-    "aerospace",
-    "aviation",
-    "environmental science",
-    "earth science",
-    "geology",
-    "mathematics",
-    "statistic",
-    "bioinformatics",
-    "computational",
-    "sensor",
-    "signal processing",
-    "control system",
-    # Chinese engineering titles on HKUST(GZ), e.g. 研究助理（嵌入式开发工程师）.
-    "工程师",
-    "工程師",
-]
-
 
 class Source(Protocol):
     KEY: str
@@ -335,7 +486,9 @@ def _fetch_browser(url: str, wait_for: Optional[str] = None) -> Optional[Beautif
         print(f"  [browser] {url[:80]}")
         page.goto(url, wait_until="domcontentloaded", timeout=PLAYWRIGHT_TIMEOUT)
         if wait_for:
-            page.wait_for_selector(wait_for, timeout=30000)
+            # HKU keeps a second copy of the job table in the DOM but hides it.
+            # "visible" would wait until timeout even though the rows are there.
+            page.wait_for_selector(wait_for, timeout=30000, state="attached")
         else:
             page.wait_for_function(
                 """() => {
@@ -570,17 +723,61 @@ def parse_date(text: str) -> Optional[str]:
         return None
 
 
-def is_research_related(title: str, department: str = "", project: str = "") -> bool:
-    title_l = (title or "").lower()
-    dept_l = (department or "").lower()
-    project_l = (project or "").lower()
-    combined = f"{title_l} {dept_l} {project_l}"
+def _role_title(title: str) -> str:
+    text = _RANK.sub(" ", title or "")
+    return re.sub(r"\s+", " ", text.replace("\xa0", " ")).strip()
 
-    is_research = any(kw in title_l for kw in RESEARCH_KEYWORDS)
-    if not is_research:
+
+def is_research_related(
+    title: str,
+    department: str = "",
+    project: str = "",
+    description: str = "",
+) -> bool:
+    """True for research appointments, including outside STEM.
+
+    Research assistant, research associate/officer/fellow, postdoc, research
+    engineer/scientist/analyst, project fellow, and data analyst pass on the title.
+    Project assistant/associate pass unless the post sits in an admin office.
+    Technical and engineer titles still need a discipline, a lab, or a
+    research word. Clerks, executive officers, admissions, HR, and finance do not.
+    A clerk or clerical grade anywhere in the title, including inside
+    "(at the rank of Clerk)", excludes the post. The same grade named in the
+    advertisement ("Clerk grade", "文員職級") does too.
+    """
+    raw_title = title or ""
+    if _CLERK_WORD.search(raw_title) or _CLERK_RANK.search(raw_title):
         return False
-
-    return any(kw in combined for kw in STEM_KEYWORDS)
+    rank_blob = "\n".join(part for part in (description, project) if part)
+    if rank_blob and _CLERK_RANK.search(rank_blob):
+        return False
+    role = _role_title(raw_title)
+    if not role:
+        return False
+    # A combined title can offer either a research grade or an admin grade
+    # ("Research Assistant / Research Administrative Assistant"). The research
+    # grade is enough. Admin words only reject a title that has no research grade.
+    if _RESEARCH_ROLE.search(role):
+        return True
+    if _ADMIN_ROLE.search(role) or re.search(r"\badministration\b", role, re.I):
+        return False
+    place = f"{role} {department or ''}"
+    if _PROJECT_SUPPORT.search(role) and not _ADMIN_OFFICE.search(place):
+        return True
+    if _PROJECT_LEAD.search(role) and _RESEARCH_WORD.search(role):
+        return True
+    if _TECHNICAL_ROLE.search(role) and not _FACILITIES_ENGINEER.search(role):
+        if _DISCIPLINE.search(role) or _RESEARCH_WORD.search(role):
+            return True
+        # "Technical Officer（测试工程师）" is lab engineering support.
+        if re.search(r"technical\s+(?:officer|assistant)|技术专员|技術專員|技术助理|技術助理", role, re.I) and re.search(
+            r"工程师|工程師", role
+        ):
+            return True
+        context = " ".join(part for part in (department, project, description) if part)
+        if _DISCIPLINE.search(context) or _LAB_UNIT.search(context):
+            return True
+    return False
 
 
 def make_id(source: str, ref: str) -> str:
@@ -602,6 +799,8 @@ def make_post(
     close_date: Optional[str] = None,
     department: Optional[str] = None,
     project: Optional[str] = None,
+    date_type: Optional[str] = None,
+    open_date: Optional[str] = None,
 ) -> dict:
     post = {
         "id": make_id(source, ref),
@@ -615,4 +814,8 @@ def make_post(
         post["department"] = department
     if project:
         post["project"] = project
+    if date_type:
+        post["date_type"] = date_type
+    if open_date:
+        post["open_date"] = open_date
     return post

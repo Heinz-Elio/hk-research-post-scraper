@@ -19,7 +19,9 @@ from sources.base import (
     html_to_text,
     is_research_related,
     make_post,
+    note_counts,
     parse_date,
+    prepare_posts,
     same_listing,
 )
 
@@ -110,6 +112,7 @@ def scrape() -> List[dict]:
     rows = _load_requisitions()
     if rows is None:
         print("  [HKBU] Oracle job search returned no data")
+        note_counts(KEY, 0, 0)
         return posts
 
     chosen = []
@@ -120,11 +123,12 @@ def scrape() -> List[dict]:
         if not title or not job_id or len(title) < 8:
             continue
         dept = _department(title, short)
-        if not is_research_related(title, department=dept or short):
+        if not is_research_related(title, department=dept, description=short):
             continue
         chosen.append((job_id, title, dept, short))
 
     print(f"  [HKBU] {len(rows)} listings, {len(chosen)} match the research filter")
+    note_counts(KEY, len(rows), len(chosen))
     listing_rows = [f"{job_id}|{title}|{dept}" for job_id, title, dept, _short in chosen]
     if same_listing(KEY, listing_rows):
         return ListingUnchanged()
@@ -153,5 +157,6 @@ def scrape() -> List[dict]:
                 department=dept or None,
             )
         )
+    prepare_posts(posts)
     finish_listing(KEY, posts)
     return posts

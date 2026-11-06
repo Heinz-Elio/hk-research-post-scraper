@@ -13,7 +13,9 @@ from sources.base import (
     finish_listing,
     is_research_related,
     make_post,
+    note_counts,
     parse_date,
+    prepare_posts,
     same_listing,
 )
 from sources.taleo import detail_url, fetch_detail, search_jobs
@@ -31,6 +33,7 @@ def scrape() -> List[dict]:
     rows = search_jobs(_HOST, _PORTAL)
     if rows is None:
         print("  [CUHK] Taleo job search returned no data")
+        note_counts(KEY, 0, 0)
         return posts
 
     jobs = []
@@ -48,6 +51,7 @@ def scrape() -> List[dict]:
         jobs.append((ref, title, dept, detail_url(_HOST, _SECTION, ref)))
 
     print(f"  [CUHK] {len(rows)} listings, {len(jobs)} match the research filter")
+    note_counts(KEY, len(rows), len(jobs))
     listing_rows = [f"{ref}|{title}|{dept}|{url}" for ref, title, dept, url in jobs]
     if same_listing(KEY, listing_rows):
         return ListingUnchanged()
@@ -70,5 +74,6 @@ def scrape() -> List[dict]:
                 department=dept or None,
             )
         )
+    prepare_posts(posts)
     finish_listing(KEY, posts)
     return posts

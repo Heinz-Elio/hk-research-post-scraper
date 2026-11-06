@@ -167,6 +167,15 @@
       border: none;
       cursor: default;
     }
+    .badge-stale {
+      background: #fef3c7;
+      color: #92400e;
+      margin-left: 0.35rem;
+    }
+    .date-note {
+      display: block;
+      margin-top: 0.15rem;
+    }
     button.tag {
       cursor: pointer;
     }
@@ -326,6 +335,7 @@
       "environment": "Environment",
       "math-stats": "Math / Stats",
       "industrial": "Industrial / Systems",
+      "health": "Health",
     };
 
     const PAGE_SIZE = 20;
@@ -558,16 +568,13 @@
       }
 
       container.innerHTML = pagePosts.map((p) => {
-        const metaTags = [p.source, p.work_type, degreeLabel(p), p.department]
+        const metaTags = [p.id, p.source, p.work_type, degreeLabel(p), p.department]
           .filter(Boolean)
           .map((t) => `<span class="tag">${escapeHtml(t)}</span>`)
           .join("");
         const domainTags = (p.domains || [])
           .map((id) => `<button type="button" class="tag" data-domain="${escapeHtml(id)}">${escapeHtml(domainLabel(id))}</button>`)
           .join("");
-        const close = p.close_date
-          ? `Close: ${escapeHtml(p.close_date)}`
-          : "Closing date not specified";
 
         return `
           <article class="card">
@@ -578,7 +585,7 @@
             </div>
             <div class="tags">${metaTags}${domainTags}</div>
             ${summaryHtml(p.summary)}
-            <div class="card-footer">${close}</div>
+            <div class="card-footer">${dateFooter(p)}</div>
           </article>
         `;
       }).join("");
@@ -592,6 +599,28 @@
           resetPageAndRender();
         });
       });
+    }
+
+    function dateFooter(p) {
+      const kind = p.date_type || "";
+      const when = p.close_date ? escapeHtml(p.close_date) : "";
+      let text;
+      if (kind === "review_start" && p.close_date) {
+        text = `Review starts: ${when} (open until filled)`;
+      } else if (kind === "open_until_filled") {
+        text = "Open until filled";
+      } else if (p.close_date) {
+        text = `Close: ${when}`;
+      } else {
+        text = "Closing date not specified";
+      }
+      const stale = p.possibly_stale
+        ? ` <span class="tag badge-stale">Possibly stale</span>`
+        : "";
+      const note = p.date_note
+        ? `<span class="date-note">${escapeHtml(p.date_note)}</span>`
+        : "";
+      return `${text}${stale}${note}`;
     }
 
     function degreeLabel(p) {

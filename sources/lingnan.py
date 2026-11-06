@@ -19,7 +19,9 @@ from sources.base import (
     finish_listing,
     is_research_related,
     make_post,
+    note_counts,
     parse_date,
+    prepare_posts,
     same_listing,
 )
 
@@ -110,6 +112,7 @@ def scrape() -> List[dict]:
     opened = _token_and_cloud()
     if not opened:
         print("  [Lingnan] CSOD careers page returned no data")
+        note_counts(KEY, 0, 0)
         return posts
     token, cloud = opened
     # The token page is the only hit on lingnan.csod.com. Further calls
@@ -117,6 +120,7 @@ def scrape() -> List[dict]:
     rows = _search(token, cloud)
     if rows is None:
         print("  [Lingnan] CSOD job search returned no data")
+        note_counts(KEY, 0, 0)
         return posts
 
     jobs = []
@@ -134,7 +138,8 @@ def scrape() -> List[dict]:
         close_raw = str(row.get("postingExpirationDate") or "").strip()
         jobs.append((job_id, title, dept, close_raw, description))
 
-    print(f"  [Lingnan] {len(rows)} research-category listings, {len(jobs)} match the STEM filter")
+    print(f"  [Lingnan] {len(rows)} research-category listings, {len(jobs)} match the research filter")
+    note_counts(KEY, len(rows), len(jobs))
     listing_rows = [
         f"{job_id}|{title}|{dept}|{close}" for job_id, title, dept, close, _desc in jobs
     ]
@@ -153,5 +158,6 @@ def scrape() -> List[dict]:
                 department=dept or None,
             )
         )
+    prepare_posts(posts)
     finish_listing(KEY, posts)
     return posts

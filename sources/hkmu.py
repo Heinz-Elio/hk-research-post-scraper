@@ -2,8 +2,7 @@
 
 POST https://hkmu.taleo.net/careersection/rest/jobboard/searchjobs
 portal 101430233. Columns are title, department, closing date.
-Titles such as "Research Assistant I/II (N&HS)" only pass the STEM
-check when the department is included.
+A research-grade title is kept in any discipline. Admin titles are not.
 """
 
 import time
@@ -15,7 +14,9 @@ from sources.base import (
     finish_listing,
     is_research_related,
     make_post,
+    note_counts,
     parse_date,
+    prepare_posts,
     same_listing,
 )
 from sources.taleo import detail_url, fetch_detail, search_jobs
@@ -33,6 +34,7 @@ def scrape() -> List[dict]:
     rows = search_jobs(_HOST, _PORTAL)
     if rows is None:
         print("  [HKMU] Taleo job search returned no data")
+        note_counts(KEY, 0, 0)
         return posts
 
     jobs = []
@@ -51,6 +53,7 @@ def scrape() -> List[dict]:
         jobs.append((ref, title, dept, close_raw, detail_url(_HOST, _SECTION, ref)))
 
     print(f"  [HKMU] {len(rows)} listings, {len(jobs)} match the research filter")
+    note_counts(KEY, len(rows), len(jobs))
     listing_rows = [
         f"{ref}|{title}|{dept}|{close}|{url}" for ref, title, dept, close, url in jobs
     ]
@@ -79,5 +82,6 @@ def scrape() -> List[dict]:
                 department=dept or None,
             )
         )
+    prepare_posts(posts)
     finish_listing(KEY, posts)
     return posts

@@ -8,7 +8,9 @@ from sources.base import (
     finish_listing,
     is_research_related,
     make_post,
+    note_counts,
     parse_date,
+    prepare_posts,
     same_listing,
 )
 
@@ -30,11 +32,13 @@ def scrape() -> List[dict]:
     posts: List[dict] = []
     soup = fetch(url)
     if not soup:
+        note_counts(KEY, 0, 0)
         return posts
 
     items = soup.select("div.job__item")
     if not items:
         print("  [EdUHK] no div.job__item on the listing page")
+        note_counts(KEY, 0, 0)
         return posts
 
     seen = set()
@@ -59,6 +63,8 @@ def scrape() -> List[dict]:
         content = item.get_text("\n", strip=True)
         chosen.append((ref, title, dept, close_date, detail_url, content))
 
+    print(f"  [EdUHK] {len(items)} listing rows, {len(chosen)} match the research filter")
+    note_counts(KEY, len(items), len(chosen))
     listing_rows = [
         f"{ref}|{title}|{dept}|{close}|{detail}"
         for ref, title, dept, close, detail, _content in chosen
@@ -78,5 +84,6 @@ def scrape() -> List[dict]:
                 department=dept or None,
             )
         )
+    prepare_posts(posts)
     finish_listing(KEY, posts)
     return posts
