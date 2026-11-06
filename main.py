@@ -13,7 +13,6 @@ import argparse
 import json
 import logging
 import os
-import re
 from datetime import date, datetime
 from pathlib import Path
 from typing import Dict, List, Optional
@@ -28,7 +27,8 @@ from embeddings_store import (
     upsert_vector,
 )
 from sources import SCRAPERS, SOURCE_NAMES
-from sources.base import ListingUnchanged
+from sources.base import ListingUnchanged, commit_listing_hashes, configure_run, listing_counts, set_listing_hash_path
+from summary import fact_summary, salvage_summary, summarize as build_summary, summary_needs_repair
 from taxonomy import enrich_classification
 
 # ==================================================================
@@ -45,7 +45,7 @@ logging.getLogger("torch").setLevel(logging.ERROR)
 # ==================================================================
 # Config switches
 # ==================================================================
-USE_LOCAL_SUMMARIZER = True
+USE_LOCAL_SUMMARIZER = False
 USE_EMBEDDINGS = True
 
 SUMMARIZER_MODEL = "Qwen/Qwen2.5-1.5B-Instruct"
@@ -78,217 +78,6 @@ if USE_LOCAL_SUMMARIZER:
         HAS_SUMMARIZER = False
 
 
-_SECTION_HEADS = [
-    ("Project", re.compile(r"^(?:project(?:\s+title)?|research\s+project)\b\s*:?\s*(.*)$", re.I)),
-    ("Duties", re.compile(r"^(?:duties|responsibilities|job\s+duties)\b\s*:?\s*(.*)$", re.I)),
-    ("Requirements", re.compile(r"^(?:requirements?|qualifications?|entry\s+requirements)\b\s*:?\s*(.*)$", re.I)),
-    ("Contact", re.compile(r"^(?:contacts?|enquir(?:y|ies)|how\s+to\s+apply)\b\s*:?\s*(.*)$", re.I)),
-    ("Salary", re.compile(r"^(?:salary|remuneration)\b\s*:?\s*(.*)$", re.I)),
-    ("Appointment", re.compile(r"^(?:appointment(?:\s+period)?|duration)\b\s*:?\s*(.*)$", re.I)),
-    ("Conditions", re.compile(r"^(?:conditions(?:\s+of\s+service)?|what\s+we\s+offer|benefits)\b\s*:?\s*(.*)$", re.I)),
-]
-# "Duties and Responsibilities" is one heading. The words after Duties are not the duty text.
-_COMPOUND_HEAD = re.compile(
-    r"^(?:and|&|/)\s+(?:duties|responsibilities|requirements?|qualifications?)\s*$",
-    re.I,
-)
-_CONTACT_LINE = re.compile(r"\b(invited to contact|please contact|for enquir)", re.I)
-_CLOSE_LINE = re.compile(r"^the closing date\b", re.I)
-_END_LINE = re.compile(
-    r"^(?:advertised\b|applications close\b|back to search results\b|whatsapp\b|facebook\b|linkedin\b)",
-    re.I,
-)
-_EMAIL_RE = re.compile(r"[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}")
-_PHONE_RE = re.compile(r"(?:\+?852[\s\-]?)?\d{4}[\s\-]\d{4}")
-_SKIP_LINE = re.compile(
-    r"^(apply now|printable version|skip to|posting date|share\b|menu\b|return to previous page)\b",
-    re.I,
-)
-_META_LINE = re.compile(
-    r"^(?:ref\.?|work type|department|categories|job title|job id|job description|job posting details|hong kong)\b",
-    re.I,
-)
-
-
-def _clean_line(text: str) -> str:
-    text = re.sub(r"\s+", " ", text or "").strip(" \t:-")
-    return text
-
-
-def _section_text(chunks: List[str]) -> str:
-    parts: List[str] = []
-    for part in chunks:
-        part = _clean_line(part)
-        if not part or _SKIP_LINE.match(part):
-            continue
-        # A layout break can split a word across lines ("Fello" / "w,").
-        if parts and re.match(r"^[a-z]{1,2}(?:,|\.|\s)", part) and parts[-1][-1].isalpha():
-            parts[-1] = parts[-1] + part
-        else:
-            parts.append(part)
-    text = " ".join(parts)
-    text = re.sub(r"\s+([,.;:])", r"\1", text)
-    return text.strip()
-
-
-def _split_sections(text: str) -> Dict[str, str]:
-    found: Dict[str, List[str]] = {}
-    current = None
-    last_plain = ""
-    for raw in (text or "").replace("\r\n", "\n").replace("\r", "\n").splitlines():
-        line = raw.strip()
-        if not line or _SKIP_LINE.match(line) or _CLOSE_LINE.match(line) or _END_LINE.match(line):
-            if _END_LINE.match(line):
-                current = None
-            continue
-        probe = line[1:-1].strip() if line.startswith("[") and line.endswith("]") else line
-        matched = False
-        for label, pattern in _SECTION_HEADS:
-            hit = pattern.match(probe)
-            if not hit:
-                continue
-            found.setdefault(label, [])
-            rest = (hit.group(1) or "").strip(" :")
-            if _COMPOUND_HEAD.match(rest):
-                rest = ""
-            if rest:
-                if label == "Appointment" and last_plain:
-                    found[label].append(f"{last_plain}: {rest}")
-                else:
-                    found[label].append(rest)
-                # The heading line already holds the value. Don't swallow the next lines.
-                current = None
-            else:
-                current = label
-            matched = True
-            break
-        if matched:
-            continue
-        dept = re.match(r"^department\s*:\s*(.+)$", line, re.I)
-        if dept and "Department" not in found:
-            found["Department"] = [dept.group(1)]
-            current = None
-            continue
-        if _CONTACT_LINE.search(line):
-            current = "Contact"
-            found.setdefault("Contact", []).append(line)
-            continue
-        if current:
-            found.setdefault(current, []).append(line)
-        else:
-            last_plain = line
-    sections = {}
-    for label, parts in found.items():
-        if label == "Appointment":
-            bits = [_clean_line(part) for part in parts]
-            text = "; ".join(bit for bit in bits if bit)
-        else:
-            text = _section_text(parts)
-        if text:
-            sections[label] = text
-    return sections
-
-
-def _contacts(text: str, section: str) -> str:
-    section = _clean_line(section)
-    blob = text or ""
-    emails = []
-    for email in _EMAIL_RE.findall(blob):
-        if email.lower().endswith((".png", ".jpg", ".gif")):
-            continue
-        if "example.com" in email.lower() or email.startswith("["):
-            continue
-        if email not in emails:
-            emails.append(email)
-    phones = []
-    if re.search(r"tel|phone|enquir|contact", blob, re.I):
-        for phone in _PHONE_RE.findall(blob):
-            parts = re.split(r"[\s\-]", phone.strip())
-            # 2026-2027 is an academic year, not a telephone number.
-            if len(parts) == 2 and all(re.fullmatch(r"(?:19|20)\d{2}", part) for part in parts):
-                continue
-            if phone not in phones:
-                phones.append(phone)
-    extra = []
-    haystack = section.lower()
-    for bit in emails + phones:
-        if bit.lower() not in haystack:
-            extra.append(bit)
-    if section and extra:
-        return f"{section}; " + "; ".join(extra)
-    if section:
-        return section
-    return "; ".join(extra)
-
-
-def _narrative(text: str) -> str:
-    """Prose from a page that has no Duties or Requirements heading."""
-    kept: List[str] = []
-    skip_value = False
-    for raw in (text or "").replace("\r\n", "\n").replace("\r", "\n").splitlines():
-        line = raw.strip()
-        if not line or _SKIP_LINE.match(line) or _CLOSE_LINE.match(line) or _END_LINE.match(line):
-            continue
-        if _META_LINE.match(line) or _CONTACT_LINE.search(line):
-            # "Department:" is on its own line and the name follows.
-            skip_value = line.endswith(":") or ":" not in line
-            continue
-        if skip_value:
-            skip_value = False
-            if len(_clean_line(line)) < 90:
-                continue
-        probe = line[1:-1].strip() if line.startswith("[") and line.endswith("]") else line
-        if any(pattern.match(probe) for _, pattern in _SECTION_HEADS):
-            break
-        if re.match(r"^(?:how to apply|contacts?|enquir(?:y|ies))\b", probe, re.I):
-            break
-        if len(_clean_line(line)) < 40:
-            continue
-        kept.append(line)
-    return _section_text(kept)[:1000]
-
-
-def fact_summary(
-    text: str,
-    *,
-    title: str = "",
-    university: str = "",
-    department: str = "",
-    project: str = "",
-    close_date: str = "",
-    url: str = "",
-) -> str:
-    """Bullet list of facts taken from the scrape. Does not invent a university or contact."""
-    sections = _split_sections(text)
-    department = _clean_line(department) or sections.get("Department", "")
-    project = _clean_line(project) or sections.get("Project", "")
-    contact = _contacts(text, sections.get("Contact", ""))
-    items = []
-
-    def add(label: str, value: str) -> None:
-        value = _clean_line(value)
-        if value:
-            items.append(f"- {label}: {value}")
-
-    add("University", university)
-    add("Department", department)
-    add("Project", project)
-    if not sections.get("Duties") and not sections.get("Requirements"):
-        add("Description", _narrative(text))
-    add("Duties", sections.get("Duties", ""))
-    add("Requirements", sections.get("Requirements", ""))
-    add("Appointment", sections.get("Appointment", ""))
-    add("Salary", sections.get("Salary", ""))
-    add("Conditions", sections.get("Conditions", ""))
-    add("Contact", contact)
-    add("Closing date", close_date)
-    if not contact and url:
-        add("Apply", url)
-    if not items and title:
-        add("Post", title)
-    return "\n".join(items)
-
-
 def summarize(
     text: str,
     title: str = "",
@@ -297,8 +86,26 @@ def summarize(
     project: str = "",
     close_date: str = "",
     url: str = "",
+    date_type: str = "",
 ) -> str:
-    facts = fact_summary(
+    """Deterministic extractive summary. The local model is optional and off by default."""
+
+    def model(prompt: str) -> str:
+        result = summarizer_pipeline(
+            prompt,
+            max_new_tokens=220,
+            do_sample=False,
+            temperature=0.1,
+            pad_token_id=summarizer_pipeline.tokenizer.eos_token_id,
+        )
+        generated = result[0]["generated_text"]
+        if "List:" in generated:
+            return generated.split("List:")[-1].strip()
+        if generated.startswith(prompt):
+            return generated[len(prompt):].strip()
+        return generated.strip()
+
+    return build_summary(
         text,
         title=title,
         university=university,
@@ -306,50 +113,9 @@ def summarize(
         project=project,
         close_date=close_date,
         url=url,
+        date_type=date_type,
+        model=model if HAS_SUMMARIZER and summarizer_pipeline is not None else None,
     )
-    if not text or not HAS_SUMMARIZER or summarizer_pipeline is None:
-        return facts
-
-    prompt = f"""You rewrite academic job facts into a bullet list.
-Use only the facts below. Keep the university name exactly as given.
-Include project domain, main duties, key requirements, and contact when they are present.
-Do not invent names, emails, dates, or placeholders.
-One fact per line, each line starting with "- ".
-
-{facts}
-
-List:"""
-
-    try:
-        result = summarizer_pipeline(
-            prompt,
-            max_new_tokens=420,
-            do_sample=False,
-            temperature=0.1,
-            pad_token_id=summarizer_pipeline.tokenizer.eos_token_id,
-        )
-        generated = result[0]["generated_text"]
-        summary = generated.split("List:")[-1].strip() if "List:" in generated else generated[len(prompt):].strip()
-        lines = [line.strip() for line in summary.splitlines() if line.strip().startswith("- ")]
-        joined = "\n".join(lines)
-        if university and university not in joined:
-            return facts
-        if re.search(r"\[[^\]]*(university|email|contact|deadline)", joined, re.I):
-            return facts
-        labels = re.findall(r"(?m)^-\s*([^:]+):", joined)
-        junk = {"what we offer", "advertised", "applications close", "back to search results"}
-        if any(label.strip().lower() in junk for label in labels):
-            return facts
-        if re.search(r"(?m)^- Duties:\s*and Responsibilities\s*$", joined):
-            return facts
-        def has_body(blob: str) -> bool:
-            return bool(re.search(r"(?m)^- (?:Duties|Requirements|Description):", blob))
-        if has_body(facts) and not has_body(joined):
-            return facts
-        return joined or facts
-    except Exception as e:
-        print(f"  [summarize error] {e}")
-        return facts
 
 
 # ==================================================================
@@ -429,45 +195,100 @@ def harvest_embeddings(posts: Dict[str, dict], store: dict) -> None:
 
 def backfill_posts(posts: Dict[str, dict]) -> None:
     for post in posts.values():
-        university = SOURCE_NAMES.get(post.get("source") or "", post.get("source") or "")
+        # PolyU's listing column is a review-start date, including rows saved
+        # before date_type existed. A passed review date must not retire them.
+        if post.get("source") == "PolyU" and not post.get("date_type"):
+            post["date_type"] = "review_start" if post.get("close_date") else "open_until_filled"
         summary = post.get("summary") or ""
-        # Older model summaries invented the school and the contact. Keep only
-        # text that is already a fact list, or a scrape that has real headings.
-        invented = bool(re.search(r"\[University Name\]|XYZ University|\[email|\[contact|\[deadline", summary, re.I))
-        has_headings = bool(re.search(r"(?m)^(Duties|Requirements|Qualifications|Project(?: Title)?|Department)\b", summary))
-        if not summary.startswith("- University:"):
-            post["summary"] = fact_summary(
-                summary if has_headings and not invented else "",
+        if post.get("content"):
+            post["summary"] = summarize(
+                post.get("content") or "",
                 title=post.get("title") or "",
-                university=university,
+                university=SOURCE_NAMES.get(post.get("source") or "", ""),
                 department=post.get("department") or "",
                 project=post.get("project") or "",
                 close_date=post.get("close_date") or "",
                 url=post.get("url") or "",
+                date_type=post.get("date_type") or "",
             )
-        # A list that only names the school has no requirements text. Leave the
-        # degree and domain fields already stored on the post.
-        if post.get("content") or re.search(r"(?m)^- Requirements:", post.get("summary") or ""):
-            enrich_classification(post)
+        elif summary_needs_repair(summary):
+            repaired = salvage_summary(summary)
+            post["summary"] = repaired or fact_summary(
+                "",
+                title=post.get("title") or "",
+                department=post.get("department") or "",
+                project=post.get("project") or "",
+                close_date=post.get("close_date") or "",
+                date_type=post.get("date_type") or "",
+            )
+        enrich_classification(post)
 
 
 # ==================================================================
 # Main logic
 # ==================================================================
+def bind_data_dir(path: Path) -> None:
+    """Write JSON and the listing hash under ``path`` instead of the repo."""
+    global ACTIVE_FILE, OUTDATED_FILE, PUBLIC_FILE, EMBED_FILE
+    path = Path(path)
+    path.mkdir(parents=True, exist_ok=True)
+    (path / "docs").mkdir(parents=True, exist_ok=True)
+    ACTIVE_FILE = path / "research_posts.json"
+    OUTDATED_FILE = path / "outdated_posts.json"
+    PUBLIC_FILE = path / "docs" / "research_posts.json"
+    EMBED_FILE = path / "docs" / "embeddings.json"
+    set_listing_hash_path(path / "listing_hashes.json")
+
+
+def _remember_summary(post: dict, full_text: str, old: Optional[dict], university: str) -> None:
+    old_summary = (old or {}).get("summary") or ""
+    if (
+        not full_text.strip()
+        and old_summary
+        and not summary_needs_repair(old_summary)
+    ):
+        post["summary"] = old_summary
+        return
+    if (
+        old
+        and old.get("content") == full_text
+        and old_summary.startswith("- Dept:")
+        and not summary_needs_repair(old_summary)
+    ):
+        post["summary"] = old_summary
+        return
+    post["summary"] = summarize(
+        full_text,
+        title=post.get("title", ""),
+        university=university,
+        department=post.get("department") or "",
+        project=post.get("project") or "",
+        close_date=post.get("close_date") or "",
+        url=post.get("url") or "",
+        date_type=post.get("date_type") or "",
+    )
+
+
 def run(
     sources: Optional[List[str]] = None,
     generate_embeddings: bool = True,
     use_summarizer: bool = True,
     scrape: bool = True,
+    force: bool = False,
+    data_dir: Optional[Path] = None,
 ):
+    if data_dir is not None:
+        bind_data_dir(data_dir)
     if sources is None:
         sources = list(SCRAPERS.keys())
 
     print(f"[{datetime.now():%Y-%m-%d %H:%M:%S}] Starting {'scrape' if scrape else 'migrate'}")
     if scrape:
         print(f"  Sources     : {sources}")
+    if force:
+        print("  Hashes      : ignored (--force)")
     print(
-        f"  Summarizer  : {'ON (local model)' if use_summarizer and HAS_SUMMARIZER else 'ON (rule-based)' if use_summarizer else 'OFF'}"
+        f"  Summarizer  : {'ON (local model)' if use_summarizer and HAS_SUMMARIZER else 'extractive' if use_summarizer else 'OFF'}"
     )
     print(f"  Embeddings  : {'ON' if generate_embeddings and HAS_EMBED else 'OFF'}")
 
@@ -478,9 +299,18 @@ def run(
     harvest_embeddings(outdated, embed_store)
     today = date.today().isoformat()
 
+    stored_active = {}
+    for post in active.values():
+        key = post.get("source") or ""
+        stored_active[key] = stored_active.get(key, 0) + 1
+    empty_sources = [name for name in sources if stored_active.get(name, 0) == 0]
+    configure_run(force=force, sources_with_no_posts=empty_sources)
+
     new_count = 0
     updated_count = 0
     moved_count = 0
+    fresh_ids: Dict[str, set] = {}
+    run_stats: Dict[str, dict] = {}
 
     if scrape:
         for name in sources:
@@ -493,33 +323,24 @@ def run(
                 posts = SCRAPERS[name]()
                 if isinstance(posts, ListingUnchanged):
                     print("  Listing unchanged; kept the stored posts")
+                    run_stats[name] = {"unchanged": True}
                     continue
                 print(f"  Found {len(posts)} research-related posts")
+                if not posts:
+                    run_stats[name] = {"returned": 0}
+                    continue
 
+                fresh_ids[name] = set()
                 for p in posts:
                     pid = p["id"]
                     p["scraped_at"] = datetime.now().isoformat(timespec="seconds")
-
                     full_text = p.get("content") or ""
                     university = SOURCE_NAMES.get(p.get("source") or name, name)
                     old = active.get(pid) or outdated.get(pid)
-                    if (
-                        use_summarizer
-                        and old
-                        and old.get("content") == full_text
-                        and (old.get("summary") or "").startswith("- University:")
-                    ):
+                    if use_summarizer:
+                        _remember_summary(p, full_text, old, university)
+                    elif old and old.get("summary"):
                         p["summary"] = old.get("summary")
-                    else:
-                        p["summary"] = summarize(
-                            full_text,
-                            title=p.get("title", ""),
-                            university=university,
-                            department=p.get("department") or "",
-                            project=p.get("project") or "",
-                            close_date=p.get("close_date") or "",
-                            url=p.get("url") or "",
-                        )
 
                     p = enrich_classification(p)
                     p.pop("content", None)
@@ -541,11 +362,21 @@ def run(
                         updated_count += 1
                     else:
                         new_count += 1
-
+                    # Back on the live board: it is active again.
+                    outdated.pop(pid, None)
                     active[pid] = p
+                    fresh_ids[name].add(pid)
 
+                returned = [active[pid] for pid in fresh_ids[name]]
+                run_stats[name] = {
+                    "returned": len(returned),
+                    "empty_close": sum(1 for post in returned if not post.get("close_date")),
+                    "stale": sum(1 for post in returned if post.get("possibly_stale")),
+                    "review": sum(1 for post in returned if post.get("date_type") == "review_start"),
+                }
             except Exception as e:
                 print(f"  [Error] {name}: {e}")
+                run_stats[name] = {"error": str(e)}
 
     backfill_posts(active)
     backfill_posts(outdated)
@@ -558,18 +389,28 @@ def run(
             if vec:
                 upsert_vector(embed_store, pid, vec)
 
-    to_move = []
+    # A fresh listing replaces that source's active set. Posts no longer
+    # listed move to outdated. An empty or failed scrape does not.
     for pid, post in list(active.items()):
-        close = post.get("close_date")
-        if close and close < today:
+        src = post.get("source")
+        if src in fresh_ids and pid not in fresh_ids[src]:
             outdated[pid] = post
-            to_move.append(pid)
+            del active[pid]
             moved_count += 1
 
-    for pid in to_move:
-        del active[pid]
+    for pid, post in list(active.items()):
+        if post.get("source") in fresh_ids:
+            continue
+        kind = post.get("date_type")
+        if kind in ("review_start", "open_until_filled"):
+            continue
+        close = post.get("close_date")
+        # Stored rows with no date_type still use close_date as a hard deadline.
+        if close and close < today and kind in (None, "", "deadline"):
+            outdated[pid] = post
+            del active[pid]
+            moved_count += 1
 
-    # Drop embeddings for posts that are no longer active from the public file
     embed_store["items"] = {
         pid: item
         for pid, item in embed_store.get("items", {}).items()
@@ -580,6 +421,8 @@ def run(
     save_json(OUTDATED_FILE, outdated)
     save_public_json(active)
     save_embeddings(EMBED_FILE, embed_store)
+    if scrape:
+        commit_listing_hashes()
 
     print("\n" + "=" * 50)
     print(f"[{datetime.now():%H:%M:%S}] Finished")
@@ -589,7 +432,38 @@ def run(
     print(f"  Updated this run : {updated_count}")
     print(f"  Moved to outdated: {moved_count}")
     print(f"  Embeddings       : {len(embed_store.get('items', {}))}")
+    _print_source_report(active, outdated, run_stats)
     print("=" * 50)
+
+
+def _print_source_report(active: Dict[str, dict], outdated: Dict[str, dict], run_stats: Dict[str, dict]) -> None:
+    counts = listing_counts()
+    names = sorted(set(counts) | set(run_stats) | {p.get("source") for p in active.values()} | {p.get("source") for p in outdated.values()})
+    names = [name for name in names if name]
+    if not names:
+        return
+    print(f"  {'Source':<10} {'Listed':>7} {'Kept':>6} {'Active':>7} {'Outdated':>9} {'No close':>9} {'Stale':>6} {'Review':>7}")
+    active_by = {}
+    outdated_by = {}
+    for post in active.values():
+        active_by[post.get("source")] = active_by.get(post.get("source"), 0) + 1
+    for post in outdated.values():
+        outdated_by[post.get("source")] = outdated_by.get(post.get("source"), 0) + 1
+    for name in names:
+        listed = counts.get(name, {}).get("listed", "")
+        kept = counts.get(name, {}).get("kept", "")
+        stat = run_stats.get(name) or {}
+        if stat.get("unchanged"):
+            kept = kept if kept != "" else "skip"
+        no_close = stat.get("empty_close", "")
+        stale = stat.get("stale", "")
+        review = stat.get("review", "")
+        if stat.get("error"):
+            kept = "ERR"
+        print(
+            f"  {name:<10} {str(listed):>7} {str(kept):>6} {active_by.get(name, 0):>7} "
+            f"{outdated_by.get(name, 0):>9} {str(no_close):>9} {str(stale):>6} {str(review):>7}"
+        )
 
 
 def semantic_search(query: str, top_k: int = 8) -> List[dict]:
@@ -649,6 +523,22 @@ def parse_args():
         action="store_true",
         help="Re-enrich stored posts and split embeddings; do not scrape",
     )
+    parser.add_argument(
+        "--force",
+        "--ignore-hashes",
+        action="store_true",
+        dest="force",
+        help="Re-fetch detail pages even when the listing hash is unchanged",
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Scrape into a temporary directory and do not update repo JSON or listing hashes",
+    )
+    parser.add_argument(
+        "--data-dir",
+        help="Write JSON and listing hashes under this directory instead of the repo",
+    )
     parser.add_argument("--search", help="Semantic search query (CLI)")
     parser.add_argument("--top-k", type=int, default=8)
     return parser.parse_args()
@@ -664,4 +554,17 @@ if __name__ == "__main__":
         source_list = None
         if args.sources:
             source_list = [s.strip() for s in args.sources.split(",") if s.strip()]
-        run(sources=source_list, scrape=not args.migrate_only)
+        data_dir = None
+        if args.dry_run:
+            import tempfile
+
+            data_dir = Path(tempfile.mkdtemp(prefix="hkrps-dry-"))
+            print(f"[dry-run] writing under {data_dir} (repo JSON and listing hashes are left untouched)")
+        elif args.data_dir:
+            data_dir = Path(args.data_dir)
+        run(
+            sources=source_list,
+            scrape=not args.migrate_only,
+            force=args.force,
+            data_dir=data_dir,
+        )

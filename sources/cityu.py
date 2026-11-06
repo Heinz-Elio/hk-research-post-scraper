@@ -11,7 +11,9 @@ from sources.base import (
     is_research_related,
     job_content,
     make_post,
+    note_counts,
     parse_date,
+    prepare_posts,
     safe_text,
     same_listing,
 )
@@ -26,14 +28,17 @@ def scrape() -> List[dict]:
     posts: List[dict] = []
     soup = fetch(url)
     if not soup:
+        note_counts(KEY, 0, 0)
         return posts
 
     table = soup.find("table", id="MainContent_gvJobResearch")
     if not table:
+        note_counts(KEY, 0, 0)
         return posts
 
+    data_rows = table.find_all("tr")[1:]
     jobs = []
-    for row in table.find_all("tr")[1:]:
+    for row in data_rows:
         tds = row.find_all("td")
         if len(tds) < 2:
             continue
@@ -51,6 +56,8 @@ def scrape() -> List[dict]:
         ref = a["href"].split("=")[-1] or hashlib.md5(title.encode()).hexdigest()[:8]
         jobs.append((ref, title, dept, close_raw, detail_url))
 
+    print(f"  [CityU] {len(data_rows)} listing rows, {len(jobs)} match the research filter")
+    note_counts(KEY, len(data_rows), len(jobs))
     rows = [f"{ref}|{title}|{dept}|{close}|{detail}" for ref, title, dept, close, detail in jobs]
     if same_listing(KEY, rows):
         return ListingUnchanged()
@@ -77,5 +84,6 @@ def scrape() -> List[dict]:
                 department=dept,
             )
         )
+    prepare_posts(posts)
     finish_listing(KEY, posts)
     return posts

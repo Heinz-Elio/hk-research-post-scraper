@@ -19,7 +19,9 @@ from sources.base import (
     html_to_text,
     is_research_related,
     make_post,
+    note_counts,
     parse_date,
+    prepare_posts,
     same_listing,
 )
 
@@ -77,6 +79,7 @@ def scrape() -> List[dict]:
     rows = _load_list()
     if rows is None:
         print("  [HKUST-GZ] career list returned no data")
+        note_counts(KEY, 0, 0)
         return posts
 
     jobs = []
@@ -93,6 +96,7 @@ def scrape() -> List[dict]:
         jobs.append((record_id, job_id, title, dept, _clean(row.get("offlineDate"))))
 
     print(f"  [HKUST-GZ] {len(rows)} listings, {len(jobs)} match the research filter")
+    note_counts(KEY, len(rows), len(jobs))
     listing_rows = [
         f"{job_id}|{title}|{dept}|{offline}"
         for _record, job_id, title, dept, offline in jobs
@@ -119,5 +123,6 @@ def scrape() -> List[dict]:
                 department=_clean(detail.get("enPostDept")) or dept or None,
             )
         )
+    prepare_posts(posts)
     finish_listing(KEY, posts)
     return posts

@@ -109,7 +109,7 @@ def test_taleo_search_failure_is_none():
         assert search_jobs("https://cuhk.taleo.net", "8115020119") is None
 
 
-def test_cuhk_scrape_keeps_stem_research_posts_only():
+def test_cuhk_scrape_keeps_research_posts_in_any_discipline():
     rows = [
         {"contestNo": "260001CS", "column": ["260001CS", "Research Assistant", "Department of Computer Science and Engineering"]},
         {"contestNo": "260001HX", "column": ["260001HX", "Executive Officer", "Registry"]},
@@ -127,14 +127,16 @@ def test_cuhk_scrape_keeps_stem_research_posts_only():
          patch("sources.cuhk.finish_listing"), \
          patch("sources.cuhk.time.sleep"):
         posts = scrape_cuhk()
-    assert len(posts) == 1
-    post = posts[0]
-    assert post["id"] == "CUHK_260001CS"
+    by_id = {post["id"]: post for post in posts}
+    assert set(by_id) == {"CUHK_260001CS", "CUHK_260001HS"}
+    post = by_id["CUHK_260001CS"]
     assert post["source"] == "CUHK"
     assert post["department"] == "Department of Computer Science and Engineering"
     assert post["close_date"] == "2026-11-30"
+    assert post["date_type"] == "deadline"
     assert post["url"].endswith("jobdetail.ftl?job=260001CS&lang=en")
     assert "software experiments" in post["content"]
+    assert by_id["CUHK_260001HS"]["department"] == "Department of History"
 
 
 def test_cuhk_unchanged_listing_skips_details():
@@ -150,13 +152,14 @@ def test_cuhk_unchanged_listing_skips_details():
     fetch_detail.assert_not_called()
 
 
-def test_hkmu_passes_department_into_the_stem_check():
-    assert is_research_related("Research Assistant I/II (R7069) (N&HS)") is False
+def test_hkmu_research_title_does_not_need_a_stem_department():
+    assert is_research_related("Research Assistant I/II (R7069) (N&HS)")
     assert is_research_related(
         "Research Assistant I/II (R7069) (N&HS)",
         department="School of Nursing and Health Sciences",
     )
     assert is_research_related("Postdoc (N&HS)", department="School of Nursing and Health Sciences")
+    assert is_research_related("Officer (FO)", department="Finance Office") is False
 
     rows = [
         {
@@ -345,12 +348,12 @@ def test_hkust_gz_chinese_titles_dates_and_detail_url():
     assert is_research_related("实验室研究助理（BSBE）", department="Thrust of Bioscience and Biomedical Engineering")
     assert is_research_related("技术助理（BioCRF）质谱色谱方向", department="Biosciences Central Research Facility (GZ)")
     assert is_research_related("博士后", department="Thrust of Bioscience and Biomedical Engineering")
-    assert is_research_related("研究助理（项目经理）", department="Thrust of Smart Manufacturing") is False
-    # English rules are unchanged.
-    assert is_research_related("Research Assistant", department="Department of History") is False
+    assert is_research_related("研究助理（项目经理）", department="Thrust of Smart Manufacturing")
+    assert is_research_related("Research Assistant", department="Department of History")
     assert is_research_related("Research Assistant", department="Department of Computer Science")
-    assert is_research_related("Research Assistant (AI research and development)", department="English Language Teaching Unit") is False
-    assert is_research_related("Data Analyst") is False
+    assert is_research_related("Research Assistant (AI research and development)", department="English Language Teaching Unit")
+    assert is_research_related("Data Analyst")
+    assert is_research_related("Research Analyst", department="Department of History")
 
     assert _close_date("3000-01-02 07:59:59") is None
     assert _close_date("2027-01-01 07:59:59") == "2027-01-01"
@@ -413,6 +416,15 @@ def test_hkust_gz_chinese_titles_dates_and_detail_url():
                 "jobPostingDetail": {"content": "<p>PhD in computer science.</p>"},
             },
         },
+        "1411": {
+            "code": 0,
+            "data": {
+                "postNameCh": "研究助理（项目经理）",
+                "enPostDept": "Thrust of Smart Manufacturing",
+                "offlineDate": "2027-04-01 07:59:59",
+                "jobPostingDetail": {"content": "<p>Coordinate the research project.</p>"},
+            },
+        },
     }
 
     def fake(method, url, **kwargs):
@@ -429,7 +441,7 @@ def test_hkust_gz_chinese_titles_dates_and_detail_url():
          patch("sources.hkust_gz.time.sleep"):
         posts = scrape_gz()
     by_id = {post["id"]: post for post in posts}
-    assert set(by_id) == {"HKUST-GZ_6727", "HKUST-GZ_5001"}
+    assert set(by_id) == {"HKUST-GZ_6727", "HKUST-GZ_5001", "HKUST-GZ_6900"}
     engineer = by_id["HKUST-GZ_6727"]
     assert engineer["title"] == "研究助理（机械结构工程师）"
     assert engineer["close_date"] == "2027-01-01"
