@@ -1,7 +1,7 @@
 """Research-role filter: who is kept, and who stays out."""
 
 from sources.base import is_research_related
-from taxonomy import extract_domains
+from taxonomy import extract_domains, plausible_department
 
 
 def test_research_roles_pass_outside_stem():
@@ -108,6 +108,30 @@ def test_admin_and_non_research_titles_are_excluded():
         assert is_research_related(title, department=dept) is False, title
 
 
+def test_project_assistant_whose_work_is_clerical_is_excluded():
+    assert is_research_related(
+        "Project Assistant II",
+        department="Transport Office",
+        description=(
+            "The appointee will be responsible for (a) providing clerical and "
+            "administrative support; (b) handling enquiries and complaints."
+        ),
+    ) is False
+    assert is_research_related(
+        "Research Assistant",
+        department="Department of History",
+        description=(
+            "The appointee will conduct archival research and will also handle "
+            "some administrative support for the project."
+        ),
+    )
+    assert is_research_related(
+        "Project Assistant",
+        department="Department of Biology",
+        description="The appointee will conduct laboratory experiments and data analysis.",
+    )
+
+
 def test_clerk_grade_in_the_advertisement_is_excluded():
     assert is_research_related(
         "Research Assistant",
@@ -130,6 +154,14 @@ def test_clerk_grade_in_the_advertisement_is_excluded():
         department="Department of History",
         description="Liaise with the departmental clerk about room bookings and archives.",
     )
+
+
+def test_department_names_drop_locations_and_keep_codes():
+    assert plausible_department("SOCSP")
+    assert plausible_department(
+        "Institute for Innovation and Translation at our off-campus office located at Hong Kong Science Park"
+    ) is False
+    assert plausible_department("Department of Physics")
 
 
 def test_domain_tags_ignore_incidental_words():

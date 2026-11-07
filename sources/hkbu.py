@@ -63,11 +63,24 @@ def _detail_url(job_id: str) -> str:
     return f"{_DETAIL}?expand=all&onlyData=true&finder={quote(finder, safe=';=,\"')}"
 
 
+_DEPT_TAIL = re.compile(
+    r"\s+(?:at our|located at|located in|which|who|and will|and is)\b",
+    re.I,
+)
+
+
+def _trim_department(name: str) -> str:
+    name = _DEPT_TAIL.split(name or "", maxsplit=1)[0]
+    return name.strip(" .,-")
+
+
 def _department(title: str, short: str) -> str:
     if "," in title:
-        return title.split(",")[-1].strip()
+        candidate = _trim_department(title.split(",")[-1])
+        if candidate:
+            return candidate
     match = _SITS_UNDER.search(short or "")
-    return match.group(1).strip() if match else ""
+    return _trim_department(match.group(1)) if match else ""
 
 
 def _closing_date(api_value: Optional[str], description: str) -> Optional[str]:

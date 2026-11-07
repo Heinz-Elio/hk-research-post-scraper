@@ -79,7 +79,36 @@ _BOILER = re.compile(
     r"|we are an equal"
     r"|the university is an equal"
     r"|committed to equality"
-    r"|all information on applicants",
+    r"|all information on applicants"
+    r"|fringe benefits"
+    r"|medical and dental",
+    re.I,
+)
+_BOILER_CLAUSE = re.compile(
+    r"(?:,\s*)?(?:and\s+)?(?:perform\s+)?(?:any\s+)?other duties as assigned\b[^.;•]*"
+    r"|\bfringe benefits\b[^.;•]*"
+    r"|\bmedical and dental\b[^.;•]*",
+    re.I,
+)
+_UNI_BLURB = re.compile(
+    r"founded in \d{4}|established in \d{4}"
+    r"|is a (?:modern|vibrant|dynamic|leading|world-class)"
+    r"|research-led, and professionally"
+    r"|about the university",
+    re.I,
+)
+_REF_HEADER = re.compile(r"\(ref\.?\s*:?\s*\d+\)|\bto commence\b", re.I)
+_DUTY_SENTENCE = re.compile(
+    r"duties\b.{0,40}\binclude\b|"
+    r"\bassist the\b|\bconduct(?:ing)?\b|"
+    r"appointees? will|will be responsible|responsible for|"
+    r"will (?:join|assist|participate|conduct|support|manage|perform|carry|contribute)",
+    re.I,
+)
+_INSTITUTION = re.compile(
+    r"\b(?:the university|this university|the school of|we embrace|we tailor|our students|"
+    r"our programmes|professional education|learning environment|career paths|"
+    r"faculty-driven|student-centred|student-centered)\b",
     re.I,
 )
 _DEMOGRAPHIC = re.compile(
@@ -91,16 +120,17 @@ _BAD_LABEL = re.compile(
     r"project domain|team environment|career path|privacy notice|university name",
     re.I,
 )
+_APOS = r"['’`]"
 _DEGREE = re.compile(
-    r"((?:an?\s+)?(?:honours\s+|honor\s+)?"
-    r"(?:bachelor(?:'s)?|master(?:'s)?|doctoral|ph\.?d\.?|m\.?\s*phil|mphil|doctorate)"
-    r"(?:\s+degree)?(?:\s+or above)?(?:\s+in\s+[^.;]{0,90})?"
-    r"|(?:an?\s+)?(?:honours\s+)?degree(?:\s+or above)?(?:\s+in\s+[^.;]{0,90})?)",
+    rf"((?:an?\s+)?(?:honours\s+|honor\s+)?"
+    rf"(?:bachelor(?:{_APOS}s)?|master(?:{_APOS}s)?|doctoral|ph\.?\s*d\.?|m\.?\s*phil|mphil|doctorate)"
+    rf"(?:\s+degree)?(?:\s+or above)?(?:\s+in\s+\S[^.;]{{0,140}})?"
+    rf"|(?:an?\s+)?(?:honours\s+)?degree(?:\s+or above)?(?:\s+in\s+\S[^.;]{{0,140}})?)",
     re.I,
 )
 _SKILL = re.compile(
     r"(?:experience (?:in|with|of)|knowledge of|proficien\w* in|familiar with|"
-    r"background in|skills? in|command of)\s+([^.;]{3,70})",
+    r"background in|skills? in|command of)\s+(\S.{3,90})",
     re.I,
 )
 _NAME = re.compile(
@@ -113,33 +143,62 @@ _APPT_HINT = re.compile(
 
 
 def _clean_line(text: str) -> str:
-    return re.sub(r"\s+", " ", text or "").strip(" \t:-")
+    text = re.sub(r"https?://\S+", "", text or "")
+    return re.sub(r"\s+", " ", text).strip(" \t:-")
+
+
+def _trim_open_paren(text: str) -> str:
+    """Drop a trailing fragment that starts a parenthesis or an 'e.g.'."""
+    if text.count("(") > text.count(")"):
+        cut = text.rfind("(")
+        if cut > 12:
+            text = text[:cut]
+    text = re.sub(r"\s*\(?\s*(?:e\.g|i\.e)\.?\s*$", "", text, flags=re.I)
+    return text.rstrip(" ,;:-.(")
 
 
 def _cap(text: str, limit: int = LINE_CAP) -> str:
-    text = _clean_line(text).strip(" \t-;\"'")
-    if len(text) <= limit:
-        return text
-    window = text[:limit]
+    text = _clean_line(_restore_abbrev(_protect_abbrev(text))).strip(" \t-;\"'")
+    if len(text) <= limit and text.count("(") <= text.count(")"):
+        return _trim_open_paren(text) if text.count("(") > text.count(")") else text
+    window = _trim_open_paren(text[:limit])
+    if len(window) < int(limit * 0.45):
+        window = text[:limit]
+    protected = _protect_abbrev(window)
     for sep in (". ", "; ", ", "):
-        idx = window.rfind(sep)
-        if idx >= int(limit * 0.55):
-            cut = window[:idx].rstrip()
+        idx = protected.rfind(sep)
+        if idx >= int(limit * 0.45):
+            cut = _trim_open_paren(_restore_abbrev(protected[:idx]))
             if sep == ". ":
                 return cut + "."
-            return cut.rstrip(". ") + "..."
+            return cut + "..."
     idx = window.rfind(" ")
-    if idx >= int(limit * 0.5):
-        return window[:idx].rstrip(" ,;:-.") + "..."
-    return window.rstrip(" .") + "..."
+    if idx >= int(limit * 0.4):
+        return _trim_open_paren(window[:idx]) + "..."
+    return _trim_open_paren(window) + "..."
+
+
+_ABBREV = re.compile(
+    r"\b(?:e\.g|i\.e|etc|Dr|Prof|Mr|Mrs|Ms|Jr|Sr|St|No|vs|Ph\.D|M\.Phil|M\.Sc|B\.Sc|B\.A|M\.A)\.",
+    re.I,
+)
+
+
+def _protect_abbrev(text: str) -> str:
+    return _ABBREV.sub(lambda match: match.group(0).replace(".", "\u0001"), text)
+
+
+def _restore_abbrev(text: str) -> str:
+    return text.replace("\u0001", ".")
 
 
 def _sentences(text: str) -> List[str]:
     text = _clean_line(text)
     if not text:
         return []
-    parts = re.split(r"(?<=[.!?])\s+", text)
-    return [part.strip() for part in parts if part.strip()]
+    protected = _protect_abbrev(text)
+    parts = re.split(r"(?<=[.!?])\s+|•|\u2022", protected)
+    return [_restore_abbrev(part).strip(" \t-•") for part in parts if part.strip(" \t-•")]
 
 
 def _scrub_sentence(sentence: str) -> str:
@@ -231,8 +290,9 @@ def _split_sections(text: str) -> Dict[str, str]:
             found.setdefault(current, []).append(line)
         else:
             last_plain = line
-            if len(line) >= 40 and not _BOILER.search(line):
-                found.setdefault("Prose", []).append(line)
+            cleaned = _BOILER_CLAUSE.sub("", line).strip(" ,;")
+            if len(cleaned) >= 40:
+                found.setdefault("Prose", []).append(cleaned)
     sections = {}
     for label, parts in found.items():
         if label == "Appointment":
@@ -274,8 +334,9 @@ def _narrative(text: str, title: str) -> str:
         line = raw.strip()
         if not line or _SKIP_LINE.match(line) or _CLOSE_LINE.match(line) or _END_LINE.match(line):
             continue
-        if _BOILER.search(line):
+        if _BOILER.search(line) and len(_BOILER_CLAUSE.sub("", line).strip()) < 40:
             continue
+        line = _BOILER_CLAUSE.sub("", line).strip(" ,;") or line
         if _META_LINE.match(line) or _CONTACT_LINE.search(line):
             skip_value = line.endswith(":") or ":" not in line
             continue
@@ -320,52 +381,101 @@ def _contact_value(section: str, text: str) -> str:
 
 _REF_FRAGMENT = re.compile(r"\(Ref\.?:", re.I)
 _REQUIREMENT_SENTENCE = re.compile(
-    r"applicants should|should possess|should have|must (?:have|possess)|degree in|honours degree",
+    r"applicants should|they should|should possess|should have|must (?:have|possess)|degree in|honours degree",
     re.I,
 )
 
 
-def _role_focus(duties: str, narrative: str, title: str) -> str:
-    source = _strip_leading_title(duties or "", title) or narrative
-    useful = _useful(source)
-    # A doubled title leaves "of the School ... (Ref.: 123)." Prefer a real sentence.
-    while len(useful) > 1 and (
-        len(useful[0]) < 40
-        or re.match(r"^(?:of|in|at|for)\b", useful[0], re.I)
-        or (_REF_FRAGMENT.search(useful[0]) and len(useful[0]) < 140)
-        or (_REQUIREMENT_SENTENCE.search(useful[0]) and duties)
+def _is_bad_role(sentence: str, title: str = "", department: str = "") -> bool:
+    """University blurbs, reference headers, and title restatements are not duties."""
+    if _UNI_BLURB.search(sentence) or _INSTITUTION.search(sentence):
+        return True
+    if re.match(r"applicants\b", sentence, re.I) and not _DUTY_SENTENCE.search(sentence):
+        return True
+    if re.search(r"competitive salary|medical benefits|annual leave|will be offered", sentence, re.I):
+        return True
+    if re.search(r"\b(?:HKMU|CUHK|HKUST|PolyU|the University)\b", sentence) and not _DUTY_SENTENCE.search(sentence):
+        return True
+    if re.search(r"is an advantage|would be an advantage|are welcome to apply", sentence, re.I):
+        return True
+    if _REQUIREMENT_SENTENCE.search(sentence) and not _DUTY_SENTENCE.search(sentence):
+        return True
+    if _REF_HEADER.search(sentence) and (
+        re.search(r"to commence", sentence, re.I) or not _DUTY_SENTENCE.search(sentence)
     ):
-        useful = useful[1:]
-    if useful:
-        return _cap(useful[0])
-    cleaned = _clean_line(source)
-    if cleaned and not _BOILER.search(cleaned):
-        return _cap(cleaned)
-    return ""
+        return True
+    if _BOILER.search(sentence) and len(_BOILER_CLAUSE.sub("", sentence).strip()) < 40:
+        return True
+    stripped = _strip_leading_title(sentence, title)
+    if department:
+        stripped = _strip_leading_title(stripped, department)
+    stripped = re.sub(r"\(ref\.?\s*:?\s*\d+\)", "", stripped, flags=re.I)
+    if len(_clean_line(stripped)) < 20:
+        return True
+    return False
+
+
+def _near_duplicate(left: str, right: str) -> bool:
+    def norm(value: str) -> str:
+        return re.sub(r"\W+", " ", value.lower()).strip()
+
+    a, b = norm(left), norm(right)
+    if not a or not b:
+        return False
+    if a == b or a.startswith(b[:48]) or b.startswith(a[:48]):
+        return True
+    return False
+
+
+def _role_focus(duties: str, narrative: str, title: str, department: str = "") -> str:
+    source = _strip_leading_title(duties or "", title) or narrative
+    useful = [sentence for sentence in _useful(source) if not _is_bad_role(sentence, title, department)]
+    chosen = [sentence for sentence in useful if _DUTY_SENTENCE.search(sentence)]
+    # A doubled title leaves "of the School ... (Ref.: 123)." Prefer a real sentence.
+    while len(chosen) > 1 and (
+        len(chosen[0]) < 40
+        or re.match(r"^(?:of|in|at|for)\b", chosen[0], re.I)
+        or (_REF_FRAGMENT.search(chosen[0]) and len(chosen[0]) < 140)
+    ):
+        chosen = chosen[1:]
+    if not chosen:
+        return ""
+    return _cap(chosen[0])
 
 
 def _requirements_line(text: str) -> str:
-    useful = _useful(text)
-    blob = " ".join(useful) if useful else _clean_line(text)
+    useful = [sentence for sentence in _useful(text) if not _UNI_BLURB.search(sentence)]
+    blob = _BOILER_CLAUSE.sub(" ", " ".join(useful) if useful else _clean_line(text))
+    blob = blob.replace("’", "'").replace("`", "'")
     if not blob or _BOILER.fullmatch(blob or ""):
         return ""
     degree_match = _DEGREE.search(blob)
-    degree = _cap(degree_match.group(1), 110) if degree_match else ""
+    degree = ""
+    if degree_match:
+        degree = re.split(
+            r"\s+(?:They|Applicants|The appointee)\b",
+            degree_match.group(1),
+            maxsplit=1,
+            flags=re.I,
+        )[0]
+        degree = _cap(degree, 140)
     skills: List[str] = []
     for match in _SKILL.finditer(blob):
-        skill = _clean_line(match.group(1)).strip(" .")
-        if not skill or _BOILER.search(skill):
+        skill = re.split(r"\s+(?:They|Applicants|The appointee)\b", match.group(1), maxsplit=1, flags=re.I)[0]
+        skill = _cap(_clean_line(skill).strip(" ."), 70)
+        if not skill or _BOILER.search(skill) or _UNI_BLURB.search(skill):
             continue
-        if skill.lower() in {item.lower() for item in skills}:
+        if skill.lower().rstrip(".") in {item.lower().rstrip(".") for item in skills}:
             continue
-        skills.append(_cap(skill, 60))
-        if len(skills) == 3:
+        skills.append(skill)
+        if len(skills) == 2:
             break
     parts = [part for part in (degree, *skills) if part]
     if parts:
         return _cap("; ".join(parts))
-    if useful:
-        return _cap(useful[0])
+    for sentence in useful:
+        if _REQUIREMENT_SENTENCE.search(sentence) and not _DUTY_SENTENCE.search(sentence):
+            return _cap(sentence)
     return ""
 
 
@@ -450,12 +560,19 @@ def fact_summary(
         items.append(("Dept", _cap(department, 120)))
     if project:
         items.append(("Project", _cap(project)))
-    role = _role_focus(sections.get("Duties", ""), narrative, title)
+    role = _role_focus(sections.get("Duties", ""), narrative, title, department)
     if department and role.lower().startswith(department.lower()):
         role = _strip_leading_title(role, department)
+    requirements = _requirements_line(sections.get("Requirements", "") or narrative or sections.get("Duties", ""))
+    if role and requirements and _near_duplicate(role, requirements):
+        if _REQUIREMENT_SENTENCE.search(role) or _DEGREE.search(role):
+            role = ""
+        else:
+            requirements = ""
+    if role and _is_bad_role(role, title, department):
+        role = ""
     if role:
         items.append(("Role focus", role))
-    requirements = _requirements_line(sections.get("Requirements", "") or narrative)
     if requirements:
         items.append(("Requirements", requirements))
     appointment = _appointment_line(sections.get("Appointment", ""), sections.get("Salary", ""))

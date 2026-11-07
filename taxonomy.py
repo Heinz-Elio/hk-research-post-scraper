@@ -479,10 +479,15 @@ def plausible_department(name: Optional[str]) -> bool:
     if not name:
         return False
     name = name.strip()
-    if not (5 < len(name) < 70):
-        return False
     low = name.lower()
     if "[university" in low or " is seek" in low or "..." in name:
+        return False
+    if re.search(r"\b(located at|located in|off-campus|at our)\b", low):
+        return False
+    # Short unit codes such as SOCSP are real departments.
+    if re.fullmatch(r"[A-Z][A-Z0-9&/\-]{2,15}", name):
+        return True
+    if not (5 < len(name) < 80):
         return False
     return True
 

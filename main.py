@@ -27,7 +27,14 @@ from embeddings_store import (
     upsert_vector,
 )
 from sources import SCRAPERS, SOURCE_NAMES
-from sources.base import ListingUnchanged, commit_listing_hashes, configure_run, listing_counts, set_listing_hash_path
+from sources.base import (
+    ListingUnchanged,
+    commit_listing_hashes,
+    configure_run,
+    is_research_related,
+    listing_counts,
+    set_listing_hash_path,
+)
 from summary import fact_summary, salvage_summary, summarize as build_summary, summary_needs_repair
 from taxonomy import enrich_classification
 
@@ -388,6 +395,22 @@ def run(
             vec = get_embedding(text_for_embed(post))
             if vec:
                 upsert_vector(embed_store, pid, vec)
+
+    # A stored project-assistant ad can be clerical even when the listing
+    # hash has not changed, because the grade is only in the description.
+    for pid, post in list(active.items()):
+        blob = "\n".join(
+            part for part in (post.get("content"), post.get("summary"), post.get("project")) if part
+        )
+        if not is_research_related(
+            post.get("title") or "",
+            department=post.get("department") or "",
+            project=post.get("project") or "",
+            description=blob,
+        ):
+            outdated[pid] = post
+            del active[pid]
+            moved_count += 1
 
     # A fresh listing replaces that source's active set. Posts no longer
     # listed move to outdated. An empty or failed scrape does not.

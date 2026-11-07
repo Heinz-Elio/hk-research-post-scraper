@@ -2,10 +2,22 @@
 
 from datetime import date
 
-from sources.dates import extract_deadline, extract_review_start, refine_dates
+from sources.base import parse_date
+from sources.dates import extract_deadline, extract_review_start, interpret_open_date, refine_dates
 
 
 TODAY = date(2026, 11, 6)
+
+
+def test_relative_open_date_is_not_read_as_a_day_of_the_month():
+    assert parse_date("30+ days ago") is None
+    assert parse_date("Open Date: 30+ days ago") is None
+    opened, approximate = interpret_open_date("30+ days ago", today=date(2026, 11, 7))
+    assert opened == "2026-10-08"
+    assert approximate is True
+    exact, approximate = interpret_open_date("26 November 2025", today=date(2026, 11, 7))
+    assert exact == "2025-11-26"
+    assert approximate is False
 
 
 def test_appointment_start_and_funding_window_are_not_deadlines():
