@@ -37,6 +37,25 @@
     ]
   },
   {
+    "id": "CUHK_260001WO",
+    "title": "Project Assistant II",
+    "close_date": "2026-11-17",
+    "url": "https://cuhk.taleo.net/careersection/cu_career_non_teach/jobdetail.ftl?job=260001WO&lang=en",
+    "source": "CUHK",
+    "department": "Transport Office",
+    "date_type": "deadline",
+    "possibly_stale": false,
+    "scraped_at": "2026-11-07T01:02:08",
+    "summary": "- Dept: Transport Office\n- Role focus: The appointee will be responsible for (a) providing clerical and administrative support; (b) handling enquiries and complaints...\n- Requirements: both English and Chinese; written and spoken English and Chinese (preferably...; MS Word, Excel and PowerPoint (knowledge of poster design...\n- Closing: 2026-11-17",
+    "work_type": null,
+    "min_degree": "unspecified",
+    "degree_rank": 0,
+    "degree_level": null,
+    "domains": [
+      "civil"
+    ]
+  },
+  {
     "id": "EdUHK_2600932",
     "title": "Research Assistant I/II (Part-time)",
     "close_date": "2026-11-06",
@@ -1007,6 +1026,24 @@
     "date_type": "review_start"
   },
   {
+    "id": "PolyU_260828010",
+    "title": "Project Associate / Project Assistant",
+    "close_date": "2026-09-04",
+    "url": "https://jobs.polyu.edu.hk/job_detail.php?job=260828010",
+    "source": "PolyU",
+    "department": "Department of Chinese History and Culture",
+    "project": "N.A.",
+    "date_type": "review_start",
+    "possibly_stale": false,
+    "scraped_at": "2026-11-07T01:32:53",
+    "summary": "- Dept: Department of Chinese History and Culture\n- Project: N.A.\n- Role focus: The appointee will support the operations of the Hong Kong Palace Museum – PolyU Joint Chinese Textile Centre (HKPM-JCTC), a collaborative initiative between PolyU and HKPM\n- Requirements: honours degree; administrative support and/or event management Applicants...; administrative support and/or event management For both...\n- Appointment: twelve months\n- Review: 2026-09-04 (open until filled)\n- Contact: cherine.chau@polyu.edu.hk",
+    "work_type": null,
+    "min_degree": "unspecified",
+    "degree_rank": 0,
+    "degree_level": null,
+    "domains": []
+  },
+  {
     "id": "PolyU_260707021",
     "title": "Research Associate",
     "close_date": "2026-07-14",
@@ -1133,8 +1170,8 @@
     "department": "Centre for Chinese Herbal Medicine Drug Development",
     "date_type": "deadline",
     "possibly_stale": false,
-    "scraped_at": "2026-11-07T01:03:25",
-    "summary": "- Dept: Centre for Chinese Herbal Medicine Drug Development\n- Role focus: Design, lead, and publish hypothesis-driven clinical research on the new drug development; Develop and submit grant proposals to secure extramural funding for clinical and...\n- Requirements: degree in a relevant biomedical field (e; conducting clinical trials as a study leader or senior...\n- Closing: 2026-05-07",
+    "scraped_at": "2026-11-07T20:59:23",
+    "summary": "- Dept: Centre for Chinese Herbal Medicine Drug Development\n- Requirements: a Ph.D. degree in a relevant biomedical field...; conducting clinical trials as a study leader or senior clinical...\n- Closing: 2026-05-07",
     "work_type": null,
     "min_degree": "doctor",
     "degree_rank": 3,
@@ -1153,8 +1190,8 @@
     "department": "Centre for Chinese Herbal Medicine Drug Development",
     "date_type": "deadline",
     "possibly_stale": false,
-    "scraped_at": "2026-11-07T01:03:25",
-    "summary": "- Dept: Centre for Chinese Herbal Medicine Drug Development\n- Role focus: Conduct high-quality and innovative research on the phytochemistry, formulation\n- Requirements: degree in Pharmaceuticals, Medicinal Chemistry, Natural Product Chemistry, Pharmacology, or related\n- Closing: 2026-05-07",
+    "scraped_at": "2026-11-07T20:59:23",
+    "summary": "- Dept: Centre for Chinese Herbal Medicine Drug Development\n- Role focus: Conduct high-quality and innovative research on the phytochemistry, formulation\n- Requirements: a Ph.D. degree in Pharmaceuticals, Medicinal Chemistry, Natural Product Chemistry, Pharmacology, or related disciplines...\n- Closing: 2026-05-07",
     "work_type": null,
     "min_degree": "doctor",
     "degree_rank": 3,
