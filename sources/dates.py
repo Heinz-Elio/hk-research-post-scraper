@@ -16,8 +16,8 @@ disagrees with the listing is recorded in ``date_note``; the listing wins.
 from __future__ import annotations
 
 import re
-from datetime import date
-from typing import Optional
+from datetime import date, timedelta
+from typing import Optional, Tuple
 
 from sources.base import parse_date
 
@@ -71,6 +71,30 @@ _CONTEXT_DATE = re.compile(
     re.I,
 )
 _TRIennium_NEAR = re.compile(r"trienn|funding|grant", re.I)
+
+
+_RELATIVE_DAYS = re.compile(r"(\d+)\s*(\+)?\s*days?\s+ago", re.I)
+
+
+def interpret_open_date(text: str, today: Optional[date] = None) -> Tuple[Optional[str], bool]:
+    """Turn a card's open-date text into YYYY-MM-DD.
+
+    "30+ days ago" is a relative age, not the 30th of this month. The second
+    value is True when the date is only approximate.
+    """
+    today = today or date.today()
+    raw = text or ""
+    match = _RELATIVE_DAYS.search(raw)
+    if match:
+        opened = today - timedelta(days=int(match.group(1)))
+        return opened.isoformat(), True
+    if re.search(r"\byesterday\b", raw, re.I):
+        return (today - timedelta(days=1)).isoformat(), True
+    if re.search(r"\btoday\b", raw, re.I) and not re.search(
+        r"\b(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)", raw, re.I
+    ):
+        return today.isoformat(), True
+    return parse_date(raw), False
 
 
 def extract_deadline(text: str) -> Optional[str]:

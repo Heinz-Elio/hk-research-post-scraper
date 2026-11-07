@@ -16,6 +16,7 @@ from sources.base import (
     prepare_posts,
     same_listing,
 )
+from sources.dates import interpret_open_date
 
 KEY = "HKUST"
 NAME = "HKUST Clear Water Bay"
@@ -30,6 +31,7 @@ def _card_fields(card) -> dict:
     dept = ""
     close_date = None
     open_date = None
+    open_approx = False
     for p in card.select("p"):
         text = p.get_text(" ", strip=True)
         low = text.lower()
@@ -38,7 +40,7 @@ def _card_fields(card) -> dict:
         elif "apply by" in low:
             close_date = parse_date(text.split(":")[-1].strip())
         elif "open date" in low:
-            open_date = parse_date(text.split(":")[-1].strip())
+            open_date, open_approx = interpret_open_date(text.split(":")[-1].strip())
         elif not dept and text and "date" not in low:
             dept = text
     return {
@@ -48,6 +50,7 @@ def _card_fields(card) -> dict:
         "dept": dept,
         "close_date": close_date,
         "open_date": open_date,
+        "open_date_approximate": open_approx,
     }
 
 
@@ -84,19 +87,28 @@ def scrape() -> List[dict]:
         ref = fields["job_id"] or hashlib.md5(detail_url.encode()).hexdigest()[:10]
         card_text = card.get_text("\n", strip=True)
         jobs.append(
-            (ref, title, fields["dept"], fields["close_date"], fields["open_date"], detail_url, card_text)
+            (
+                ref,
+                title,
+                fields["dept"],
+                fields["close_date"],
+                fields["open_date"],
+                fields["open_date_approximate"],
+                detail_url,
+                card_text,
+            )
         )
 
     print(f"  [HKUST] {len(cards)} cards, {len(jobs)} match the research filter")
     note_counts(KEY, len(cards), len(jobs))
     listing_rows = [
         f"{ref}|{title}|{dept}|{close}|{detail}"
-        for ref, title, dept, close, _opened, detail, _card in jobs
+        for ref, title, dept, close, _opened, _approx, detail, _card in jobs
     ]
     if same_listing(KEY, listing_rows):
         return ListingUnchanged()
 
-    for ref, title, dept, close_date, open_date, detail_url, card_text in jobs:
+    for ref, title, dept, close_date, open_date, open_approx, detail_url, card_text in jobs:
         time.sleep(REQUEST_DELAY)
         detail = fetch(detail_url)
         body = job_content(detail)
@@ -112,6 +124,7 @@ def scrape() -> List[dict]:
                 close_date=close_date,
                 department=dept or None,
                 open_date=open_date,
+                open_date_approximate=open_approx,
             )
         )
     prepare_posts(posts)

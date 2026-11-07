@@ -111,7 +111,9 @@ def scrape() -> List[dict]:
         if not isinstance(detail, dict):
             detail = {}
         body = _description(detail)
+        # Some Technical Officer ads publish a title and department only.
         content = body or f"Department: {dept}\nJob ID: {job_id}".strip()
+        posted = parse_date(_clean(detail.get("onlineDate") or detail.get("publicDate")))
         posts.append(
             make_post(
                 source=KEY,
@@ -121,6 +123,7 @@ def scrape() -> List[dict]:
                 content=content,
                 close_date=_close_date(detail.get("offlineDate") or offline),
                 department=_clean(detail.get("enPostDept")) or dept or None,
+                open_date=posted,
             )
         )
     prepare_posts(posts)

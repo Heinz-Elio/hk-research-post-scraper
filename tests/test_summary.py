@@ -72,9 +72,62 @@ def test_prose_heading_and_job_ref_do_not_leak_into_the_summary():
 def test_title_is_not_repeated_at_the_start_of_the_role():
     title = "Research Assistant I/II in the Division of Epidemiology and Biostatistics"
     summary = fact_summary(HKU_DOUBLED, title=title, department="School of Public Health", close_date="2026-12-31")
+    assert title.lower() not in summary.lower()
+    assert "Bachelor" in summary or "public health" in summary.lower()
+
+
+def test_requirements_keep_the_degree_clause_and_eg_examples():
+    text = (
+        "Requirements: Applicants should have a bachelor's degree in operations management "
+        "or a related discipline, with knowledge of laboratory techniques in microbiology "
+        "(e.g. PCR and ELISA) and experience in data analysis. "
+        "Fringe benefits such as medical and dental coverage are provided."
+    )
+    summary = fact_summary(text, title="Research Assistant", department="Department of Biology")
+    requirements = next(line for line in _lines(summary) if line.startswith("- Requirements:"))
+    assert "bachelor's degree in operations management" in requirements
+    assert not requirements.rstrip().endswith("(e")
+    assert "Fringe benefits" not in summary
+    assert "medical and dental" not in requirements
+
+
+def test_role_focus_skips_blurbs_headers_and_duplicate_requirements():
+    blurb = (
+        "Founded in 1989, Hong Kong Metropolitan University is a modern, vibrant and dynamic university. "
+        "The appointee will support nursing studies and collect clinical data for the project. "
+        "Applicants should possess a bachelor degree in nursing."
+    )
+    summary = fact_summary(blurb, title="Research Assistant", department="School of Nursing")
     role = next(line for line in _lines(summary) if line.startswith("- Role focus:"))
-    assert role.lower().count(title.lower()) == 0
-    assert "Bachelor" in summary or "public health" in summary
+    assert "Founded in 1989" not in summary
+    assert "nursing studies" in role or "clinical data" in role
+
+    header = (
+        "School of Public Health (Ref.: 537687) (to commence as soon as possible on a one-year contract). "
+        "The appointee will assist with laboratory work on emerging viral infections. "
+        "Applicants should possess a Bachelor's degree in biological sciences, with knowledge of "
+        "laboratory techniques in microbiology (e.g. PCR)."
+    )
+    summary = fact_summary(header, title="Research Assistant I/II", department="School of Public Health")
+    role = next(line for line in _lines(summary) if line.startswith("- Role focus:"))
+    assert "Ref.:" not in role
+    assert "to commence" not in role.lower()
+    assert "laboratory" in role.lower()
+    requirements = next(line for line in _lines(summary) if line.startswith("- Requirements:"))
+    assert "e.g. PCR" in requirements or "(e.g" not in requirements
+    assert not requirements.endswith("(e")
+
+    duty = (
+        "The appointee will join a joint research team bringing together the Freshwater Lab "
+        "(led by Dr. Alphonse Tsang) and will manage field surveys. "
+        "Perform other duties as assigned."
+    )
+    summary = fact_summary(duty, title="Senior Research Officer", department="Division of Science")
+    lines = _lines(summary)
+    roles = [line for line in lines if line.startswith("- Role focus:")]
+    reqs = [line for line in lines if line.startswith("- Requirements:")]
+    assert roles and "Dr. Alphonse" in roles[0]
+    assert not reqs or roles[0].split(": ", 1)[1] not in reqs[0]
 
 
 def test_contact_without_email_is_a_name_not_a_phone():
