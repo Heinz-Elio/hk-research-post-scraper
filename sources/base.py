@@ -715,12 +715,50 @@ def parse_date(text: str) -> Optional[str]:
     if _OPEN_ENDED.search(text):
         return None
 
+    # "Open Date: 30+ days ago" is a relative age. Fuzzy parsing would read
+    # the 30 as the 30th of the current month.
+    if re.search(r"\bago\b|\byesterday\b|\btoday\b", text, re.I) and not re.search(
+        r"\b(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)", text, re.I
+    ):
+        return None
+    if re.fullmatch(r"\d{1,2}\s*\+?", text.strip()):
+        return None
+
     try:
         # Month names stay unambiguous. Numeric leftovers are day-first.
         dt = date_parser.parse(text, fuzzy=True, dayfirst=True)
         return dt.date().isoformat()
     except Exception:
         return None
+
+
+def _primarily_clerical(*blobs: str) -> bool:
+    """True when the opening duties are clerical or administrative support.
+
+    Research work mentioned before that support keeps the post.
+    """
+    text = " ".join(part for part in blobs if part)
+    if not text:
+        return False
+    head = text[:900]
+    clerical = re.search(
+        r"clerical(?:\s+and\s+administrative)?(?:\s+support)?"
+        r"|administrative support"
+        r"|clerical support"
+        r"|clerical duties",
+        head,
+        re.I,
+    )
+    if not clerical:
+        return False
+    research = re.search(
+        r"\bresearch\b|experiment|laboratory|literature review|data analysis|fieldwork",
+        head,
+        re.I,
+    )
+    if research and research.start() < clerical.start():
+        return False
+    return True
 
 
 def _role_title(title: str) -> str:
@@ -762,6 +800,10 @@ def is_research_related(
     if _ADMIN_ROLE.search(role) or re.search(r"\badministration\b", role, re.I):
         return False
     place = f"{role} {department or ''}"
+    # "Project Assistant II" whose duties are clerical support is not a research post.
+    # A research title is already accepted above, so a mention of admin tasks there stays.
+    if _PROJECT_SUPPORT.search(role) and _primarily_clerical(description, project):
+        return False
     if _PROJECT_SUPPORT.search(role) and not _ADMIN_OFFICE.search(place):
         return True
     if _PROJECT_LEAD.search(role) and _RESEARCH_WORD.search(role):
@@ -801,6 +843,7 @@ def make_post(
     project: Optional[str] = None,
     date_type: Optional[str] = None,
     open_date: Optional[str] = None,
+    open_date_approximate: bool = False,
 ) -> dict:
     post = {
         "id": make_id(source, ref),
@@ -818,4 +861,6 @@ def make_post(
         post["date_type"] = date_type
     if open_date:
         post["open_date"] = open_date
+    if open_date_approximate:
+        post["open_date_approximate"] = True
     return post

@@ -218,7 +218,11 @@ def test_hkbu_department_and_closing_date():
     assert _department(
         "Technical Officer",
         "This position sits under the Department of Physics at our campus.",
-    ) == "Department of Physics at our campus"
+    ) == "Department of Physics"
+    assert _department(
+        "Technical Officer",
+        "This position sits under the Institute for Innovation and Translation at our off-campus office located at Hong Kong Science Park.",
+    ) == "Institute for Innovation and Translation"
     assert _closing_date(None, "Review of applications is ongoing until the position is filled.") is None
     assert _closing_date(None, "Closing date: 15 December 2026. Please apply online.") == "2026-12-15"
     # Milliseconds are stripped, then the shared parser converts the instant to Hong Kong time.
