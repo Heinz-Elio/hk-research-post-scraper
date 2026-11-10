@@ -1,5 +1,44 @@
 [
   {
+    "id": "CityU_ur-cr557",
+    "title": "Postdoctoral Fellow",
+    "close_date": null,
+    "url": "https://www.cityu.edu.hk/hro/en/job/current/administrative.asp?ref=ur-cr557",
+    "source": "CityU",
+    "department": "Department of Neuroscience",
+    "date_type": "open_until_filled",
+    "possibly_stale": false,
+    "scraped_at": "2026-11-07T21:56:57",
+    "summary": "- Dept: Department of Neuroscience\n- Project: The Medial Prefrontal Cortex Facilitates Learning and Memory in the Auditory Cortex Through the Medial Temporal Lobe Ongoing projects include the exploration of neuronal...\n- Requirements: A PhD degree; vivo or in vitro electrophysiology, medicinal chemistry...\n- Closing: Open until filled\n- Contact: hrojob@cityu.edu.hk",
+    "work_type": null,
+    "min_degree": "doctor",
+    "degree_rank": 3,
+    "degree_level": "Doctor",
+    "domains": [
+      "life-science",
+      "chemistry"
+    ]
+  },
+  {
+    "id": "CUHK_2600009M",
+    "title": "Part-time Research Assistant",
+    "close_date": null,
+    "url": "https://cuhk.taleo.net/careersection/cu_career_non_teach/jobdetail.ftl?job=2600009M&lang=en",
+    "source": "CUHK",
+    "department": "The Nethersole School of Nursing",
+    "date_type": "unspecified",
+    "possibly_stale": false,
+    "scraped_at": "2026-11-07T22:00:48",
+    "summary": "- Dept: The Nethersole School of Nursing\n- Requirements: a Bachelor's degree or above in a health-related discipline, preferably in Nursing; conducting and coordinating research studies...; both written and spoken English and Chinese...",
+    "work_type": "Part-time",
+    "min_degree": "bachelor",
+    "degree_rank": 1,
+    "degree_level": "Bachelor",
+    "domains": [
+      "health"
+    ]
+  },
+  {
     "id": "PolyU_260819010",
     "title": "Project Associate / Project Assistant / Project Technical Assistant / Project Administrative Assistant (Full-time/Part-time)",
     "close_date": "2027-02-02",
@@ -53,6 +92,84 @@
     "degree_level": null,
     "domains": [
       "civil"
+    ]
+  },
+  {
+    "id": "HKU_537317",
+    "title": "Research Assistant I/II",
+    "close_date": "2026-11-09",
+    "url": "https://jobs.hku.hk/en/job/537317/research-assistant-iii",
+    "source": "HKU",
+    "department": "Department of Microbiology, School of Clinical Medicine (20700)",
+    "date_type": "deadline",
+    "possibly_stale": false,
+    "scraped_at": "2026-11-07T22:07:08",
+    "summary": "- Dept: Department of Microbiology, School of Clinical Medicine (20700)\n- Role focus: The appointee will work on laboratory experiments and data analysis under the supervision of a Principal Investigator of the Institute\n- Requirements: a Bachelor's degree or above in Immunology/Microbiology or a related discipline...; molecular biology, immunological assays, primary cell culture...\n- Closing: 2026-11-09",
+    "work_type": "Full-time",
+    "min_degree": "bachelor",
+    "degree_rank": 1,
+    "degree_level": "Bachelor",
+    "domains": [
+      "life-science",
+      "health"
+    ]
+  },
+  {
+    "id": "HKU_537670",
+    "title": "Research Assistant I",
+    "close_date": "2026-11-09",
+    "url": "https://jobs.hku.hk/en/job/537670/research-assistant-i",
+    "source": "HKU",
+    "department": "Department of Obstetrics and Gynaecology, School of Clinical Medicine (20900)",
+    "date_type": "deadline",
+    "possibly_stale": false,
+    "scraped_at": "2026-11-07T22:07:06",
+    "summary": "- Dept: Department of Obstetrics and Gynaecology, School of Clinical Medicine (20900)\n- Role focus: The appointee will participate in research projects relating to sperm fertility, fertilization, and clinical in vitro fertilization\n- Requirements: a Bachelor's degree; written and spoken English and Chinese (including Cantonese)...\n- Closing: 2026-11-09",
+    "work_type": "Full-time",
+    "min_degree": "bachelor",
+    "degree_rank": 1,
+    "degree_level": "Bachelor",
+    "domains": [
+      "health"
+    ]
+  },
+  {
+    "id": "PolyU_261102009",
+    "title": "Project Assistant",
+    "close_date": "2026-11-09",
+    "url": "https://jobs.polyu.edu.hk/job_detail.php?job=261102009",
+    "source": "PolyU",
+    "department": "School of Accounting and Finance",
+    "project": "Development and innovative application of AI tutor at PolyU-A cross-faculty pilot",
+    "date_type": "review_start",
+    "possibly_stale": false,
+    "scraped_at": "2026-11-07T22:31:50",
+    "summary": "- Dept: School of Accounting and Finance\n- Project: Development and innovative application of AI tutor at PolyU-A cross-faculty pilot\n- Role focus: The appointee will assist the project leader in the research project – “Development and innovative application of AI tutor at PolyU-A cross-faculty pilot”\n- Requirements: an honours degree\n- Appointment: twelve months\n- Review: 2026-11-09 (open until filled)\n- Contact: haitian.lu@polyu.edu.hk",
+    "work_type": null,
+    "min_degree": "unspecified",
+    "degree_rank": 0,
+    "degree_level": null,
+    "domains": [
+      "ai-ml"
+    ]
+  },
+  {
+    "id": "HKU_537277",
+    "title": "Research Assistant Professor in the Division of Rheumatology & Clinical Immunology",
+    "close_date": "2026-11-08",
+    "url": "https://jobs.hku.hk/en/job/537277/research-assistant-professor-in-the-division-of-rheumatology-clinical-immunology",
+    "source": "HKU",
+    "department": "Department of Medicine, School of Clinical Medicine (20600)",
+    "date_type": "deadline",
+    "possibly_stale": false,
+    "scraped_at": "2026-11-07T22:07:08",
+    "summary": "- Dept: Department of Medicine, School of Clinical Medicine (20600)\n- Role focus: The appointee will be given an opportunity to develop their own research programme in the wider fields of PID and autoimmunity\n- Requirements: A PhD degree; the area of primary immunodeficiencies (PID) and autoimmunity\n- Appointment: The appointment will commence as soon as possible on a 3-year fixed-term basis, with the possibility of renewal subject to satisfactory performance and funding availability...\n- Closing: 2026-11-08",
+    "work_type": "Full-time",
+    "min_degree": "doctor",
+    "degree_rank": 3,
+    "degree_level": "Doctor",
+    "domains": [
+      "health"
     ]
   },
   {
@@ -1026,6 +1143,26 @@
     "date_type": "review_start"
   },
   {
+    "id": "PolyU_260903006",
+    "title": "Project Assistant",
+    "close_date": "2026-09-10",
+    "url": "https://jobs.polyu.edu.hk/job_detail.php?job=260903006",
+    "source": "PolyU",
+    "department": "Department of Industrial and Systems Engineering",
+    "project": "N.A.",
+    "date_type": "review_start",
+    "possibly_stale": false,
+    "scraped_at": "2026-11-07T01:32:53",
+    "summary": "- Dept: Department of Industrial and Systems Engineering\n- Project: N.A.\n- Role focus: The appointee will assist the project leader to (a) support the daily operation of academic programmes, scholarships, and various student initiatives...\n- Requirements: an honours degree; written and spoken English and Chinese...; basic video/photo editing, graphic design...\n- Appointment: twelve months\n- Review: 2026-09-10 (open until filled)\n- Contact: mylene-yu-yee.ho@polyu.edu.hk",
+    "work_type": null,
+    "min_degree": "unspecified",
+    "degree_rank": 0,
+    "degree_level": null,
+    "domains": [
+      "industrial"
+    ]
+  },
+  {
     "id": "PolyU_260828010",
     "title": "Project Associate / Project Assistant",
     "close_date": "2026-09-04",
@@ -1042,6 +1179,44 @@
     "degree_rank": 0,
     "degree_level": null,
     "domains": []
+  },
+  {
+    "id": "PolyU_260821021",
+    "title": "Part-time Project Assistant",
+    "close_date": "2026-08-28",
+    "url": "https://jobs.polyu.edu.hk/job_detail.php?job=260821021",
+    "source": "PolyU",
+    "department": "Department of Applied Social Sciences",
+    "project": "Support for student-athletes",
+    "date_type": "review_start",
+    "possibly_stale": false,
+    "scraped_at": "2026-11-07T01:32:53",
+    "summary": "- Dept: Department of Applied Social Sciences\n- Project: Support for student-athletes\n- Role focus: The appointees will assist the project leader in the project - “Support for student-athletes”\n- Requirements: an honours degree in Social Policy or an equivalent qualification; both written and spoken English and Chinese\n- Appointment: each for ten months\n- Review: 2026-08-28 (open until filled)\n- Contact: sskytam@polyu.edu.hk",
+    "work_type": "Part-time",
+    "min_degree": "unspecified",
+    "degree_rank": 0,
+    "degree_level": null,
+    "domains": []
+  },
+  {
+    "id": "PolyU_260819006",
+    "title": "Part-time Project Assistant",
+    "close_date": "2026-08-26",
+    "url": "https://jobs.polyu.edu.hk/job_detail.php?job=260819006",
+    "source": "PolyU",
+    "department": "Department of Industrial and Systems Engineering",
+    "project": "Innovative educational program",
+    "date_type": "review_start",
+    "possibly_stale": false,
+    "scraped_at": "2026-11-07T01:32:53",
+    "summary": "- Dept: Department of Industrial and Systems Engineering\n- Project: Innovative educational program\n- Role focus: The appointees will assist the project leader in the project - “Innovative educational program”\n- Requirements: an honours degree; both written and spoken English and Chinese...; computer software, including Microsoft Office applications...\n- Appointment: each for twelve months\n- Review: 2026-08-26 (open until filled)\n- Contact: mylene-yu-yee.ho@polyu.edu.hk",
+    "work_type": "Part-time",
+    "min_degree": "unspecified",
+    "degree_rank": 0,
+    "degree_level": null,
+    "domains": [
+      "industrial"
+    ]
   },
   {
     "id": "PolyU_260707021",
@@ -1086,6 +1261,84 @@
     "date_type": "review_start"
   },
   {
+    "id": "PolyU_260609015",
+    "title": "Project Assistant",
+    "close_date": "2026-06-17",
+    "url": "https://jobs.polyu.edu.hk/job_detail.php?job=260609015",
+    "source": "PolyU",
+    "department": "School of Optometry",
+    "project": "Learning through providing eye care and vision health to the community",
+    "date_type": "review_start",
+    "possibly_stale": false,
+    "scraped_at": "2026-11-07T22:31:57",
+    "summary": "- Dept: School of Optometry\n- Project: Learning through providing eye care and vision health to the community\n- Role focus: The appointee will assist the project leader in the project - “Learning through providing eye care and vision health to the community”\n- Requirements: honours degree; both written and spoken English and Chinese including Putonghua...\n- Appointment: twelve months initially, with possibility of further appointment\n- Review: 2026-06-17 (open until filled)\n- Contact: kin.wan@polyu.edu.hk",
+    "work_type": null,
+    "min_degree": "unspecified",
+    "degree_rank": 0,
+    "degree_level": null,
+    "domains": []
+  },
+  {
+    "id": "PolyU_260529009",
+    "title": "Project Associate",
+    "close_date": "2026-06-05",
+    "url": "https://jobs.polyu.edu.hk/job_detail.php?job=260529009",
+    "source": "PolyU",
+    "department": "School of Design",
+    "project": "Academic curriculum, impact and network expansion",
+    "date_type": "review_start",
+    "possibly_stale": false,
+    "scraped_at": "2026-11-07T01:32:58",
+    "summary": "- Dept: School of Design\n- Project: Academic curriculum, impact and network expansion\n- Role focus: The appointee will assist the project leader in the project - “Academic curriculum, impact and network expansion”\n- Requirements: a master; design studies or related fields; both written and spoken English; design software, and have knowledge of basic web content...\n- Appointment: twelve months\n- Review: 2026-06-05 (open until filled)\n- Contact: gerhard.bruyns@polyu.edu.hk",
+    "work_type": null,
+    "min_degree": "master",
+    "degree_rank": 2,
+    "degree_level": "Master",
+    "domains": [
+      "computer-science"
+    ]
+  },
+  {
+    "id": "PolyU_260521010",
+    "title": "Postdoctoral Fellow / Research Assistant",
+    "close_date": "2026-05-28",
+    "url": "https://jobs.polyu.edu.hk/job_detail.php?job=260521010",
+    "source": "PolyU",
+    "department": "Department of Chemistry",
+    "project": "Development of next-generation theranostic agents",
+    "date_type": "review_start",
+    "possibly_stale": false,
+    "scraped_at": "2026-11-07T22:31:58",
+    "summary": "- Dept: Department of Chemistry\n- Project: Development of next-generation theranostic agents\n- Role focus: The appointees will assist the project leader in the research project - “Development of next-generation theranostic agents”\n- Requirements: doctoral; diabetic wound healing, including designing and evaluating...; brain disease models, focusing on mechanisms of neurodegeneration...\n- Appointment: twelve months; each for twelve months\n- Review: 2026-05-28 (open until filled)\n- Contact: yanjuan.gu@polyu.edu.hk",
+    "work_type": null,
+    "min_degree": "doctor",
+    "degree_rank": 3,
+    "degree_level": "Doctor",
+    "domains": [
+      "chemistry"
+    ]
+  },
+  {
+    "id": "PolyU_260515018",
+    "title": "Research Assistant",
+    "close_date": "2026-05-22",
+    "url": "https://jobs.polyu.edu.hk/job_detail.php?job=260515018",
+    "source": "PolyU",
+    "department": "Department of Chemistry",
+    "project": "Exploring ligand-metal secondary interactions: rational design of tunable phosphine ligands for enhanced catalytic performance",
+    "date_type": "review_start",
+    "possibly_stale": false,
+    "scraped_at": "2026-11-07T22:31:58",
+    "summary": "- Dept: Department of Chemistry\n- Project: Exploring ligand-metal secondary interactions: rational design of tunable phosphine ligands for enhanced catalytic performance\n- Role focus: The appointees will assist the project leader in the research project - “Exploring ligand-metal secondary interactions: rational design of...\n- Requirements: a bachelor's degree or above in Chemistry or related disciplines or an equivalent qualification...\n- Appointment: each for six months\n- Review: 2026-05-22 (open until filled)\n- Contact: chau.ming.so@polyu.edu.hk",
+    "work_type": null,
+    "min_degree": "bachelor",
+    "degree_rank": 1,
+    "degree_level": "Bachelor",
+    "domains": [
+      "chemistry"
+    ]
+  },
+  {
     "id": "PolyU_260512021",
     "title": "Research Administrative Assistant",
     "close_date": "2026-05-19",
@@ -1126,6 +1379,28 @@
     "date_type": "review_start"
   },
   {
+    "id": "PolyU_260511001",
+    "title": "Postdoctoral Fellow",
+    "close_date": "2026-05-18",
+    "url": "https://jobs.polyu.edu.hk/job_detail.php?job=260511001",
+    "source": "PolyU",
+    "department": "Department of Physics and Materials",
+    "project": "Explore novel nonlinear charge and spin transport effects",
+    "date_type": "review_start",
+    "possibly_stale": false,
+    "scraped_at": "2026-11-07T22:31:59",
+    "summary": "- Dept: Department of Physics and Materials\n- Project: Explore novel nonlinear charge and spin transport effects\n- Role focus: The appointee will assist the project leader in the research project - “Explore novel nonlinear charge and spin transport effects”\n- Requirements: a PhD degree in Physics, Materials or Engineering or equivalent qualifications and must have no more than five years of post-qualification...\n- Appointment: twelve months\n- Review: 2026-05-18 (open until filled)\n- Contact: shengyuan.yang@polyu.edu.hk",
+    "work_type": null,
+    "min_degree": "doctor",
+    "degree_rank": 3,
+    "degree_level": "Doctor",
+    "domains": [
+      "civil",
+      "physics",
+      "materials"
+    ]
+  },
+  {
     "id": "PolyU_260414003",
     "title": "Postdoctoral Fellow",
     "close_date": "2026-05-15",
@@ -1160,46 +1435,6 @@
     "degree_level": "Doctor",
     "domains": [],
     "date_type": "review_start"
-  },
-  {
-    "id": "HKBU_26270203",
-    "title": "Research Assistant Professor,Centre for Chinese Herbal Medicine Drug Development",
-    "close_date": "2026-05-07",
-    "url": "https://fa-ewqq-saasfaprod1.fa.ocs.oraclecloud.com/hcmUI/CandidateExperience/en/sites/hkbu/job/26270203",
-    "source": "HKBU",
-    "department": "Centre for Chinese Herbal Medicine Drug Development",
-    "date_type": "deadline",
-    "possibly_stale": false,
-    "scraped_at": "2026-11-07T20:59:23",
-    "summary": "- Dept: Centre for Chinese Herbal Medicine Drug Development\n- Requirements: a Ph.D. degree in a relevant biomedical field...; conducting clinical trials as a study leader or senior clinical...\n- Closing: 2026-05-07",
-    "work_type": null,
-    "min_degree": "doctor",
-    "degree_rank": 3,
-    "degree_level": "Doctor",
-    "domains": [
-      "biomedical",
-      "health"
-    ]
-  },
-  {
-    "id": "HKBU_26270087",
-    "title": "Research Assistant Professor,Centre for Chinese Herbal Medicine Drug Development",
-    "close_date": "2026-05-07",
-    "url": "https://fa-ewqq-saasfaprod1.fa.ocs.oraclecloud.com/hcmUI/CandidateExperience/en/sites/hkbu/job/26270087",
-    "source": "HKBU",
-    "department": "Centre for Chinese Herbal Medicine Drug Development",
-    "date_type": "deadline",
-    "possibly_stale": false,
-    "scraped_at": "2026-11-07T20:59:23",
-    "summary": "- Dept: Centre for Chinese Herbal Medicine Drug Development\n- Role focus: Conduct high-quality and innovative research on the phytochemistry, formulation\n- Requirements: a Ph.D. degree in Pharmaceuticals, Medicinal Chemistry, Natural Product Chemistry, Pharmacology, or related disciplines...\n- Closing: 2026-05-07",
-    "work_type": null,
-    "min_degree": "doctor",
-    "degree_rank": 3,
-    "degree_level": "Doctor",
-    "domains": [
-      "chemistry",
-      "health"
-    ]
   },
   {
     "id": "PolyU_260430011",
@@ -2204,6 +2439,27 @@
       "health"
     ],
     "date_type": "review_start"
+  },
+  {
+    "id": "PolyU_260210012",
+    "title": "Project Associate / Project Assistant (Full-time/Part-time)",
+    "close_date": "2026-02-20",
+    "url": "https://jobs.polyu.edu.hk/job_detail.php?job=260210012",
+    "source": "PolyU",
+    "department": "Department of Industrial and Systems Engineering",
+    "project": "Education 4.0: AI-driven personalized learning and its impact",
+    "date_type": "review_start",
+    "possibly_stale": false,
+    "scraped_at": "2026-11-07T01:33:00",
+    "summary": "- Dept: Department of Industrial and Systems Engineering\n- Project: Education 4.0: AI-driven personalized learning and its impact\n- Role focus: The appointee will assist the project leader in the project - “Education 4.0: AI-driven personalized learning and its impact”\n- Requirements: a Master\n- Appointment: Appointment period: six to twelve months initially, with possibility of further appointment\n- Review: 2026-02-20 (open until filled)\n- Contact: yukming.tang@polyu.edu.hk",
+    "work_type": "Full-time/Part-time",
+    "min_degree": "master",
+    "degree_rank": 2,
+    "degree_level": "Master",
+    "domains": [
+      "ai-ml",
+      "industrial"
+    ]
   },
   {
     "id": "PolyU_251014019",
