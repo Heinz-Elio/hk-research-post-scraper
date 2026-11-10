@@ -15,8 +15,11 @@ from __future__ import annotations
 import re
 from typing import Callable, Dict, List, Optional, Tuple
 
-LINE_CAP = 180
-TOTAL_CAP = 600
+# Soft limits are where we look for a clause boundary. A quoted project
+# title is kept whole even past the soft limit, up to the hard limit.
+LINE_CAP = 360
+TOTAL_CAP = 1100
+QUOTE_HARD = 520
 
 _CANONICAL = {
     "dept": "Dept",
@@ -124,8 +127,8 @@ _APOS = r"['’`]"
 _DEGREE = re.compile(
     rf"((?:an?\s+)?(?:honours\s+|honor\s+)?"
     rf"(?:bachelor(?:{_APOS}s)?|master(?:{_APOS}s)?|doctoral|ph\.?\s*d\.?|m\.?\s*phil|mphil|doctorate)"
-    rf"(?:\s+degree)?(?:\s+or above)?(?:\s+in\s+\S[^.;]{{0,140}})?"
-    rf"|(?:an?\s+)?(?:honours\s+)?degree(?:\s+or above)?(?:\s+in\s+\S[^.;]{{0,140}})?)",
+    rf"(?:\s+degree)?(?:\s+or above)?(?:\s+in\s+\S[^.;]{{0,260}})?"
+    rf"|(?:an?\s+)?(?:honours\s+)?degree(?:\s+or above)?(?:\s+in\s+\S[^.;]{{0,260}})?)",
     re.I,
 )
 _SKILL = re.compile(
@@ -147,35 +150,121 @@ def _clean_line(text: str) -> str:
     return re.sub(r"\s+", " ", text).strip(" \t:-")
 
 
-def _trim_open_paren(text: str) -> str:
-    """Drop a trailing fragment that starts a parenthesis or an 'e.g.'."""
-    if text.count("(") > text.count(")"):
-        cut = text.rfind("(")
-        if cut > 12:
-            text = text[:cut]
-    text = re.sub(r"\s*\(?\s*(?:e\.g|i\.e)\.?\s*$", "", text, flags=re.I)
-    return text.rstrip(" ,;:-.(")
+def _quote_spans(text: str) -> List[Tuple[int, int]]:
+    """Quoted project titles, including an opening quote that runs to the end."""
+    spans: List[Tuple[int, int]] = []
+    for match in re.finditer(r"“[^”]*”|\"[^\"\n]*\"|‘[^’]*’", text):
+        spans.append((match.start(), match.end()))
+    for match in re.finditer(r"[“\"‘]", text):
+        if any(start <= match.start() < end for start, end in spans):
+            continue
+        spans.append((match.start(), len(text)))
+    return spans
+
+
+def _paren_spans(text: str) -> List[Tuple[int, int]]:
+    spans: List[Tuple[int, int]] = []
+    depth = 0
+    start = None
+    for index, char in enumerate(text):
+        if char == "(":
+            if depth == 0:
+                start = index
+            depth += 1
+        elif char == ")" and depth:
+            depth -= 1
+            if depth == 0 and start is not None:
+                spans.append((start, index + 1))
+                start = None
+    if depth and start is not None:
+        spans.append((start, len(text)))
+    return spans
+
+
+def _inside(index: int, spans: List[Tuple[int, int]]) -> bool:
+    return any(start <= index < end for start, end in spans)
+
+
+def _clause_ends(text: str, spans: List[Tuple[int, int]]) -> List[int]:
+    """Indexes just after a clause, never inside a title, quote, or parenthesis."""
+    points: List[int] = []
+    for match in re.finditer(r"[.?!;]", text):
+        if _inside(match.start(), spans):
+            continue
+        if match.group() == "." and re.search(
+            r"(?:e\.g|i\.e|etc|Dr|Prof|Mr|Ms|Ph\.D|M\.Phil)$",
+            text[: match.end()],
+            re.I,
+        ):
+            continue
+        points.append(match.end())
+    for match in re.finditer(r",\s+(?:and|or)\s+", text, re.I):
+        if not _inside(match.start(), spans):
+            points.append(match.start())
+    for _start, end in _quote_spans(text):
+        if end < len(text) or text[end - 1 : end] in "”\"’":
+            points.append(end)
+    return points
+
+
+def _clip(text: str, soft: int = LINE_CAP, hard: int = QUOTE_HARD) -> str:
+    """Trim at a sentence or clause boundary.
+
+    A quoted project title is kept intact. Ellipsis is only added when a
+    later clause was dropped, never in the middle of a word or a title.
+    """
+    text = _clean_line(text).strip(" \t")
+    if not text:
+        return ""
+    quotes = _quote_spans(text)
+    spans = quotes + _paren_spans(text)
+    limit = soft
+    for start, end in quotes:
+        if start < soft < end and (end - start) <= 500:
+            limit = max(limit, end)
+    limit = min(max(limit, soft), max(hard, limit))
+    if len(text) <= limit:
+        return text
+    ends = [point for point in _clause_ends(text, spans) if 24 <= point <= limit]
+    if ends:
+        cut = max(ends)
+        kept = text[:cut].rstrip(" ,;")
+        if kept.endswith((".", "?", "!", ";", "”", '"', "’")):
+            return kept
+        return kept + "..."
+    # No clause boundary in range. Finish the protected span, or stop at a word.
+    index = min(limit, len(text))
+    if _inside(index - 1, quotes):
+        for start, end in quotes:
+            if start <= index - 1 < end and (end - start) <= 500:
+                return text[:end].rstrip()
+    while index > 24 and text[index - 1].isalnum():
+        index -= 1
+    kept = text[:index].rstrip(" ,;:-")
+    if len(kept) < 24:
+        return text
+    return kept if kept.endswith((".", "?", "!")) else kept + "..."
 
 
 def _cap(text: str, limit: int = LINE_CAP) -> str:
-    text = _clean_line(_restore_abbrev(_protect_abbrev(text))).strip(" \t-;\"'")
-    if len(text) <= limit and text.count("(") <= text.count(")"):
-        return _trim_open_paren(text) if text.count("(") > text.count(")") else text
-    window = _trim_open_paren(text[:limit])
-    if len(window) < int(limit * 0.45):
-        window = text[:limit]
-    protected = _protect_abbrev(window)
-    for sep in (". ", "; ", ", "):
-        idx = protected.rfind(sep)
-        if idx >= int(limit * 0.45):
-            cut = _trim_open_paren(_restore_abbrev(protected[:idx]))
-            if sep == ". ":
-                return cut + "."
-            return cut + "..."
-    idx = window.rfind(" ")
-    if idx >= int(limit * 0.4):
-        return _trim_open_paren(window[:idx]) + "..."
-    return _trim_open_paren(window) + "..."
+    return _clip(text, soft=limit, hard=max(limit, QUOTE_HARD))
+
+
+def _project_line(project: str) -> str:
+    """Keep a project title whole. Drop a following aims-sentence jammed onto it."""
+    project = _clean_line(project)
+    if not project:
+        return ""
+    follow = re.search(
+        r"\s+(?:The Project aims|This project aims|This research\b|We are looking\b|"
+        r"Ongoing projects\b|City University of Hong Kong is\b)",
+        project,
+    )
+    if follow and follow.start() >= 12:
+        project = project[: follow.start()].rstrip(" -–—")
+    if len(project) <= QUOTE_HARD:
+        return project
+    return _clip(project, soft=420, hard=QUOTE_HARD)
 
 
 _ABBREV = re.compile(
@@ -440,7 +529,7 @@ def _role_focus(duties: str, narrative: str, title: str, department: str = "") -
         chosen = chosen[1:]
     if not chosen:
         return ""
-    return _cap(chosen[0])
+    return _clip(chosen[0], soft=LINE_CAP, hard=QUOTE_HARD)
 
 
 def _requirements_line(text: str) -> str:
@@ -458,11 +547,11 @@ def _requirements_line(text: str) -> str:
             maxsplit=1,
             flags=re.I,
         )[0]
-        degree = _cap(degree, 140)
+        degree = _clip(degree, soft=280, hard=360)
     skills: List[str] = []
     for match in _SKILL.finditer(blob):
         skill = re.split(r"\s+(?:They|Applicants|The appointee)\b", match.group(1), maxsplit=1, flags=re.I)[0]
-        skill = _cap(_clean_line(skill).strip(" ."), 70)
+        skill = _clip(_clean_line(skill).strip(" ."), soft=180, hard=240)
         if not skill or _BOILER.search(skill) or _UNI_BLURB.search(skill):
             continue
         if skill.lower().rstrip(".") in {item.lower().rstrip(".") for item in skills}:
@@ -472,7 +561,7 @@ def _requirements_line(text: str) -> str:
             break
     parts = [part for part in (degree, *skills) if part]
     if parts:
-        return _cap("; ".join(parts))
+        return _clip("; ".join(parts), soft=400, hard=QUOTE_HARD)
     for sentence in useful:
         if _REQUIREMENT_SENTENCE.search(sentence) and not _DUTY_SENTENCE.search(sentence):
             return _cap(sentence)
@@ -507,27 +596,29 @@ def _date_line(close_date: str, date_type: str) -> Optional[Tuple[str, str]]:
 
 
 def _render(items: List[Tuple[str, str]]) -> str:
-    lines = [f"- {label}: {value}" for label, value in items if value]
-    text = "\n".join(lines)
+    """Join lines. Drop low-value lines before cutting a project title or a clause."""
+    def render(rows: List[Tuple[str, str]]) -> str:
+        return "\n".join(f"- {label}: {value}" for label, value in rows if value)
+
+    rows = [(label, value) for label, value in items if value]
+    text = render(rows)
     if len(text) <= TOTAL_CAP:
         return text
-    shrinkable = {"Role focus", "Requirements", "Appointment", "Project"}
-    for cap in (140, 100, 70):
-        items = [(label, _cap(value, cap) if label in shrinkable else value) for label, value in items]
-        lines = [f"- {label}: {value}" for label, value in items if value]
-        text = "\n".join(lines)
-        if len(text) <= TOTAL_CAP:
-            return text
-    while items and len(text) > TOTAL_CAP:
-        # Drop the longest optional line until the card fits.
-        optional = [i for i, (label, _) in enumerate(items) if label in ("Project", "Appointment", "Contact")]
-        if not optional:
-            break
-        drop = max(optional, key=lambda i: len(items[i][1]))
-        items.pop(drop)
-        lines = [f"- {label}: {value}" for label, value in items if value]
-        text = "\n".join(lines)
-    return text
+    # Appointment repeats duration often enough to drop first.
+    shorter = [row for row in rows if row[0] != "Appointment"]
+    if len(render(shorter)) <= TOTAL_CAP:
+        return render(shorter)
+    rows = shorter
+    # Clip role and requirements at a clause boundary. Leave a project title whole.
+    clipped = []
+    for label, value in rows:
+        if label == "Role focus":
+            clipped.append((label, _clip(value, soft=240, hard=QUOTE_HARD)))
+        elif label == "Requirements":
+            clipped.append((label, _clip(value, soft=240, hard=400)))
+        else:
+            clipped.append((label, value))
+    return render(clipped)
 
 
 def fact_summary(
@@ -557,9 +648,9 @@ def fact_summary(
         narrative = _strip_leading_title(sections.get("Prose", ""), title) or _narrative(text, title)
     items: List[Tuple[str, str]] = []
     if department:
-        items.append(("Dept", _cap(department, 120)))
+        items.append(("Dept", _clip(department, soft=180, hard=240)))
     if project:
-        items.append(("Project", _cap(project)))
+        items.append(("Project", _project_line(project)))
     role = _role_focus(sections.get("Duties", ""), narrative, title, department)
     if department and role.lower().startswith(department.lower()):
         role = _strip_leading_title(role, department)
@@ -587,7 +678,7 @@ def fact_summary(
     if contact and not _PHONE_RE.fullmatch(contact):
         items.append(("Contact", contact))
     if not items and title:
-        items.append(("Role focus", _cap(title)))
+        items.append(("Role focus", _clip(title, soft=240, hard=360)))
     return _render(items)
 
 

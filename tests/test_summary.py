@@ -1,5 +1,7 @@
 """Concise extractive summaries, and rejection of a bad model rewrite."""
 
+import re
+
 from summary import fact_summary, summarize, summary_needs_repair, validate_llm_summary
 
 
@@ -47,9 +49,9 @@ def test_summary_is_short_labelled_and_drops_boilerplate():
     assert "yijia.chang@polyu.edu.hk" in summary
     assert "- Review: 2026-11-15 (open until filled)" in summary
     assert "HK$20,000" in summary or "12 months" in summary
-    assert len(summary) <= 600
+    assert len(summary) <= 1100
     for line in _lines(summary):
-        assert len(line) <= 200
+        assert len(line) <= 520
         label = line.split(":", 1)[0].replace("- ", "")
         assert label in {"Dept", "Project", "Role focus", "Requirements", "Appointment", "Review", "Closing", "Contact"}
 
@@ -128,6 +130,57 @@ def test_role_focus_skips_blurbs_headers_and_duplicate_requirements():
     reqs = [line for line in lines if line.startswith("- Requirements:")]
     assert roles and "Dr. Alphonse" in roles[0]
     assert not reqs or roles[0].split(": ", 1)[1] not in reqs[0]
+
+
+SPHERICAL = (
+    "AI-enhanced omnidirectional side-coil multiplexing spherical actuator with "
+    "integrated active magnetic levitation: a direct-drive solution for "
+    "ultra-precision manufacturing equipment"
+)
+BIOCHIP = (
+    "Ultrasensitive optical microcavity sensor-enhanced multifunctional "
+    "optofluidic biochips for upgrading point-of-care diagnostics"
+)
+
+
+def test_project_titles_are_not_cut_mid_phrase():
+    """Titles taken from the 1107 posts PolyU_261016013 and PolyU_261009010."""
+    summary = fact_summary(
+        f'The appointees will assist the project leader in the research project - “{SPHERICAL}”.',
+        title="Research Assistant",
+        department="Department of Mechanical Engineering",
+        project=SPHERICAL,
+        close_date="2026-12-01",
+        date_type="review_start",
+    )
+    assert SPHERICAL in summary
+    assert "solution..." not in summary
+    assert "spherical..." not in summary
+
+    summary = fact_summary(
+        f'The appointees will assist the project leader in the research project - “{BIOCHIP}”. '
+        "They will also prepare figures.",
+        title="Research Assistant",
+        department="Department of Biomedical Engineering",
+        project=BIOCHIP,
+    )
+    assert f"“{BIOCHIP}”" in summary
+    assert "upgrading..." not in summary
+
+
+def test_requirements_stop_at_a_clause_not_mid_word():
+    """CityU and PolyU lines were ending like 'or an...' and 'Social...'."""
+    text = (
+        "Requirements: A Bachelor's degree in Electrical, Electronic, Optical or "
+        "Mechanics Engineering or an equivalent qualification. "
+        "Experience in diagnostic imaging, health assessment and postmortem examination "
+        "of aquatic animals is required."
+    )
+    summary = fact_summary(text, title="Research Assistant", department="Department of Veterinary Clinical Sciences")
+    requirements = next(line for line in _lines(summary) if line.startswith("- Requirements:"))
+    assert "or an..." not in requirements
+    assert "Mechanics Engineering" in requirements
+    assert not re.search(r"[A-Za-z]\.\.\.$", requirements)
 
 
 def test_contact_without_email_is_a_name_not_a_phone():
