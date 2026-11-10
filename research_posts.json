@@ -1616,7 +1616,9 @@
       "computer-science",
       "data",
       "math-stats"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "HKUST-GZ_5625",
@@ -1634,7 +1636,10 @@
     "min_degree": "doctor",
     "degree_rank": 3,
     "degree_level": "Doctor",
-    "domains": []
+    "domains": [],
+    "contract_months": 24,
+    "contract_months_max": 24,
+    "contract_renewable": true
   },
   {
     "id": "HKUST-GZ_6131",
@@ -1655,7 +1660,9 @@
     "domains": [
       "chemistry",
       "materials"
-    ]
+    ],
+    "contract_months": 24,
+    "contract_months_max": 24
   },
   {
     "id": "HKBU_26270219",
@@ -1943,7 +1950,10 @@
       "ai-ml",
       "data",
       "civil"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 3,
+    "contract_renewable": true
   },
   {
     "id": "HKUST_11087",
@@ -2031,7 +2041,10 @@
     "domains": [
       "ai-ml",
       "data"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 24,
+    "contract_renewable": true
   },
   {
     "id": "CUHK_2600003V",
@@ -2216,7 +2229,9 @@
       "electronics",
       "robotics",
       "mechanical"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "HKUST_9522",
@@ -2400,7 +2415,10 @@
     "degree_level": "Bachelor",
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 24,
+    "contract_renewable": true
   },
   {
     "id": "HKUST_9719",
@@ -2647,7 +2665,10 @@
     "degree_level": "Bachelor",
     "domains": [
       "data"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "HKUST_10688",
@@ -4811,7 +4832,9 @@
       "biomedical",
       "life-science",
       "health"
-    ]
+    ],
+    "contract_months": 24,
+    "contract_months_max": 24
   },
   {
     "id": "CityU_ur-t08426",
@@ -5063,7 +5086,10 @@
     "domains": [
       "ai-ml",
       "computer-science"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 24,
+    "contract_renewable": true
   },
   {
     "id": "HKUST_192415",
@@ -5453,7 +5479,10 @@
       "computer-science",
       "data",
       "life-science"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "HKUST-GZ_5636",
@@ -5471,7 +5500,9 @@
     "min_degree": "doctor",
     "degree_rank": 3,
     "degree_level": "Doctor",
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 24
   },
   {
     "id": "HKUST-GZ_5637",
@@ -5489,7 +5520,9 @@
     "min_degree": "doctor",
     "degree_rank": 3,
     "degree_level": "Doctor",
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 24
   },
   {
     "id": "HKUST_10970",
@@ -5621,7 +5654,9 @@
     "degree_level": "Doctor",
     "domains": [
       "ai-ml"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 24
   },
   {
     "id": "HKUST-GZ_5639",
@@ -5642,7 +5677,9 @@
     "domains": [
       "computer-science",
       "data"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 24
   },
   {
     "id": "HKUST-GZ_6052",
@@ -5662,7 +5699,9 @@
     "degree_level": "Doctor",
     "domains": [
       "data"
-    ]
+    ],
+    "contract_months": 24,
+    "contract_months_max": 24
   },
   {
     "id": "HKU_519152",
@@ -5683,7 +5722,10 @@
       "data",
       "civil",
       "math-stats"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "HKUST_192928",
@@ -5835,7 +5877,9 @@
     "degree_level": "Doctor",
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 24
   },
   {
     "id": "HKUST-GZ_5831",
@@ -5853,7 +5897,9 @@
     "min_degree": "doctor",
     "degree_rank": 3,
     "degree_level": "Doctor",
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 24
   },
   {
     "id": "HKUST-GZ_6109",
@@ -5871,7 +5917,9 @@
     "min_degree": "doctor",
     "degree_rank": 3,
     "degree_level": "Doctor",
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 24
   },
   {
     "id": "HKBU_25260681",
@@ -5989,7 +6037,9 @@
       "mechanical",
       "math-stats",
       "industrial"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 36
   },
   {
     "id": "CityU_ur-t05026",
@@ -6534,7 +6584,10 @@
     "min_degree": "bachelor",
     "degree_rank": 1,
     "degree_level": "Bachelor",
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 24,
+    "contract_renewable": true
   },
   {
     "id": "HKUST_189164",
@@ -6555,7 +6608,10 @@
     "degree_level": "Bachelor",
     "domains": [
       "ai-ml"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6,
+    "contract_renewable": true
   },
   {
     "id": "HKUST_189722",
@@ -6574,7 +6630,10 @@
     "min_degree": "doctor",
     "degree_rank": 3,
     "degree_level": "Doctor",
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 24,
+    "contract_renewable": true
   },
   {
     "id": "HKUST_11126",
@@ -6752,7 +6811,10 @@
       "computer-science",
       "data",
       "civil"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "HKUST-GZ_6805",
@@ -6870,7 +6932,9 @@
     "degree_level": "Doctor",
     "domains": [
       "industrial"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_261022006",
@@ -6890,7 +6954,9 @@
     "degree_level": "Doctor",
     "domains": [
       "electronics"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "HKUST-GZ_6818",
@@ -6991,7 +7057,9 @@
     "degree_level": "Doctor",
     "domains": [
       "electronics"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 24
   },
   {
     "id": "PolyU_260925009",
@@ -7011,7 +7079,9 @@
     "degree_level": "Doctor",
     "domains": [
       "mechanical"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260925008",
@@ -7031,7 +7101,9 @@
     "degree_level": "Doctor",
     "domains": [
       "mechanical"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "HKU_537427",
@@ -7071,7 +7143,9 @@
     "degree_level": "Doctor",
     "domains": [
       "industrial"
-    ]
+    ],
+    "contract_months": 4,
+    "contract_months_max": 20
   },
   {
     "id": "HKUST-GZ_6824",
@@ -7111,7 +7185,9 @@
       "ai-ml",
       "mechanical",
       "industrial"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260914003",
@@ -7129,7 +7205,9 @@
     "min_degree": "doctor",
     "degree_rank": 3,
     "degree_level": "Doctor",
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260828006",
@@ -7150,7 +7228,9 @@
     "domains": [
       "electronics",
       "industrial"
-    ]
+    ],
+    "contract_months": 8,
+    "contract_months_max": 8
   },
   {
     "id": "PolyU_260907004",
@@ -7172,7 +7252,9 @@
       "ai-ml",
       "mechanical",
       "industrial"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260901007",
@@ -7191,7 +7273,9 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260826011",
@@ -7211,7 +7295,9 @@
     "degree_level": "Doctor",
     "domains": [
       "industrial"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_261016013",
@@ -7233,7 +7319,9 @@
       "ai-ml",
       "mechanical",
       "industrial"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 12
   },
   {
     "id": "HKU_536608",
@@ -7274,7 +7362,10 @@
       "data",
       "electronics",
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 24,
+    "contract_renewable": true
   },
   {
     "id": "HKU_537630",
@@ -7354,7 +7445,10 @@
       "biomedical",
       "life-science",
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "HKU_537603",
@@ -7374,7 +7468,10 @@
     "domains": [
       "chemistry",
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "HKU_537604",
@@ -7397,7 +7494,10 @@
       "chemistry",
       "materials",
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "HKU_537011",
@@ -7514,7 +7614,9 @@
     "domains": [
       "electronics",
       "mechanical"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 24
   },
   {
     "id": "PolyU_260724001",
@@ -7536,7 +7638,9 @@
       "civil",
       "life-science",
       "math-stats"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 12
   },
   {
     "id": "HKU_537673",
@@ -7578,7 +7682,10 @@
     "degree_level": null,
     "domains": [
       "electronics"
-    ]
+    ],
+    "contract_months": 8,
+    "contract_months_max": 8,
+    "contract_renewable": true
   },
   {
     "id": "CUHK_2600003Q",
@@ -7617,7 +7724,9 @@
     "degree_level": null,
     "domains": [
       "industrial"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "HKU_537674",
@@ -7670,7 +7779,10 @@
     "min_degree": "doctor",
     "degree_rank": 3,
     "degree_level": "Doctor",
-    "domains": []
+    "domains": [],
+    "contract_months": 6,
+    "contract_months_max": 6,
+    "contract_renewable": true
   },
   {
     "id": "HKU_537631",
@@ -7712,7 +7824,9 @@
     "domains": [
       "mechanical",
       "industrial"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "HKU_537641",
@@ -7850,7 +7964,9 @@
     "degree_level": "Master",
     "domains": [
       "industrial"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260724022",
@@ -7871,7 +7987,9 @@
     "domains": [
       "mechanical",
       "industrial"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_261105003",
@@ -7891,7 +8009,9 @@
     "degree_level": "Doctor",
     "domains": [
       "mechanical"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 18
   },
   {
     "id": "PolyU_260903004",
@@ -7914,7 +8034,9 @@
       "computer-science",
       "electronics",
       "environment"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "HKU_537687",
@@ -7955,7 +8077,10 @@
     "domains": [
       "physics",
       "materials"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "HKU_537717",
@@ -8241,7 +8366,10 @@
     "degree_level": "Master",
     "domains": [
       "materials"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "HKU_537322",
@@ -8283,7 +8411,10 @@
       "electronics",
       "mechanical",
       "civil"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "HKU_537310",
@@ -8303,7 +8434,10 @@
     "domains": [
       "life-science",
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 36,
+    "contract_renewable": true
   },
   {
     "id": "HKUST_190352",
@@ -8347,7 +8481,10 @@
     "degree_level": "Doctor",
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 36,
+    "contract_renewable": true
   },
   {
     "id": "HKU_537462",
@@ -8484,7 +8621,10 @@
     "degree_level": "Bachelor",
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "HKU_537307",
@@ -8505,7 +8645,10 @@
       "biomedical",
       "life-science",
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 24,
+    "contract_renewable": true
   },
   {
     "id": "HKU_537793",
@@ -8567,7 +8710,10 @@
       "electronics",
       "mechanical",
       "civil"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "HKU_537707",
@@ -8589,7 +8735,10 @@
       "electronics",
       "mechanical",
       "civil"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "HKU_537759",
@@ -8672,7 +8821,10 @@
     "domains": [
       "computer-science",
       "materials"
-    ]
+    ],
+    "contract_months": 24,
+    "contract_months_max": 24,
+    "contract_renewable": true
   },
   {
     "id": "HKUST_191455",
@@ -8716,7 +8868,9 @@
       "civil",
       "environment",
       "math-stats"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 36
   },
   {
     "id": "HKU_537268",
@@ -8791,7 +8945,10 @@
       "electronics",
       "physics",
       "materials"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "HKU_537526",
@@ -8832,7 +8989,10 @@
       "life-science",
       "chemistry",
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 36,
+    "contract_renewable": true
   },
   {
     "id": "HKU_537308",
@@ -8853,7 +9013,10 @@
       "data",
       "life-science",
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 36,
+    "contract_renewable": true
   },
   {
     "id": "HKU_537663",
@@ -8959,7 +9122,10 @@
       "robotics",
       "civil",
       "math-stats"
-    ]
+    ],
+    "contract_months": 24,
+    "contract_months_max": 24,
+    "contract_renewable": true
   },
   {
     "id": "HKU_537727",
@@ -9065,7 +9231,8 @@
       "electronics",
       "mechanical",
       "civil"
-    ]
+    ],
+    "contract_renewable": true
   },
   {
     "id": "HKU_536877",
@@ -9165,7 +9332,9 @@
     "domains": [
       "ai-ml",
       "computer-science"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "HKU_537512",
@@ -9219,7 +9388,9 @@
     "degree_level": null,
     "domains": [
       "robotics"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260629006",
@@ -9239,7 +9410,9 @@
     "degree_level": "Doctor",
     "domains": [
       "mechanical"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "HKU_537806",
@@ -9318,7 +9491,10 @@
     "degree_level": "Bachelor",
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 24,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260921007",
@@ -9339,7 +9515,9 @@
     "domains": [
       "computer-science",
       "physics"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 3
   },
   {
     "id": "HKU_537842",
@@ -9380,7 +9558,9 @@
     "degree_level": "Doctor",
     "domains": [
       "industrial"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260630002",
@@ -9401,7 +9581,9 @@
     "domains": [
       "electronics",
       "industrial"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "HKU_537812",
@@ -9422,7 +9604,10 @@
       "ai-ml",
       "math-stats",
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "HKU_537873",
@@ -9439,7 +9624,10 @@
     "min_degree": "doctor",
     "degree_rank": 3,
     "degree_level": "Doctor",
-    "domains": []
+    "domains": [],
+    "contract_months": 3,
+    "contract_months_max": 3,
+    "contract_renewable": true
   },
   {
     "id": "HKU_537340",
@@ -9599,7 +9787,9 @@
     "domains": [
       "ai-ml",
       "mechanical"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_261109010",
@@ -9620,7 +9810,9 @@
     "domains": [
       "environment",
       "industrial"
-    ]
+    ],
+    "contract_months": 1,
+    "contract_months_max": 1
   },
   {
     "id": "PolyU_260908017",
@@ -9641,7 +9833,9 @@
     "domains": [
       "ai-ml",
       "computer-science"
-    ]
+    ],
+    "contract_months": 1,
+    "contract_months_max": 12
   },
   {
     "id": "HKU_537725",
@@ -9719,7 +9913,10 @@
       "biomedical",
       "life-science",
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "CUHK_260001U3",
@@ -9946,7 +10143,9 @@
     "degree_level": null,
     "domains": [
       "biomedical"
-    ]
+    ],
+    "contract_months": 2,
+    "contract_months_max": 2
   },
   {
     "id": "PolyU_260616017",
@@ -9966,7 +10165,9 @@
     "degree_level": "Doctor",
     "domains": [
       "industrial"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260616016",
@@ -9986,7 +10187,9 @@
     "degree_level": "Doctor",
     "domains": [
       "industrial"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260616015",
@@ -10007,7 +10210,9 @@
     "domains": [
       "civil",
       "industrial"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260616014",
@@ -10027,7 +10232,9 @@
     "degree_level": "Doctor",
     "domains": [
       "industrial"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_261103007",
@@ -10047,7 +10254,9 @@
     "degree_level": "Doctor",
     "domains": [
       "biomedical"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_261016009",
@@ -10068,7 +10277,9 @@
     "domains": [
       "ai-ml",
       "biomedical"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "HKU_537750",
@@ -10196,7 +10407,10 @@
       "electronics",
       "math-stats",
       "health"
-    ]
+    ],
+    "contract_months": 24,
+    "contract_months_max": 24,
+    "contract_renewable": true
   },
   {
     "id": "CUHK_260001UX",
@@ -10341,7 +10555,10 @@
       "biomedical",
       "math-stats",
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "HKU_537771",
@@ -10445,7 +10662,10 @@
     "domains": [
       "civil",
       "math-stats"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "CUHK_260001H9",
@@ -10611,7 +10831,9 @@
     "degree_level": "Doctor",
     "domains": [
       "ai-ml"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "HKU_536653",
@@ -10822,7 +11044,9 @@
     "degree_level": "Master",
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_261030007",
@@ -10842,7 +11066,9 @@
     "degree_level": null,
     "domains": [
       "electronics"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260709010",
@@ -10863,7 +11089,9 @@
     "domains": [
       "mechanical",
       "materials"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260527004",
@@ -10883,7 +11111,9 @@
     "degree_level": "Doctor",
     "domains": [
       "mechanical"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_261021011",
@@ -10903,7 +11133,9 @@
     "degree_level": "Doctor",
     "domains": [
       "industrial"
-    ]
+    ],
+    "contract_months": 4,
+    "contract_months_max": 4
   },
   {
     "id": "HKU_537705",
@@ -10965,7 +11197,9 @@
       "ai-ml",
       "computer-science",
       "industrial"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260609009",
@@ -10985,7 +11219,9 @@
     "degree_level": "Doctor",
     "domains": [
       "industrial"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_261109008",
@@ -11011,7 +11247,9 @@
       "robotics",
       "physics",
       "industrial"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "HKU_537700",
@@ -11051,7 +11289,10 @@
     "domains": [
       "life-science",
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "HKU_537691",
@@ -11071,7 +11312,10 @@
     "domains": [
       "math-stats",
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "HKU_537751",
@@ -11167,7 +11411,9 @@
       "ai-ml",
       "math-stats",
       "industrial"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 3
   },
   {
     "id": "CUHK_260001VL",
@@ -11210,7 +11456,9 @@
       "ai-ml",
       "computer-science",
       "health"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260522008",
@@ -11230,7 +11478,10 @@
     "degree_level": "Doctor",
     "domains": [
       "mechanical"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 10,
+    "contract_renewable": true
   },
   {
     "id": "HKU_537618",
@@ -11301,7 +11552,9 @@
     "degree_level": null,
     "domains": [
       "ai-ml"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "CityU_ur-t21426",
@@ -11395,7 +11648,9 @@
       "ai-ml",
       "biomedical",
       "health"
-    ]
+    ],
+    "contract_months": 4,
+    "contract_months_max": 20
   },
   {
     "id": "PolyU_260520005",
@@ -11416,7 +11671,9 @@
     "domains": [
       "robotics",
       "mechanical"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 24
   },
   {
     "id": "PolyU_261105001",
@@ -11437,7 +11694,9 @@
     "domains": [
       "robotics",
       "mechanical"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_261023004",
@@ -11458,7 +11717,9 @@
     "domains": [
       "physics",
       "materials"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "HKUST-GZ_6787",
@@ -11498,7 +11759,9 @@
     "degree_level": "Doctor",
     "domains": [
       "electronics"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260826012",
@@ -11518,7 +11781,9 @@
     "degree_level": "Doctor",
     "domains": [
       "industrial"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "CUHK_260001TA",
@@ -11558,7 +11823,9 @@
     "degree_level": "Doctor",
     "domains": [
       "industrial"
-    ]
+    ],
+    "contract_months": 4,
+    "contract_months_max": 4
   },
   {
     "id": "CUHK_260001TV",
@@ -11596,7 +11863,9 @@
     "domains": [
       "data",
       "industrial"
-    ]
+    ],
+    "contract_months": 2,
+    "contract_months_max": 2
   },
   {
     "id": "CUHK_260001V8",
@@ -11671,7 +11940,9 @@
     "min_degree": "bachelor",
     "degree_rank": 1,
     "degree_level": "Bachelor",
-    "domains": []
+    "domains": [],
+    "contract_months": 3,
+    "contract_months_max": 3
   },
   {
     "id": "CUHK_260001RF",
@@ -11711,7 +11982,9 @@
     "degree_level": "Doctor",
     "domains": [
       "industrial"
-    ]
+    ],
+    "contract_months": 2,
+    "contract_months_max": 2
   },
   {
     "id": "CUHK_260001VA",
@@ -11751,7 +12024,9 @@
     "degree_level": "Master",
     "domains": [
       "ai-ml"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260824002",
@@ -11772,7 +12047,9 @@
     "domains": [
       "computer-science",
       "civil"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260824001",
@@ -11794,7 +12071,9 @@
       "ai-ml",
       "computer-science",
       "civil"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "EdUHK_2600971",
@@ -11849,7 +12128,9 @@
     "domains": [
       "life-science",
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_261109002",
@@ -11869,7 +12150,9 @@
     "degree_level": null,
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "EdUHK_2600942",
@@ -11904,7 +12187,10 @@
     "min_degree": "master",
     "degree_rank": 2,
     "degree_level": "Master",
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_261109001",
@@ -11924,7 +12210,9 @@
     "degree_level": null,
     "domains": [
       "electronics"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "HKU_537593",
@@ -11966,7 +12254,9 @@
       "computer-science",
       "data",
       "math-stats"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "CUHK_260001QP",
@@ -12042,7 +12332,9 @@
     "degree_level": "Doctor",
     "domains": [
       "electronics"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_261106008",
@@ -12063,7 +12355,9 @@
     "domains": [
       "electronics",
       "robotics"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_261106012",
@@ -12083,7 +12377,9 @@
     "degree_level": "Doctor",
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "HKU_537602",
@@ -12104,7 +12400,10 @@
       "biomedical",
       "life-science",
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "HKU_537617",
@@ -12145,7 +12444,10 @@
       "biomedical",
       "life-science",
       "health"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_261030003",
@@ -12165,7 +12467,9 @@
     "degree_level": null,
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260515007",
@@ -12185,7 +12489,9 @@
     "degree_level": "Doctor",
     "domains": [
       "mechanical"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260515006",
@@ -12205,7 +12511,9 @@
     "degree_level": "Doctor",
     "domains": [
       "mechanical"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260515005",
@@ -12226,7 +12534,9 @@
     "domains": [
       "mechanical",
       "materials"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260515004",
@@ -12246,7 +12556,9 @@
     "degree_level": "Doctor",
     "domains": [
       "mechanical"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_261104012",
@@ -12267,7 +12579,9 @@
     "domains": [
       "robotics",
       "mechanical"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_261026012",
@@ -12285,7 +12599,9 @@
     "min_degree": "doctor",
     "degree_rank": 3,
     "degree_level": "Doctor",
-    "domains": []
+    "domains": [],
+    "contract_months": 4,
+    "contract_months_max": 20
   },
   {
     "id": "HKU_537756",
@@ -12361,7 +12677,9 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "HKU_537664",
@@ -12378,7 +12696,9 @@
     "min_degree": "master",
     "degree_rank": 2,
     "degree_level": "Master",
-    "domains": []
+    "domains": [],
+    "contract_months": 7,
+    "contract_months_max": 7
   },
   {
     "id": "EdUHK_2600943",
@@ -12416,7 +12736,9 @@
     "domains": [
       "materials",
       "industrial"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260513008",
@@ -12436,7 +12758,9 @@
     "degree_level": "Master",
     "domains": [
       "industrial"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "HKU_537409",
@@ -12493,7 +12817,9 @@
     "domains": [
       "life-science",
       "health"
-    ]
+    ],
+    "contract_months": 13,
+    "contract_months_max": 13
   },
   {
     "id": "PolyU_261105002",
@@ -12515,7 +12841,9 @@
       "computer-science",
       "data",
       "mechanical"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "HKU_537407",
@@ -12578,7 +12906,9 @@
     "domains": [
       "ai-ml",
       "industrial"
-    ]
+    ],
+    "contract_months": 2,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260527006",
@@ -12598,7 +12928,9 @@
     "degree_level": "Doctor",
     "domains": [
       "industrial"
-    ]
+    ],
+    "contract_months": 4,
+    "contract_months_max": 20
   },
   {
     "id": "PolyU_261104009",
@@ -12619,7 +12951,9 @@
     "domains": [
       "ai-ml",
       "computer-science"
-    ]
+    ],
+    "contract_months": 9,
+    "contract_months_max": 9
   },
   {
     "id": "PolyU_261104006",
@@ -12637,7 +12971,10 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 4,
+    "contract_months_max": 20,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_261104013",
@@ -12659,7 +12996,9 @@
       "ai-ml",
       "computer-science",
       "environment"
-    ]
+    ],
+    "contract_months": 7,
+    "contract_months_max": 7
   },
   {
     "id": "PolyU_260903007",
@@ -12677,7 +13016,9 @@
     "min_degree": "master",
     "degree_rank": 2,
     "degree_level": "Master",
-    "domains": []
+    "domains": [],
+    "contract_months": 3,
+    "contract_months_max": 3
   },
   {
     "id": "PolyU_261104007",
@@ -12695,7 +13036,10 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_261104002",
@@ -12716,7 +13060,9 @@
     "domains": [
       "math-stats",
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_261106004",
@@ -12737,7 +13083,9 @@
     "domains": [
       "civil",
       "environment"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_261106003",
@@ -12758,7 +13106,9 @@
     "domains": [
       "civil",
       "environment"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_261106002",
@@ -12778,7 +13128,9 @@
     "degree_level": "Doctor",
     "domains": [
       "environment"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_261106005",
@@ -12799,7 +13151,9 @@
     "domains": [
       "materials",
       "environment"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_261104003",
@@ -12820,7 +13174,9 @@
     "domains": [
       "electronics",
       "industrial"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_261104008",
@@ -12838,7 +13194,9 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_261103002",
@@ -12859,7 +13217,10 @@
     "domains": [
       "environment",
       "industrial"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260818016",
@@ -12879,7 +13240,9 @@
     "degree_level": null,
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_261103004",
@@ -12899,7 +13262,9 @@
     "degree_level": null,
     "domains": [
       "industrial"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_261102007",
@@ -12919,7 +13284,9 @@
     "degree_level": "Doctor",
     "domains": [
       "environment"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_261103003",
@@ -12941,7 +13308,9 @@
       "robotics",
       "mechanical",
       "environment"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_261104004",
@@ -12962,7 +13331,9 @@
     "domains": [
       "physics",
       "materials"
-    ]
+    ],
+    "contract_months": 13,
+    "contract_months_max": 13
   },
   {
     "id": "PolyU_261103001",
@@ -12982,7 +13353,9 @@
     "degree_level": "Master",
     "domains": [
       "industrial"
-    ]
+    ],
+    "contract_months": 4,
+    "contract_months_max": 4
   },
   {
     "id": "PolyU_261103005",
@@ -13000,7 +13373,10 @@
     "min_degree": "master",
     "degree_rank": 2,
     "degree_level": "Master",
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "HKU_537625",
@@ -13092,7 +13468,9 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 8,
+    "contract_months_max": 8
   },
   {
     "id": "PolyU_261102014",
@@ -13110,7 +13488,9 @@
     "min_degree": "bachelor",
     "degree_rank": 1,
     "degree_level": "Bachelor",
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_261102011",
@@ -13130,7 +13510,9 @@
     "degree_level": null,
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_261030002",
@@ -13150,7 +13532,10 @@
     "degree_level": null,
     "domains": [
       "life-science"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_261029003",
@@ -13170,7 +13555,9 @@
     "degree_level": "Bachelor",
     "domains": [
       "math-stats"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_261030004",
@@ -13190,7 +13577,9 @@
     "degree_level": "Doctor",
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 1,
+    "contract_months_max": 8
   },
   {
     "id": "CityU_ur-t21126",
@@ -13230,7 +13619,9 @@
     "degree_level": "Master",
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_261029001",
@@ -13250,7 +13641,9 @@
     "degree_level": "Doctor",
     "domains": [
       "mechanical"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_261029015",
@@ -13270,7 +13663,9 @@
     "degree_level": null,
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_261029016",
@@ -13292,7 +13687,9 @@
       "ai-ml",
       "computer-science",
       "biomedical"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 3
   },
   {
     "id": "PolyU_261028008",
@@ -13312,7 +13709,10 @@
     "degree_level": "Master",
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_261028007",
@@ -13330,7 +13730,10 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 6,
+    "contract_months_max": 9,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_261027005",
@@ -13350,7 +13753,10 @@
     "degree_level": "Master",
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_261027004",
@@ -13370,7 +13776,9 @@
     "degree_level": "Doctor",
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_261026002",
@@ -13392,7 +13800,9 @@
       "ai-ml",
       "computer-science",
       "data"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_261026003",
@@ -13412,7 +13822,9 @@
     "degree_level": "Master",
     "domains": [
       "math-stats"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_261026014",
@@ -13432,7 +13844,9 @@
     "degree_level": null,
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_261026004",
@@ -13472,7 +13886,9 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 2,
+    "contract_months_max": 2
   },
   {
     "id": "PolyU_261026018",
@@ -13492,7 +13908,9 @@
     "degree_level": "Doctor",
     "domains": [
       "environment"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_261026016",
@@ -13514,7 +13932,9 @@
       "ai-ml",
       "computer-science",
       "mechanical"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_261026015",
@@ -13534,7 +13954,9 @@
     "degree_level": null,
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_261026005",
@@ -13552,7 +13974,10 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 6,
+    "contract_months_max": 6,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_261014008",
@@ -13573,7 +13998,9 @@
     "domains": [
       "physics",
       "materials"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_261014007",
@@ -13593,7 +14020,9 @@
     "degree_level": "Doctor",
     "domains": [
       "industrial"
-    ]
+    ],
+    "contract_months": 9,
+    "contract_months_max": 11
   },
   {
     "id": "PolyU_261023005",
@@ -13613,7 +14042,9 @@
     "degree_level": null,
     "domains": [
       "mechanical"
-    ]
+    ],
+    "contract_months": 7,
+    "contract_months_max": 7
   },
   {
     "id": "PolyU_261020013",
@@ -13634,7 +14065,9 @@
     "domains": [
       "mechanical",
       "environment"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_261022002",
@@ -13654,7 +14087,10 @@
     "degree_level": "Doctor",
     "domains": [
       "environment"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 24,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_261022001",
@@ -13674,7 +14110,9 @@
     "degree_level": "Doctor",
     "domains": [
       "electronics"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_261022004",
@@ -13697,7 +14135,9 @@
       "computer-science",
       "robotics",
       "health"
-    ]
+    ],
+    "contract_months": 11,
+    "contract_months_max": 11
   },
   {
     "id": "PolyU_261021010",
@@ -13717,7 +14157,9 @@
     "degree_level": "Doctor",
     "domains": [
       "industrial"
-    ]
+    ],
+    "contract_months": 7,
+    "contract_months_max": 7
   },
   {
     "id": "PolyU_261021006",
@@ -13737,7 +14179,9 @@
     "degree_level": "Doctor",
     "domains": [
       "environment"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_261021005",
@@ -13757,7 +14201,9 @@
     "degree_level": "Doctor",
     "domains": [
       "environment"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_261020007",
@@ -13779,7 +14225,9 @@
       "ai-ml",
       "computer-science",
       "data"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 24
   },
   {
     "id": "PolyU_261020012",
@@ -13797,7 +14245,10 @@
     "min_degree": "master",
     "degree_rank": 2,
     "degree_level": "Master",
-    "domains": []
+    "domains": [],
+    "contract_months": 6,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_261020009",
@@ -13817,7 +14268,9 @@
     "degree_level": null,
     "domains": [
       "ai-ml"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_261020005",
@@ -13841,7 +14294,10 @@
       "data",
       "robotics",
       "civil"
-    ]
+    ],
+    "contract_months": 1,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_261020008",
@@ -13859,7 +14315,9 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 1,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_261020003",
@@ -13880,7 +14338,9 @@
     "domains": [
       "ai-ml",
       "computer-science"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_261020002",
@@ -13900,7 +14360,9 @@
     "degree_level": null,
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 24
   },
   {
     "id": "PolyU_261020001",
@@ -13921,7 +14383,9 @@
     "domains": [
       "ai-ml",
       "computer-science"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 24
   },
   {
     "id": "PolyU_261020004",
@@ -13942,7 +14406,9 @@
     "domains": [
       "ai-ml",
       "computer-science"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "CityU_ur-t19926",
@@ -13979,7 +14445,9 @@
     "degree_level": "Master",
     "domains": [
       "math-stats"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_261016002",
@@ -14017,7 +14485,9 @@
     "degree_level": null,
     "domains": [
       "life-science"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_261013004",
@@ -14035,7 +14505,9 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 3,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_261013003",
@@ -14053,7 +14525,9 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 3,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_261016019",
@@ -14073,7 +14547,9 @@
     "degree_level": "Doctor",
     "domains": [
       "electronics"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_261016016",
@@ -14093,7 +14569,9 @@
     "degree_level": "Doctor",
     "domains": [
       "electronics"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_261016015",
@@ -14114,7 +14592,9 @@
     "domains": [
       "electronics",
       "mechanical"
-    ]
+    ],
+    "contract_months": 2,
+    "contract_months_max": 2
   },
   {
     "id": "PolyU_261016020",
@@ -14134,7 +14614,9 @@
     "degree_level": "Master",
     "domains": [
       "electronics"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 6
   },
   {
     "id": "CityU_ur-t20926",
@@ -14174,7 +14656,10 @@
     "degree_level": "Master",
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_261016011",
@@ -14196,7 +14681,9 @@
       "ai-ml",
       "computer-science",
       "environment"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_261015003",
@@ -14217,7 +14704,9 @@
     "domains": [
       "ai-ml",
       "computer-science"
-    ]
+    ],
+    "contract_months": 9,
+    "contract_months_max": 9
   },
   {
     "id": "PolyU_261014014",
@@ -14237,7 +14726,9 @@
     "degree_level": "Master",
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_261014009",
@@ -14258,7 +14749,10 @@
     "domains": [
       "life-science",
       "chemistry"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_261014005",
@@ -14278,7 +14772,9 @@
     "degree_level": "Doctor",
     "domains": [
       "industrial"
-    ]
+    ],
+    "contract_months": 4,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_261014004",
@@ -14298,7 +14794,9 @@
     "degree_level": "Doctor",
     "domains": [
       "industrial"
-    ]
+    ],
+    "contract_months": 4,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_261014013",
@@ -14319,7 +14817,9 @@
     "domains": [
       "electronics",
       "physics"
-    ]
+    ],
+    "contract_months": 4,
+    "contract_months_max": 4
   },
   {
     "id": "PolyU_261013001",
@@ -14340,7 +14840,9 @@
     "domains": [
       "ai-ml",
       "electronics"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_261013009",
@@ -14361,7 +14863,10 @@
     "domains": [
       "environment",
       "industrial"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 24,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_261012001",
@@ -14381,7 +14886,9 @@
     "degree_level": "Doctor",
     "domains": [
       "industrial"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_261013006",
@@ -14401,7 +14908,10 @@
     "degree_level": "Master",
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_261014003",
@@ -14422,7 +14932,9 @@
     "domains": [
       "chemistry",
       "environment"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_261014002",
@@ -14443,7 +14955,9 @@
     "domains": [
       "chemistry",
       "environment"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_261008011",
@@ -14465,7 +14979,9 @@
       "computer-science",
       "robotics",
       "mechanical"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 24
   },
   {
     "id": "PolyU_261012014",
@@ -14485,7 +15001,9 @@
     "degree_level": "Master",
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_261012012",
@@ -14506,7 +15024,9 @@
     "domains": [
       "ai-ml",
       "computer-science"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_261012004",
@@ -14526,7 +15046,9 @@
     "degree_level": "Master",
     "domains": [
       "math-stats"
-    ]
+    ],
+    "contract_months": 2,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_261012013",
@@ -14550,7 +15072,10 @@
       "data",
       "robotics",
       "civil"
-    ]
+    ],
+    "contract_months": 1,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_261012005",
@@ -14570,7 +15095,10 @@
     "degree_level": null,
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_261012009",
@@ -14591,7 +15119,9 @@
     "domains": [
       "ai-ml",
       "health"
-    ]
+    ],
+    "contract_months": 4,
+    "contract_months_max": 4
   },
   {
     "id": "PolyU_261012003",
@@ -14611,7 +15141,9 @@
     "degree_level": "Doctor",
     "domains": [
       "math-stats"
-    ]
+    ],
+    "contract_months": 1,
+    "contract_months_max": 3
   },
   {
     "id": "PolyU_261009003",
@@ -14629,7 +15161,9 @@
     "min_degree": "master",
     "degree_rank": 2,
     "degree_level": "Master",
-    "domains": []
+    "domains": [],
+    "contract_months": 9,
+    "contract_months_max": 9
   },
   {
     "id": "PolyU_261009013",
@@ -14647,7 +15181,9 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 4,
+    "contract_months_max": 20
   },
   {
     "id": "PolyU_261009006",
@@ -14668,7 +15204,9 @@
     "domains": [
       "ai-ml",
       "computer-science"
-    ]
+    ],
+    "contract_months": 1,
+    "contract_months_max": 8
   },
   {
     "id": "PolyU_261009005",
@@ -14689,7 +15227,9 @@
     "domains": [
       "computer-science",
       "environment"
-    ]
+    ],
+    "contract_months": 1,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_261009004",
@@ -14710,7 +15250,9 @@
     "domains": [
       "ai-ml",
       "computer-science"
-    ]
+    ],
+    "contract_months": 1,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_261008009",
@@ -14751,7 +15293,10 @@
     "degree_level": "Master",
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 6,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_261008006",
@@ -14771,7 +15316,10 @@
     "degree_level": null,
     "domains": [
       "industrial"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 3,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_261005001",
@@ -14791,7 +15339,9 @@
     "degree_level": null,
     "domains": [
       "mechanical"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260916008",
@@ -14809,7 +15359,9 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 2,
+    "contract_months_max": 2
   },
   {
     "id": "PolyU_261008008",
@@ -14849,7 +15401,9 @@
     "degree_level": "Doctor",
     "domains": [
       "industrial"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_261008002",
@@ -14869,7 +15423,10 @@
     "degree_level": "Doctor",
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_261005002",
@@ -14889,7 +15446,9 @@
     "degree_level": "Doctor",
     "domains": [
       "mechanical"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 3
   },
   {
     "id": "PolyU_261008005",
@@ -14910,7 +15469,9 @@
     "domains": [
       "electronics",
       "materials"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_261008004",
@@ -14930,7 +15491,9 @@
     "degree_level": null,
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260925011",
@@ -14948,7 +15511,9 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 8,
+    "contract_months_max": 8
   },
   {
     "id": "PolyU_261007005",
@@ -14968,7 +15533,9 @@
     "degree_level": "Master",
     "domains": [
       "chemistry"
-    ]
+    ],
+    "contract_months": 2,
+    "contract_months_max": 2
   },
   {
     "id": "PolyU_261008001",
@@ -14990,7 +15557,9 @@
       "ai-ml",
       "data",
       "math-stats"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_261007001",
@@ -15011,7 +15580,9 @@
     "domains": [
       "civil",
       "industrial"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_261002008",
@@ -15031,7 +15602,9 @@
     "degree_level": null,
     "domains": [
       "electronics"
-    ]
+    ],
+    "contract_months": 11,
+    "contract_months_max": 11
   },
   {
     "id": "PolyU_261006009",
@@ -15051,7 +15624,8 @@
     "degree_level": "Master",
     "domains": [
       "life-science"
-    ]
+    ],
+    "contract_months_max": 10
   },
   {
     "id": "PolyU_261005005",
@@ -15069,7 +15643,10 @@
     "min_degree": "doctor",
     "degree_rank": 3,
     "degree_level": "Doctor",
-    "domains": []
+    "domains": [],
+    "contract_months": 4,
+    "contract_months_max": 4,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_261006008",
@@ -15089,7 +15666,9 @@
     "degree_level": null,
     "domains": [
       "environment"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_261006011",
@@ -15109,7 +15688,9 @@
     "degree_level": "Doctor",
     "domains": [
       "environment"
-    ]
+    ],
+    "contract_months": 4,
+    "contract_months_max": 20
   },
   {
     "id": "PolyU_261006002",
@@ -15129,7 +15710,9 @@
     "degree_level": "Master",
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_261006001",
@@ -15149,7 +15732,9 @@
     "degree_level": null,
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260918006",
@@ -15167,7 +15752,9 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_261002003",
@@ -15185,7 +15772,10 @@
     "min_degree": "doctor",
     "degree_rank": 3,
     "degree_level": "Doctor",
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_261002001",
@@ -15205,7 +15795,10 @@
     "degree_level": "Master",
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "CityU_ur-t18526",
@@ -15242,7 +15835,9 @@
     "degree_level": "Doctor",
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 1,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_261002012",
@@ -15265,7 +15860,9 @@
       "computer-science",
       "data",
       "electronics"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 24
   },
   {
     "id": "CityU_ur-t18626",
@@ -15305,7 +15902,9 @@
       "chemistry",
       "physics",
       "materials"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260930003",
@@ -15325,7 +15924,10 @@
     "degree_level": null,
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260930005",
@@ -15343,7 +15945,9 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260930007",
@@ -15364,7 +15968,9 @@
     "domains": [
       "mechanical",
       "industrial"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260930009",
@@ -15384,7 +15990,9 @@
     "degree_level": "Doctor",
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260929005",
@@ -15405,7 +16013,9 @@
     "domains": [
       "life-science",
       "math-stats"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 3
   },
   {
     "id": "PolyU_260929011",
@@ -15425,7 +16035,9 @@
     "degree_level": "Doctor",
     "domains": [
       "ai-ml"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 24
   },
   {
     "id": "PolyU_260924006",
@@ -15446,7 +16058,9 @@
     "domains": [
       "chemistry",
       "materials"
-    ]
+    ],
+    "contract_months": 4,
+    "contract_months_max": 20
   },
   {
     "id": "PolyU_260928005",
@@ -15466,7 +16080,9 @@
     "degree_level": "Doctor",
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 1,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260923007",
@@ -15488,7 +16104,9 @@
       "life-science",
       "chemistry",
       "materials"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260929002",
@@ -15508,7 +16126,9 @@
     "degree_level": "Doctor",
     "domains": [
       "electronics"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260928002",
@@ -15528,7 +16148,9 @@
     "degree_level": "Doctor",
     "domains": [
       "chemistry"
-    ]
+    ],
+    "contract_months": 9,
+    "contract_months_max": 9
   },
   {
     "id": "PolyU_260928003",
@@ -15548,7 +16170,9 @@
     "degree_level": null,
     "domains": [
       "math-stats"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 3
   },
   {
     "id": "PolyU_260925006",
@@ -15569,7 +16193,9 @@
     "domains": [
       "electronics",
       "mechanical"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260924005",
@@ -15590,7 +16216,10 @@
     "domains": [
       "mechanical",
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260924009",
@@ -15611,7 +16240,9 @@
     "domains": [
       "ai-ml",
       "computer-science"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260925010",
@@ -15629,7 +16260,9 @@
     "min_degree": "master",
     "degree_rank": 2,
     "degree_level": "Master",
-    "domains": []
+    "domains": [],
+    "contract_months": 6,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260925021",
@@ -15651,7 +16284,9 @@
       "mechanical",
       "materials",
       "industrial"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260925020",
@@ -15673,7 +16308,9 @@
       "mechanical",
       "materials",
       "industrial"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260925004",
@@ -15693,7 +16330,10 @@
     "degree_level": "Doctor",
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260925002",
@@ -15713,7 +16353,9 @@
     "degree_level": "Doctor",
     "domains": [
       "industrial"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260924007",
@@ -15734,7 +16376,9 @@
     "domains": [
       "ai-ml",
       "data"
-    ]
+    ],
+    "contract_months": 2,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260922006",
@@ -15754,7 +16398,9 @@
     "degree_level": null,
     "domains": [
       "electronics"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 3
   },
   {
     "id": "PolyU_260911002",
@@ -15774,7 +16420,9 @@
     "degree_level": "Doctor",
     "domains": [
       "ai-ml"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260924004",
@@ -15794,7 +16442,9 @@
     "degree_level": "Bachelor",
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260923013",
@@ -15834,7 +16484,10 @@
     "degree_level": "Master",
     "domains": [
       "industrial"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260923005",
@@ -15854,7 +16507,9 @@
     "degree_level": null,
     "domains": [
       "industrial"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260625010",
@@ -15876,7 +16531,9 @@
       "ai-ml",
       "computer-science",
       "data"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260923017",
@@ -15897,7 +16554,9 @@
     "domains": [
       "mechanical",
       "environment"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260904012",
@@ -15920,7 +16579,9 @@
       "mechanical",
       "chemistry",
       "environment"
-    ]
+    ],
+    "contract_months": 4,
+    "contract_months_max": 20
   },
   {
     "id": "PolyU_260922002",
@@ -15941,7 +16602,9 @@
     "domains": [
       "ai-ml",
       "math-stats"
-    ]
+    ],
+    "contract_months": 2,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260922003",
@@ -15962,7 +16625,9 @@
     "domains": [
       "math-stats",
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260921008",
@@ -15982,7 +16647,9 @@
     "degree_level": "Doctor",
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 1,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260921006",
@@ -16002,7 +16669,9 @@
     "degree_level": "Doctor",
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 1,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260921005",
@@ -16022,7 +16691,9 @@
     "degree_level": "Doctor",
     "domains": [
       "mechanical"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260922001",
@@ -16045,7 +16716,9 @@
       "computer-science",
       "data",
       "electronics"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260921010",
@@ -16068,7 +16741,10 @@
       "chemistry",
       "materials",
       "environment"
-    ]
+    ],
+    "contract_months": 13,
+    "contract_months_max": 13,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260921011",
@@ -16089,7 +16765,10 @@
     "domains": [
       "ai-ml",
       "computer-science"
-    ]
+    ],
+    "contract_months": 4,
+    "contract_months_max": 4,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260910011",
@@ -16110,7 +16789,9 @@
     "domains": [
       "ai-ml",
       "electronics"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260921004",
@@ -16130,7 +16811,9 @@
     "degree_level": "Doctor",
     "domains": [
       "mechanical"
-    ]
+    ],
+    "contract_months": 4,
+    "contract_months_max": 20
   },
   {
     "id": "PolyU_260921003",
@@ -16150,7 +16833,9 @@
     "degree_level": "Doctor",
     "domains": [
       "mechanical"
-    ]
+    ],
+    "contract_months": 4,
+    "contract_months_max": 20
   },
   {
     "id": "PolyU_260917001",
@@ -16170,7 +16855,9 @@
     "degree_level": null,
     "domains": [
       "ai-ml"
-    ]
+    ],
+    "contract_months": 8,
+    "contract_months_max": 8
   },
   {
     "id": "CityU_ur-t15626",
@@ -16208,7 +16895,9 @@
     "domains": [
       "electronics",
       "mechanical"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260810013",
@@ -16229,7 +16918,9 @@
     "domains": [
       "ai-ml",
       "industrial"
-    ]
+    ],
+    "contract_months": 9,
+    "contract_months_max": 9
   },
   {
     "id": "PolyU_260918004",
@@ -16251,7 +16942,9 @@
       "ai-ml",
       "computer-science",
       "environment"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260917016",
@@ -16272,7 +16965,9 @@
     "domains": [
       "robotics",
       "mechanical"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 24
   },
   {
     "id": "PolyU_260918014",
@@ -16293,7 +16988,9 @@
     "domains": [
       "computer-science",
       "industrial"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 24
   },
   {
     "id": "PolyU_260918013",
@@ -16314,7 +17011,9 @@
     "domains": [
       "ai-ml",
       "industrial"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 24
   },
   {
     "id": "PolyU_260917006",
@@ -16335,7 +17034,9 @@
     "domains": [
       "ai-ml",
       "computer-science"
-    ]
+    ],
+    "contract_months": 8,
+    "contract_months_max": 8
   },
   {
     "id": "PolyU_260917013",
@@ -16353,7 +17054,10 @@
     "min_degree": "master",
     "degree_rank": 2,
     "degree_level": "Master",
-    "domains": []
+    "domains": [],
+    "contract_months": 4,
+    "contract_months_max": 20,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260917011",
@@ -16374,7 +17078,10 @@
     "domains": [
       "ai-ml",
       "computer-science"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 6,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260917002",
@@ -16395,7 +17102,9 @@
     "domains": [
       "electronics",
       "chemistry"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 9
   },
   {
     "id": "PolyU_260917012",
@@ -16415,7 +17124,9 @@
     "degree_level": null,
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260916012",
@@ -16433,7 +17144,9 @@
     "min_degree": "master",
     "degree_rank": 2,
     "degree_level": "Master",
-    "domains": []
+    "domains": [],
+    "contract_months": 6,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260916009",
@@ -16453,7 +17166,9 @@
     "degree_level": "Master",
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 3
   },
   {
     "id": "PolyU_260916010",
@@ -16473,7 +17188,9 @@
     "degree_level": null,
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 3
   },
   {
     "id": "PolyU_260917008",
@@ -16493,7 +17210,9 @@
     "degree_level": "Master",
     "domains": [
       "environment"
-    ]
+    ],
+    "contract_months": 4,
+    "contract_months_max": 20
   },
   {
     "id": "PolyU_260909007",
@@ -16511,7 +17230,9 @@
     "min_degree": "doctor",
     "degree_rank": 3,
     "degree_level": "Doctor",
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260915004",
@@ -16531,7 +17252,10 @@
     "degree_level": "Doctor",
     "domains": [
       "environment"
-    ]
+    ],
+    "contract_months": 4,
+    "contract_months_max": 20,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260915012",
@@ -16554,7 +17278,9 @@
       "computer-science",
       "data",
       "electronics"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260915006",
@@ -16574,7 +17300,9 @@
     "degree_level": null,
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260916005",
@@ -16595,7 +17323,9 @@
     "domains": [
       "computer-science",
       "materials"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260915010",
@@ -16616,7 +17346,9 @@
     "domains": [
       "ai-ml",
       "computer-science"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260916002",
@@ -16639,7 +17371,9 @@
       "computer-science",
       "electronics",
       "robotics"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260915005",
@@ -16659,7 +17393,9 @@
     "degree_level": null,
     "domains": [
       "math-stats"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260916004",
@@ -16681,7 +17417,9 @@
       "ai-ml",
       "computer-science",
       "robotics"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260916003",
@@ -16704,7 +17442,9 @@
       "computer-science",
       "electronics",
       "robotics"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260915007",
@@ -16722,7 +17462,9 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 2,
+    "contract_months_max": 2
   },
   {
     "id": "PolyU_260914017",
@@ -16743,7 +17485,10 @@
     "domains": [
       "ai-ml",
       "computer-science"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260914016",
@@ -16764,7 +17509,10 @@
     "domains": [
       "ai-ml",
       "computer-science"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260914020",
@@ -16784,7 +17532,9 @@
     "degree_level": null,
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 4,
+    "contract_months_max": 20
   },
   {
     "id": "PolyU_260904021",
@@ -16804,7 +17554,9 @@
     "degree_level": null,
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260914019",
@@ -16825,7 +17577,9 @@
     "domains": [
       "computer-science",
       "data"
-    ]
+    ],
+    "contract_months": 2,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260914021",
@@ -16845,7 +17599,10 @@
     "degree_level": "Doctor",
     "domains": [
       "ai-ml"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260910012",
@@ -16865,7 +17622,9 @@
     "degree_level": "Master",
     "domains": [
       "electronics"
-    ]
+    ],
+    "contract_months": 11,
+    "contract_months_max": 11
   },
   {
     "id": "PolyU_260914018",
@@ -16886,7 +17645,9 @@
     "domains": [
       "ai-ml",
       "computer-science"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260914009",
@@ -16907,7 +17668,9 @@
     "domains": [
       "computer-science",
       "health"
-    ]
+    ],
+    "contract_months": 5,
+    "contract_months_max": 5
   },
   {
     "id": "PolyU_260914008",
@@ -16929,7 +17692,9 @@
       "data",
       "biomedical",
       "health"
-    ]
+    ],
+    "contract_months": 5,
+    "contract_months_max": 5
   },
   {
     "id": "PolyU_260914013",
@@ -16947,7 +17712,10 @@
     "min_degree": "master",
     "degree_rank": 2,
     "degree_level": "Master",
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260904009",
@@ -16967,7 +17735,9 @@
     "degree_level": "Doctor",
     "domains": [
       "industrial"
-    ]
+    ],
+    "contract_months": 11,
+    "contract_months_max": 11
   },
   {
     "id": "CityU_ur-t16526",
@@ -17006,7 +17776,10 @@
     "min_degree": "doctor",
     "degree_rank": 3,
     "degree_level": "Doctor",
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "CityU_ur-t16226",
@@ -17053,7 +17826,9 @@
       "chemistry",
       "math-stats",
       "health"
-    ]
+    ],
+    "contract_months": 9,
+    "contract_months_max": 9
   },
   {
     "id": "PolyU_260911003",
@@ -17073,7 +17848,9 @@
     "degree_level": null,
     "domains": [
       "ai-ml"
-    ]
+    ],
+    "contract_months": 9,
+    "contract_months_max": 9
   },
   {
     "id": "PolyU_260911006",
@@ -17094,7 +17871,9 @@
     "domains": [
       "biomedical",
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260911007",
@@ -17114,7 +17893,9 @@
     "degree_level": null,
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260910006",
@@ -17135,7 +17916,9 @@
     "domains": [
       "ai-ml",
       "civil"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260910005",
@@ -17153,7 +17936,9 @@
     "min_degree": "doctor",
     "degree_rank": 3,
     "degree_level": "Doctor",
-    "domains": []
+    "domains": [],
+    "contract_months": 2,
+    "contract_months_max": 2
   },
   {
     "id": "PolyU_260909005",
@@ -17193,7 +17978,9 @@
     "degree_level": "Doctor",
     "domains": [
       "chemistry"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260909002",
@@ -17213,7 +18000,10 @@
     "degree_level": "Master",
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260908020",
@@ -17234,7 +18024,9 @@
     "domains": [
       "ai-ml",
       "computer-science"
-    ]
+    ],
+    "contract_months": 1,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260908006",
@@ -17255,7 +18047,9 @@
     "domains": [
       "computer-science",
       "health"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260908018",
@@ -17275,7 +18069,9 @@
     "degree_level": "Doctor",
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 2,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260908024",
@@ -17296,7 +18092,10 @@
     "domains": [
       "ai-ml",
       "industrial"
-    ]
+    ],
+    "contract_months": 1,
+    "contract_months_max": 1,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260908019",
@@ -17316,7 +18115,10 @@
     "degree_level": "Doctor",
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 3,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260908023",
@@ -17336,7 +18138,9 @@
     "degree_level": "Doctor",
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260806006",
@@ -17356,7 +18160,10 @@
     "degree_level": "Doctor",
     "domains": [
       "ai-ml"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260908025",
@@ -17377,7 +18184,9 @@
     "domains": [
       "mechanical",
       "industrial"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260908022",
@@ -17398,7 +18207,9 @@
     "domains": [
       "ai-ml",
       "health"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260908012",
@@ -17418,7 +18229,9 @@
     "degree_level": null,
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260907001",
@@ -17444,7 +18257,10 @@
       "life-science",
       "math-stats",
       "health"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260907002",
@@ -17467,7 +18283,9 @@
       "computer-science",
       "data",
       "health"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260908003",
@@ -17487,7 +18305,9 @@
     "degree_level": "Doctor",
     "domains": [
       "electronics"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 24
   },
   {
     "id": "PolyU_260908002",
@@ -17507,7 +18327,9 @@
     "degree_level": "Doctor",
     "domains": [
       "electronics"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260907003",
@@ -17527,7 +18349,9 @@
     "degree_level": "Doctor",
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260904003",
@@ -17548,7 +18372,9 @@
     "domains": [
       "mechanical",
       "materials"
-    ]
+    ],
+    "contract_months": 4,
+    "contract_months_max": 20
   },
   {
     "id": "PolyU_260904013",
@@ -17568,7 +18394,9 @@
     "degree_level": "Doctor",
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260904006",
@@ -17590,7 +18418,9 @@
       "computer-science",
       "data",
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260904016",
@@ -17610,7 +18440,10 @@
     "degree_level": "Master",
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260904010",
@@ -17628,7 +18461,10 @@
     "min_degree": "doctor",
     "degree_rank": 3,
     "degree_level": "Doctor",
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260904020",
@@ -17648,7 +18484,9 @@
     "degree_level": "Doctor",
     "domains": [
       "industrial"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260904002",
@@ -17668,7 +18506,9 @@
     "degree_level": null,
     "domains": [
       "mechanical"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260904015",
@@ -17689,7 +18529,9 @@
     "domains": [
       "robotics",
       "health"
-    ]
+    ],
+    "contract_months": 2,
+    "contract_months_max": 2
   },
   {
     "id": "PolyU_260904004",
@@ -17709,7 +18551,9 @@
     "degree_level": null,
     "domains": [
       "mechanical"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260903005",
@@ -17729,7 +18573,9 @@
     "degree_level": "Doctor",
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 1,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260903008",
@@ -17747,7 +18593,9 @@
     "min_degree": "master",
     "degree_rank": 2,
     "degree_level": "Master",
-    "domains": []
+    "domains": [],
+    "contract_months": 6,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260903013",
@@ -17768,7 +18616,9 @@
     "domains": [
       "ai-ml",
       "computer-science"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 3
   },
   {
     "id": "PolyU_260903010",
@@ -17786,7 +18636,9 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 3,
+    "contract_months_max": 3
   },
   {
     "id": "PolyU_260903002",
@@ -17807,7 +18659,9 @@
     "domains": [
       "ai-ml",
       "computer-science"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 24
   },
   {
     "id": "PolyU_260903001",
@@ -17828,7 +18682,9 @@
     "domains": [
       "ai-ml",
       "computer-science"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 24
   },
   {
     "id": "PolyU_260901004",
@@ -17848,7 +18704,9 @@
     "degree_level": null,
     "domains": [
       "ai-ml"
-    ]
+    ],
+    "contract_months": 15,
+    "contract_months_max": 15
   },
   {
     "id": "PolyU_260903012",
@@ -17869,7 +18727,9 @@
     "domains": [
       "ai-ml",
       "computer-science"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260903003",
@@ -17889,7 +18749,9 @@
     "degree_level": "Doctor",
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260902005",
@@ -17909,7 +18771,9 @@
     "degree_level": "Doctor",
     "domains": [
       "electronics"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260902001",
@@ -17929,7 +18793,9 @@
     "degree_level": "Doctor",
     "domains": [
       "mechanical"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 24
   },
   {
     "id": "PolyU_260901001",
@@ -17950,7 +18816,9 @@
     "domains": [
       "biomedical",
       "life-science"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260901003",
@@ -17971,7 +18839,9 @@
     "domains": [
       "ai-ml",
       "computer-science"
-    ]
+    ],
+    "contract_months": 2,
+    "contract_months_max": 2
   },
   {
     "id": "PolyU_260901002",
@@ -17989,7 +18859,9 @@
     "min_degree": "doctor",
     "degree_rank": 3,
     "degree_level": "Doctor",
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260831001",
@@ -18007,7 +18879,9 @@
     "min_degree": "doctor",
     "degree_rank": 3,
     "degree_level": "Doctor",
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260831004",
@@ -18028,7 +18902,9 @@
     "domains": [
       "ai-ml",
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260831012",
@@ -18046,7 +18922,9 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260831010",
@@ -18064,7 +18942,9 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260831009",
@@ -18084,7 +18964,10 @@
     "degree_level": null,
     "domains": [
       "ai-ml"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 3,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260831002",
@@ -18102,7 +18985,9 @@
     "min_degree": "master",
     "degree_rank": 2,
     "degree_level": "Master",
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260831007",
@@ -18123,7 +19008,9 @@
     "domains": [
       "math-stats",
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260831005",
@@ -18148,7 +19035,9 @@
       "biomedical",
       "math-stats",
       "health"
-    ]
+    ],
+    "contract_months": 4,
+    "contract_months_max": 20
   },
   {
     "id": "PolyU_260831006",
@@ -18169,7 +19058,9 @@
     "domains": [
       "math-stats",
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260826016",
@@ -18190,7 +19081,9 @@
     "domains": [
       "ai-ml",
       "electronics"
-    ]
+    ],
+    "contract_months": 9,
+    "contract_months_max": 9
   },
   {
     "id": "PolyU_260828013",
@@ -18211,7 +19104,9 @@
     "domains": [
       "electronics",
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "CityU_ur-t15726",
@@ -18252,7 +19147,9 @@
     "domains": [
       "ai-ml",
       "biomedical"
-    ]
+    ],
+    "contract_months": 4,
+    "contract_months_max": 4
   },
   {
     "id": "PolyU_260827007",
@@ -18272,7 +19169,10 @@
     "degree_level": "Doctor",
     "domains": [
       "life-science"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260827017",
@@ -18294,7 +19194,9 @@
       "computer-science",
       "electronics",
       "physics"
-    ]
+    ],
+    "contract_months": 1,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260827013",
@@ -18312,7 +19214,10 @@
     "min_degree": "master",
     "degree_rank": 2,
     "degree_level": "Master",
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260827004",
@@ -18332,7 +19237,10 @@
     "degree_level": "Doctor",
     "domains": [
       "industrial"
-    ]
+    ],
+    "contract_months": 1,
+    "contract_months_max": 1,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260827010",
@@ -18374,7 +19282,9 @@
       "ai-ml",
       "computer-science",
       "mechanical"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260827011",
@@ -18392,7 +19302,10 @@
     "min_degree": "doctor",
     "degree_rank": 3,
     "degree_level": "Doctor",
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260827016",
@@ -18413,7 +19326,9 @@
     "domains": [
       "ai-ml",
       "computer-science"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260827014",
@@ -18433,7 +19348,9 @@
     "degree_level": null,
     "domains": [
       "chemistry"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260827006",
@@ -18456,7 +19373,9 @@
       "robotics",
       "mechanical",
       "environment"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260826015",
@@ -18476,7 +19395,9 @@
     "degree_level": "Doctor",
     "domains": [
       "electronics"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260827001",
@@ -18496,7 +19417,9 @@
     "degree_level": "Doctor",
     "domains": [
       "math-stats"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260826004",
@@ -18516,7 +19439,10 @@
     "degree_level": "Doctor",
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260826013",
@@ -18537,7 +19463,9 @@
     "domains": [
       "ai-ml",
       "industrial"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260826008",
@@ -18557,7 +19485,9 @@
     "degree_level": null,
     "domains": [
       "mechanical"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260826020",
@@ -18577,7 +19507,9 @@
     "degree_level": "Master",
     "domains": [
       "civil"
-    ]
+    ],
+    "contract_months": 4,
+    "contract_months_max": 4
   },
   {
     "id": "PolyU_260826019",
@@ -18597,7 +19529,9 @@
     "degree_level": "Master",
     "domains": [
       "civil"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260622017",
@@ -18618,7 +19552,9 @@
     "domains": [
       "ai-ml",
       "computer-science"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260817013",
@@ -18640,7 +19576,9 @@
       "computer-science",
       "math-stats",
       "health"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260825002",
@@ -18660,7 +19598,10 @@
     "degree_level": "Bachelor",
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 3,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260819002",
@@ -18680,7 +19621,9 @@
     "degree_level": "Doctor",
     "domains": [
       "math-stats"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260807014",
@@ -18720,7 +19663,9 @@
     "degree_level": "Master",
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260824003",
@@ -18740,7 +19685,9 @@
     "degree_level": "Master",
     "domains": [
       "mechanical"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260824006",
@@ -18760,7 +19707,9 @@
     "degree_level": "Doctor",
     "domains": [
       "mechanical"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260821019",
@@ -18778,7 +19727,10 @@
     "min_degree": "master",
     "degree_rank": 2,
     "degree_level": "Master",
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260821003",
@@ -18798,7 +19750,9 @@
     "degree_level": null,
     "domains": [
       "math-stats"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260821018",
@@ -18818,7 +19772,9 @@
     "degree_level": null,
     "domains": [
       "ai-ml"
-    ]
+    ],
+    "contract_months": 4,
+    "contract_months_max": 4
   },
   {
     "id": "PolyU_260821020",
@@ -18859,7 +19815,9 @@
     "degree_level": "Doctor",
     "domains": [
       "math-stats"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260821008",
@@ -18877,7 +19835,9 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 6,
+    "contract_months_max": 7
   },
   {
     "id": "PolyU_260820017",
@@ -18897,7 +19857,10 @@
     "degree_level": null,
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 15,
+    "contract_months_max": 15,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260819011",
@@ -18917,7 +19880,9 @@
     "degree_level": "Doctor",
     "domains": [
       "civil"
-    ]
+    ],
+    "contract_months": 4,
+    "contract_months_max": 20
   },
   {
     "id": "PolyU_260819004",
@@ -18937,7 +19902,9 @@
     "degree_level": null,
     "domains": [
       "mechanical"
-    ]
+    ],
+    "contract_months": 10,
+    "contract_months_max": 10
   },
   {
     "id": "PolyU_260818006",
@@ -18957,7 +19924,9 @@
     "degree_level": "Doctor",
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260818005",
@@ -18977,7 +19946,9 @@
     "degree_level": "Doctor",
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260818004",
@@ -18998,7 +19969,9 @@
     "domains": [
       "ai-ml",
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260817012",
@@ -19020,7 +19993,9 @@
       "computer-science",
       "data",
       "life-science"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260818015",
@@ -19041,7 +20016,9 @@
     "domains": [
       "ai-ml",
       "computer-science"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 3
   },
   {
     "id": "PolyU_260818002",
@@ -19061,7 +20038,9 @@
     "degree_level": "Doctor",
     "domains": [
       "mechanical"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260818021",
@@ -19083,7 +20062,9 @@
       "ai-ml",
       "computer-science",
       "electronics"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260818020",
@@ -19105,7 +20086,9 @@
       "ai-ml",
       "computer-science",
       "electronics"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260818019",
@@ -19127,7 +20110,9 @@
       "ai-ml",
       "computer-science",
       "electronics"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260818018",
@@ -19149,7 +20134,9 @@
       "ai-ml",
       "computer-science",
       "electronics"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260818017",
@@ -19171,7 +20158,9 @@
       "ai-ml",
       "computer-science",
       "life-science"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260818009",
@@ -19192,7 +20181,9 @@
     "domains": [
       "chemistry",
       "materials"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260811003",
@@ -19214,7 +20205,10 @@
       "ai-ml",
       "computer-science",
       "math-stats"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260813002",
@@ -19234,7 +20228,9 @@
     "degree_level": null,
     "domains": [
       "ai-ml"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 3
   },
   {
     "id": "PolyU_260817011",
@@ -19252,7 +20248,10 @@
     "min_degree": "doctor",
     "degree_rank": 3,
     "degree_level": "Doctor",
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260814019",
@@ -19270,7 +20269,10 @@
     "min_degree": "doctor",
     "degree_rank": 3,
     "degree_level": "Doctor",
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260813003",
@@ -19290,7 +20292,9 @@
     "degree_level": null,
     "domains": [
       "ai-ml"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 3
   },
   {
     "id": "PolyU_260817002",
@@ -19311,7 +20315,10 @@
     "domains": [
       "ai-ml",
       "computer-science"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260814002",
@@ -19331,7 +20338,9 @@
     "degree_level": "Master",
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 16,
+    "contract_months_max": 16
   },
   {
     "id": "PolyU_260814003",
@@ -19353,7 +20362,9 @@
       "computer-science",
       "data",
       "life-science"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 24
   },
   {
     "id": "PolyU_260814008",
@@ -19373,7 +20384,10 @@
     "degree_level": null,
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260814013",
@@ -19391,7 +20405,10 @@
     "min_degree": "master",
     "degree_rank": 2,
     "degree_level": "Master",
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260814010",
@@ -19409,7 +20426,9 @@
     "min_degree": "doctor",
     "degree_rank": 3,
     "degree_level": "Doctor",
-    "domains": []
+    "domains": [],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260814005",
@@ -19429,7 +20448,9 @@
     "degree_level": "Doctor",
     "domains": [
       "industrial"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260814004",
@@ -19451,7 +20472,9 @@
       "computer-science",
       "data",
       "life-science"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 24
   },
   {
     "id": "PolyU_260814007",
@@ -19469,7 +20492,10 @@
     "min_degree": "doctor",
     "degree_rank": 3,
     "degree_level": "Doctor",
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260814006",
@@ -19487,7 +20513,9 @@
     "min_degree": "doctor",
     "degree_rank": 3,
     "degree_level": "Doctor",
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260813008",
@@ -19505,7 +20533,9 @@
     "min_degree": "master",
     "degree_rank": 2,
     "degree_level": "Master",
-    "domains": []
+    "domains": [],
+    "contract_months": 4,
+    "contract_months_max": 20
   },
   {
     "id": "PolyU_260812006",
@@ -19523,7 +20553,10 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260813009",
@@ -19541,7 +20574,9 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 4,
+    "contract_months_max": 20
   },
   {
     "id": "PolyU_260813005",
@@ -19561,7 +20596,8 @@
     "degree_level": null,
     "domains": [
       "ai-ml"
-    ]
+    ],
+    "contract_months_max": 10
   },
   {
     "id": "PolyU_260813013",
@@ -19582,7 +20618,9 @@
     "domains": [
       "biomedical",
       "life-science"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260812009",
@@ -19600,7 +20638,10 @@
     "min_degree": "doctor",
     "degree_rank": 3,
     "degree_level": "Doctor",
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260813004",
@@ -19620,7 +20661,9 @@
     "degree_level": "Doctor",
     "domains": [
       "civil"
-    ]
+    ],
+    "contract_months": 4,
+    "contract_months_max": 20
   },
   {
     "id": "PolyU_260812008",
@@ -19638,7 +20681,10 @@
     "min_degree": "doctor",
     "degree_rank": 3,
     "degree_level": "Doctor",
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260812007",
@@ -19656,7 +20702,10 @@
     "min_degree": "doctor",
     "degree_rank": 3,
     "degree_level": "Doctor",
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260813007",
@@ -19674,7 +20723,9 @@
     "min_degree": "doctor",
     "degree_rank": 3,
     "degree_level": "Doctor",
-    "domains": []
+    "domains": [],
+    "contract_months": 4,
+    "contract_months_max": 20
   },
   {
     "id": "PolyU_260731005",
@@ -19695,7 +20746,9 @@
     "domains": [
       "chemistry",
       "materials"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260812002",
@@ -19715,7 +20768,9 @@
     "degree_level": null,
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260811004",
@@ -19735,7 +20790,10 @@
     "degree_level": null,
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 18,
+    "contract_months_max": 18,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260811001",
@@ -19758,7 +20816,9 @@
       "computer-science",
       "data",
       "electronics"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260811007",
@@ -19776,7 +20836,9 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 3,
+    "contract_months_max": 3
   },
   {
     "id": "PolyU_260811008",
@@ -19798,7 +20860,9 @@
       "ai-ml",
       "math-stats",
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260810001",
@@ -19819,7 +20883,9 @@
     "domains": [
       "computer-science",
       "environment"
-    ]
+    ],
+    "contract_months": 1,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260810012",
@@ -19840,7 +20906,9 @@
     "domains": [
       "mechanical",
       "industrial"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260810003",
@@ -19860,7 +20928,9 @@
     "degree_level": "Doctor",
     "domains": [
       "ai-ml"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260810004",
@@ -19881,7 +20951,9 @@
     "domains": [
       "computer-science",
       "health"
-    ]
+    ],
+    "contract_months": 4,
+    "contract_months_max": 4
   },
   {
     "id": "PolyU_260804002",
@@ -19901,7 +20973,9 @@
     "degree_level": null,
     "domains": [
       "environment"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260729008",
@@ -19921,7 +20995,9 @@
     "degree_level": "Doctor",
     "domains": [
       "ai-ml"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260729007",
@@ -19939,7 +21015,9 @@
     "min_degree": "doctor",
     "degree_rank": 3,
     "degree_level": "Doctor",
-    "domains": []
+    "domains": [],
+    "contract_months": 3,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260807013",
@@ -19959,7 +21037,10 @@
     "degree_level": null,
     "domains": [
       "ai-ml"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260807011",
@@ -19979,7 +21060,9 @@
     "degree_level": null,
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260807009",
@@ -19997,7 +21080,9 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260807001",
@@ -20017,7 +21102,9 @@
     "degree_level": null,
     "domains": [
       "ai-ml"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260730016",
@@ -20037,7 +21124,10 @@
     "degree_level": null,
     "domains": [
       "ai-ml"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260807006",
@@ -20057,7 +21147,9 @@
     "degree_level": null,
     "domains": [
       "mechanical"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 3
   },
   {
     "id": "CityU_ur-t14226",
@@ -20095,7 +21187,9 @@
     "min_degree": "doctor",
     "degree_rank": 3,
     "degree_level": "Doctor",
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260807010",
@@ -20115,7 +21209,9 @@
     "degree_level": "Doctor",
     "domains": [
       "ai-ml"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260807005",
@@ -20137,7 +21233,9 @@
       "robotics",
       "mechanical",
       "civil"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260730015",
@@ -20157,7 +21255,10 @@
     "degree_level": "Doctor",
     "domains": [
       "ai-ml"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260807004",
@@ -20178,7 +21279,9 @@
     "domains": [
       "mechanical",
       "civil"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260807012",
@@ -20196,7 +21299,9 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 4,
+    "contract_months_max": 4
   },
   {
     "id": "PolyU_260807015",
@@ -20214,7 +21319,10 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260806017",
@@ -20234,7 +21342,9 @@
     "degree_level": null,
     "domains": [
       "mechanical"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260806014",
@@ -20254,7 +21364,9 @@
     "degree_level": null,
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 4,
+    "contract_months_max": 4
   },
   {
     "id": "PolyU_260806013",
@@ -20275,7 +21387,9 @@
     "domains": [
       "ai-ml",
       "computer-science"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 24
   },
   {
     "id": "PolyU_260807007",
@@ -20296,7 +21410,9 @@
     "domains": [
       "electronics",
       "robotics"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 24
   },
   {
     "id": "PolyU_260805006",
@@ -20316,7 +21432,10 @@
     "degree_level": "Master",
     "domains": [
       "civil"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 3,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260805012",
@@ -20337,7 +21456,10 @@
     "domains": [
       "computer-science",
       "civil"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 3,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260805011",
@@ -20357,7 +21479,10 @@
     "degree_level": "Master",
     "domains": [
       "civil"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 3,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260805010",
@@ -20379,7 +21504,10 @@
       "computer-science",
       "civil",
       "environment"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 3,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260805009",
@@ -20399,7 +21527,10 @@
     "degree_level": "Master",
     "domains": [
       "civil"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 3,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260805008",
@@ -20420,7 +21551,10 @@
     "domains": [
       "ai-ml",
       "civil"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 3,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260805007",
@@ -20440,7 +21574,10 @@
     "degree_level": "Master",
     "domains": [
       "civil"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 3,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260805001",
@@ -20464,7 +21601,9 @@
       "robotics",
       "mechanical",
       "materials"
-    ]
+    ],
+    "contract_months": 5,
+    "contract_months_max": 5
   },
   {
     "id": "PolyU_260805002",
@@ -20484,7 +21623,9 @@
     "degree_level": "Doctor",
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260805014",
@@ -20504,7 +21645,9 @@
     "degree_level": "Doctor",
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260730010",
@@ -20525,7 +21668,9 @@
     "domains": [
       "ai-ml",
       "health"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 4
   },
   {
     "id": "PolyU_260804005",
@@ -20548,7 +21693,9 @@
       "mechanical",
       "chemistry",
       "materials"
-    ]
+    ],
+    "contract_months": 5,
+    "contract_months_max": 5
   },
   {
     "id": "PolyU_260803004",
@@ -20566,7 +21713,10 @@
     "min_degree": "master",
     "degree_rank": 2,
     "degree_level": "Master",
-    "domains": []
+    "domains": [],
+    "contract_months": 4,
+    "contract_months_max": 4,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260730014",
@@ -20584,7 +21734,10 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 6,
+    "contract_months_max": 6,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260729002",
@@ -20602,7 +21755,9 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260703010",
@@ -20623,7 +21778,9 @@
     "domains": [
       "ai-ml",
       "computer-science"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 16
   },
   {
     "id": "PolyU_260803006",
@@ -20641,7 +21798,9 @@
     "min_degree": "doctor",
     "degree_rank": 3,
     "degree_level": "Doctor",
-    "domains": []
+    "domains": [],
+    "contract_months": 18,
+    "contract_months_max": 18
   },
   {
     "id": "PolyU_260722014",
@@ -20661,7 +21820,9 @@
     "degree_level": null,
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 4,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260730011",
@@ -20679,7 +21840,9 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 3,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260730020",
@@ -20699,7 +21862,9 @@
     "degree_level": "Master",
     "domains": [
       "mechanical"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 3
   },
   {
     "id": "PolyU_260731008",
@@ -20717,7 +21882,9 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260729005",
@@ -20737,7 +21904,9 @@
     "degree_level": null,
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260729004",
@@ -20757,7 +21926,9 @@
     "degree_level": null,
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 4,
+    "contract_months_max": 4
   },
   {
     "id": "PolyU_260729015",
@@ -20775,7 +21946,9 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260728004",
@@ -20795,7 +21968,9 @@
     "degree_level": "Doctor",
     "domains": [
       "industrial"
-    ]
+    ],
+    "contract_months": 20,
+    "contract_months_max": 20
   },
   {
     "id": "PolyU_260728015",
@@ -20817,7 +21992,9 @@
       "ai-ml",
       "computer-science",
       "data"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 24
   },
   {
     "id": "PolyU_260728016",
@@ -20835,7 +22012,9 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 8,
+    "contract_months_max": 8
   },
   {
     "id": "PolyU_260728010",
@@ -20855,7 +22034,9 @@
     "degree_level": "Doctor",
     "domains": [
       "chemistry"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260727002",
@@ -20876,7 +22057,9 @@
     "domains": [
       "ai-ml",
       "mechanical"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260624001",
@@ -20897,7 +22080,9 @@
     "domains": [
       "ai-ml",
       "computer-science"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260724010",
@@ -20917,7 +22102,9 @@
     "degree_level": "Master",
     "domains": [
       "life-science"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260707009",
@@ -20937,7 +22124,9 @@
     "degree_level": "Doctor",
     "domains": [
       "mechanical"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260722001",
@@ -20958,7 +22147,9 @@
     "domains": [
       "ai-ml",
       "electronics"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260715004",
@@ -20976,7 +22167,9 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260724003",
@@ -20997,7 +22190,9 @@
     "domains": [
       "computer-science",
       "health"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260724008",
@@ -21017,7 +22212,9 @@
     "degree_level": "Master",
     "domains": [
       "industrial"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260724018",
@@ -21040,7 +22237,10 @@
       "robotics",
       "mechanical",
       "math-stats"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 3,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260724023",
@@ -21058,7 +22258,10 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260724011",
@@ -21076,7 +22279,9 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260723002",
@@ -21100,7 +22305,10 @@
       "biomedical",
       "life-science",
       "health"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260723010",
@@ -21122,7 +22330,10 @@
       "ai-ml",
       "life-science",
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260723003",
@@ -21147,7 +22358,10 @@
       "life-science",
       "math-stats",
       "health"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260723009",
@@ -21168,7 +22382,9 @@
     "domains": [
       "ai-ml",
       "health"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260723008",
@@ -21190,7 +22406,9 @@
       "life-science",
       "chemistry",
       "health"
-    ]
+    ],
+    "contract_months": 15,
+    "contract_months_max": 15
   },
   {
     "id": "PolyU_260722013",
@@ -21208,7 +22426,9 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260722004",
@@ -21229,7 +22449,9 @@
     "domains": [
       "biomedical",
       "life-science"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260722011",
@@ -21249,7 +22471,10 @@
     "degree_level": "Doctor",
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 3,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260722019",
@@ -21267,7 +22492,10 @@
     "min_degree": "doctor",
     "degree_rank": 3,
     "degree_level": "Doctor",
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260722018",
@@ -21287,7 +22515,9 @@
     "degree_level": "Doctor",
     "domains": [
       "electronics"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 18
   },
   {
     "id": "PolyU_260722017",
@@ -21305,7 +22535,9 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260722015",
@@ -21323,7 +22555,9 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260722020",
@@ -21341,7 +22575,9 @@
     "min_degree": "master",
     "degree_rank": 2,
     "degree_level": "Master",
-    "domains": []
+    "domains": [],
+    "contract_months": 3,
+    "contract_months_max": 3
   },
   {
     "id": "PolyU_260721007",
@@ -21362,7 +22598,9 @@
     "domains": [
       "computer-science",
       "health"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260721011",
@@ -21382,7 +22620,9 @@
     "degree_level": "Bachelor",
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 4,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260630008",
@@ -21402,7 +22642,9 @@
     "degree_level": null,
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 10,
+    "contract_months_max": 10
   },
   {
     "id": "PolyU_260721006",
@@ -21422,7 +22664,9 @@
     "degree_level": null,
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260721005",
@@ -21443,7 +22687,9 @@
     "domains": [
       "ai-ml",
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260721010",
@@ -21463,7 +22709,9 @@
     "degree_level": "Master",
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 4
   },
   {
     "id": "PolyU_260721009",
@@ -21481,7 +22729,9 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260721008",
@@ -21501,7 +22751,9 @@
     "degree_level": null,
     "domains": [
       "ai-ml"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260717003",
@@ -21521,7 +22773,9 @@
     "degree_level": "Doctor",
     "domains": [
       "electronics"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260703011",
@@ -21541,7 +22795,9 @@
     "degree_level": "Master",
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 10,
+    "contract_months_max": 10
   },
   {
     "id": "PolyU_260716007",
@@ -21562,7 +22818,9 @@
     "domains": [
       "ai-ml",
       "environment"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260716001",
@@ -21582,7 +22840,9 @@
     "degree_level": null,
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 8,
+    "contract_months_max": 8
   },
   {
     "id": "PolyU_260716008",
@@ -21602,7 +22862,9 @@
     "degree_level": "Doctor",
     "domains": [
       "chemistry"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260715012",
@@ -21624,7 +22886,9 @@
       "ai-ml",
       "computer-science",
       "life-science"
-    ]
+    ],
+    "contract_months": 9,
+    "contract_months_max": 9
   },
   {
     "id": "PolyU_260715011",
@@ -21645,7 +22909,9 @@
     "domains": [
       "ai-ml",
       "civil"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260715002",
@@ -21665,7 +22931,9 @@
     "degree_level": "Master",
     "domains": [
       "environment"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260715003",
@@ -21706,7 +22974,9 @@
     "domains": [
       "mechanical",
       "materials"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260715010",
@@ -21726,7 +22996,9 @@
     "degree_level": "Doctor",
     "domains": [
       "industrial"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260714004",
@@ -21747,7 +23019,9 @@
     "domains": [
       "ai-ml",
       "math-stats"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260714010",
@@ -21767,7 +23041,9 @@
     "degree_level": "Doctor",
     "domains": [
       "math-stats"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 3
   },
   {
     "id": "PolyU_260714009",
@@ -21787,7 +23063,9 @@
     "degree_level": "Doctor",
     "domains": [
       "math-stats"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 3
   },
   {
     "id": "PolyU_260714008",
@@ -21807,7 +23085,9 @@
     "degree_level": "Doctor",
     "domains": [
       "math-stats"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 3
   },
   {
     "id": "PolyU_260714005",
@@ -21828,7 +23108,9 @@
     "domains": [
       "ai-ml",
       "math-stats"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 3
   },
   {
     "id": "PolyU_260714003",
@@ -21848,7 +23130,9 @@
     "degree_level": "Doctor",
     "domains": [
       "math-stats"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 3
   },
   {
     "id": "PolyU_260714002",
@@ -21868,7 +23152,9 @@
     "degree_level": "Doctor",
     "domains": [
       "math-stats"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 3
   },
   {
     "id": "PolyU_260714027",
@@ -21889,7 +23175,10 @@
     "domains": [
       "ai-ml",
       "industrial"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260714019",
@@ -21911,7 +23200,9 @@
       "life-science",
       "chemistry",
       "health"
-    ]
+    ],
+    "contract_months": 4,
+    "contract_months_max": 20
   },
   {
     "id": "PolyU_260714001",
@@ -21932,7 +23223,9 @@
     "domains": [
       "ai-ml",
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260714022",
@@ -21952,7 +23245,9 @@
     "degree_level": null,
     "domains": [
       "life-science"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260714020",
@@ -21974,7 +23269,9 @@
       "ai-ml",
       "computer-science",
       "life-science"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260714016",
@@ -21995,7 +23292,9 @@
     "domains": [
       "physics",
       "materials"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260714017",
@@ -22013,7 +23312,9 @@
     "min_degree": "doctor",
     "degree_rank": 3,
     "degree_level": "Doctor",
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260630001",
@@ -22031,7 +23332,9 @@
     "min_degree": "master",
     "degree_rank": 2,
     "degree_level": "Master",
-    "domains": []
+    "domains": [],
+    "contract_months": 4,
+    "contract_months_max": 20
   },
   {
     "id": "PolyU_260714006",
@@ -22051,7 +23354,9 @@
     "degree_level": null,
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260714021",
@@ -22073,7 +23378,9 @@
       "ai-ml",
       "computer-science",
       "life-science"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260714018",
@@ -22094,7 +23401,9 @@
     "domains": [
       "ai-ml",
       "computer-science"
-    ]
+    ],
+    "contract_months": 4,
+    "contract_months_max": 20
   },
   {
     "id": "PolyU_260713004",
@@ -22114,7 +23423,9 @@
     "degree_level": "Doctor",
     "domains": [
       "environment"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260713002",
@@ -22134,7 +23445,10 @@
     "degree_level": null,
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 3,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260527018",
@@ -22152,7 +23466,10 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260710003",
@@ -22170,7 +23487,9 @@
     "min_degree": "master",
     "degree_rank": 2,
     "degree_level": "Master",
-    "domains": []
+    "domains": [],
+    "contract_months": 3,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260709019",
@@ -22190,7 +23509,9 @@
     "degree_level": "Bachelor",
     "domains": [
       "ai-ml"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260709017",
@@ -22210,7 +23531,9 @@
     "degree_level": null,
     "domains": [
       "data"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260709014",
@@ -22234,7 +23557,9 @@
       "civil",
       "physics",
       "environment"
-    ]
+    ],
+    "contract_months": 10,
+    "contract_months_max": 10
   },
   {
     "id": "PolyU_260709002",
@@ -22252,7 +23577,9 @@
     "min_degree": "doctor",
     "degree_rank": 3,
     "degree_level": "Doctor",
-    "domains": []
+    "domains": [],
+    "contract_months": 6,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260708012",
@@ -22272,7 +23599,9 @@
     "degree_level": "Doctor",
     "domains": [
       "math-stats"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260708011",
@@ -22292,7 +23621,9 @@
     "degree_level": "Doctor",
     "domains": [
       "math-stats"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260707018",
@@ -22313,7 +23644,9 @@
     "domains": [
       "ai-ml",
       "industrial"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260707017",
@@ -22334,7 +23667,9 @@
     "domains": [
       "ai-ml",
       "industrial"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260707012",
@@ -22358,7 +23693,9 @@
       "chemistry",
       "materials",
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260708009",
@@ -22398,7 +23735,9 @@
     "degree_level": "Master",
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 7
   },
   {
     "id": "PolyU_260708002",
@@ -22438,7 +23777,9 @@
     "degree_level": null,
     "domains": [
       "ai-ml"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260708010",
@@ -22456,7 +23797,9 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 4,
+    "contract_months_max": 20
   },
   {
     "id": "PolyU_260708005",
@@ -22476,7 +23819,9 @@
     "degree_level": null,
     "domains": [
       "physics"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260708003",
@@ -22496,7 +23841,9 @@
     "degree_level": null,
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260706010",
@@ -22516,7 +23863,9 @@
     "degree_level": "Doctor",
     "domains": [
       "ai-ml"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 24
   },
   {
     "id": "PolyU_260708008",
@@ -22559,7 +23908,9 @@
       "civil",
       "math-stats",
       "industrial"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260703007",
@@ -22598,7 +23949,9 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260706011",
@@ -22618,7 +23971,9 @@
     "degree_level": null,
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260707005",
@@ -22638,7 +23993,9 @@
     "degree_level": null,
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260707015",
@@ -22658,7 +24015,9 @@
     "degree_level": "Doctor",
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 9,
+    "contract_months_max": 9
   },
   {
     "id": "PolyU_260707016",
@@ -22697,7 +24056,9 @@
     "min_degree": "master",
     "degree_rank": 2,
     "degree_level": "Master",
-    "domains": []
+    "domains": [],
+    "contract_months": 6,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260706006",
@@ -22717,7 +24078,9 @@
     "degree_level": "Master",
     "domains": [
       "biomedical"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260706005",
@@ -22738,7 +24101,9 @@
     "domains": [
       "ai-ml",
       "biomedical"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260706009",
@@ -22759,7 +24124,9 @@
     "domains": [
       "robotics",
       "life-science"
-    ]
+    ],
+    "contract_months": 4,
+    "contract_months_max": 20
   },
   {
     "id": "PolyU_260706008",
@@ -22780,7 +24147,9 @@
     "domains": [
       "physics",
       "materials"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260706004",
@@ -22800,7 +24169,9 @@
     "degree_level": "Doctor",
     "domains": [
       "chemistry"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260703014",
@@ -22818,7 +24189,10 @@
     "min_degree": "master",
     "degree_rank": 2,
     "degree_level": "Master",
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "CityU_ur-t12626",
@@ -22861,7 +24235,9 @@
     "domains": [
       "ai-ml",
       "computer-science"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260703012",
@@ -22882,7 +24258,9 @@
     "domains": [
       "ai-ml",
       "computer-science"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260703001",
@@ -22903,7 +24281,9 @@
     "domains": [
       "ai-ml",
       "electronics"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260702006",
@@ -22923,7 +24303,9 @@
     "degree_level": "Doctor",
     "domains": [
       "industrial"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 24
   },
   {
     "id": "PolyU_260702004",
@@ -22945,7 +24327,9 @@
       "ai-ml",
       "computer-science",
       "data"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260702011",
@@ -22963,7 +24347,9 @@
     "min_degree": "master",
     "degree_rank": 2,
     "degree_level": "Master",
-    "domains": []
+    "domains": [],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260703002",
@@ -22984,7 +24370,9 @@
     "domains": [
       "electronics",
       "civil"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260702008",
@@ -23005,7 +24393,9 @@
     "domains": [
       "ai-ml",
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260630004",
@@ -23026,7 +24416,9 @@
     "domains": [
       "mechanical",
       "industrial"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260630013",
@@ -23049,7 +24441,9 @@
       "computer-science",
       "data",
       "math-stats"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260630014",
@@ -23067,7 +24461,9 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 3,
+    "contract_months_max": 3
   },
   {
     "id": "PolyU_260630012",
@@ -23085,7 +24481,10 @@
     "min_degree": "doctor",
     "degree_rank": 3,
     "degree_level": "Doctor",
-    "domains": []
+    "domains": [],
+    "contract_months": 3,
+    "contract_months_max": 6,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260629011",
@@ -23106,7 +24505,10 @@
     "domains": [
       "ai-ml",
       "environment"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260629002",
@@ -23126,7 +24528,10 @@
     "degree_level": null,
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 3,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260629001",
@@ -23147,7 +24552,9 @@
     "domains": [
       "civil",
       "math-stats"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260629008",
@@ -23167,7 +24574,9 @@
     "degree_level": null,
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 4,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260629003",
@@ -23188,7 +24597,9 @@
     "domains": [
       "computer-science",
       "health"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260629005",
@@ -23208,7 +24619,9 @@
     "degree_level": "Doctor",
     "domains": [
       "mechanical"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260629015",
@@ -23228,7 +24641,10 @@
     "degree_level": "Doctor",
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260626009",
@@ -23248,7 +24664,10 @@
     "degree_level": "Doctor",
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 4,
+    "contract_months_max": 20,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260615002",
@@ -23268,7 +24687,9 @@
     "degree_level": "Doctor",
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 9,
+    "contract_months_max": 13
   },
   {
     "id": "PolyU_260626002",
@@ -23288,7 +24709,9 @@
     "degree_level": null,
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 12
   },
   {
     "id": "CityU_ur-t11926",
@@ -23346,7 +24769,9 @@
     "domains": [
       "computer-science",
       "math-stats"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 3
   },
   {
     "id": "PolyU_260625011",
@@ -23364,7 +24789,9 @@
     "min_degree": "doctor",
     "degree_rank": 3,
     "degree_level": "Doctor",
-    "domains": []
+    "domains": [],
+    "contract_months": 3,
+    "contract_months_max": 24
   },
   {
     "id": "PolyU_260624005",
@@ -23384,7 +24811,9 @@
     "degree_level": "Doctor",
     "domains": [
       "industrial"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260625001",
@@ -23404,7 +24833,9 @@
     "degree_level": "Doctor",
     "domains": [
       "ai-ml"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260624009",
@@ -23425,7 +24856,9 @@
     "domains": [
       "math-stats",
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260625006",
@@ -23443,7 +24876,9 @@
     "min_degree": "master",
     "degree_rank": 2,
     "degree_level": "Master",
-    "domains": []
+    "domains": [],
+    "contract_months": 3,
+    "contract_months_max": 3
   },
   {
     "id": "PolyU_260625007",
@@ -23461,7 +24896,9 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 10,
+    "contract_months_max": 10
   },
   {
     "id": "PolyU_260624002",
@@ -23482,7 +24919,9 @@
     "domains": [
       "ai-ml",
       "computer-science"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260624003",
@@ -23503,7 +24942,9 @@
     "domains": [
       "ai-ml",
       "computer-science"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260625009",
@@ -23521,7 +24962,10 @@
     "min_degree": "doctor",
     "degree_rank": 3,
     "degree_level": "Doctor",
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260625002",
@@ -23542,7 +24986,9 @@
     "domains": [
       "mechanical",
       "industrial"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260529011",
@@ -23564,7 +25010,9 @@
       "electronics",
       "robotics",
       "civil"
-    ]
+    ],
+    "contract_months": 4,
+    "contract_months_max": 20
   },
   {
     "id": "PolyU_260623001",
@@ -23584,7 +25032,9 @@
     "degree_level": "Doctor",
     "domains": [
       "math-stats"
-    ]
+    ],
+    "contract_months": 1,
+    "contract_months_max": 36
   },
   {
     "id": "PolyU_260623018",
@@ -23606,7 +25056,9 @@
       "biomedical",
       "life-science",
       "health"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260623002",
@@ -23626,7 +25078,9 @@
     "degree_level": null,
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 9
   },
   {
     "id": "PolyU_260623014",
@@ -23644,7 +25098,10 @@
     "min_degree": "master",
     "degree_rank": 2,
     "degree_level": "Master",
-    "domains": []
+    "domains": [],
+    "contract_months": 3,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260623021",
@@ -23664,7 +25121,9 @@
     "degree_level": null,
     "domains": [
       "industrial"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260612008",
@@ -23686,7 +25145,10 @@
       "ai-ml",
       "math-stats",
       "health"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260623015",
@@ -23706,7 +25168,10 @@
     "degree_level": "Doctor",
     "domains": [
       "data"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260622003",
@@ -23726,7 +25191,9 @@
     "degree_level": "Doctor",
     "domains": [
       "math-stats"
-    ]
+    ],
+    "contract_months": 2,
+    "contract_months_max": 2
   },
   {
     "id": "PolyU_260622002",
@@ -23746,7 +25213,9 @@
     "degree_level": "Doctor",
     "domains": [
       "math-stats"
-    ]
+    ],
+    "contract_months": 1,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260622010",
@@ -23767,7 +25236,9 @@
     "domains": [
       "mechanical",
       "environment"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260622009",
@@ -23787,7 +25258,9 @@
     "degree_level": "Master",
     "domains": [
       "mechanical"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260622016",
@@ -23807,7 +25280,9 @@
     "degree_level": null,
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260617008",
@@ -23831,7 +25306,9 @@
       "mechanical",
       "physics",
       "environment"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260622013",
@@ -23852,7 +25329,9 @@
     "domains": [
       "ai-ml",
       "computer-science"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260622007",
@@ -23873,7 +25352,9 @@
     "domains": [
       "math-stats",
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260618007",
@@ -23893,7 +25374,10 @@
     "degree_level": "Master",
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260618014",
@@ -23911,7 +25395,9 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260618016",
@@ -23931,7 +25417,9 @@
     "degree_level": "Doctor",
     "domains": [
       "industrial"
-    ]
+    ],
+    "contract_months": 1,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260618012",
@@ -23953,7 +25441,9 @@
       "robotics",
       "mechanical",
       "environment"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260618017",
@@ -23973,7 +25463,9 @@
     "degree_level": "Doctor",
     "domains": [
       "life-science"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260617007",
@@ -23991,7 +25483,9 @@
     "min_degree": "doctor",
     "degree_rank": 3,
     "degree_level": "Doctor",
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260616019",
@@ -24012,7 +25506,9 @@
     "domains": [
       "robotics",
       "mechanical"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 24
   },
   {
     "id": "PolyU_260617005",
@@ -24034,7 +25530,9 @@
       "mechanical",
       "chemistry",
       "materials"
-    ]
+    ],
+    "contract_months": 4,
+    "contract_months_max": 20
   },
   {
     "id": "PolyU_260616006",
@@ -24054,7 +25552,9 @@
     "degree_level": "Doctor",
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 1,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260616007",
@@ -24072,7 +25572,9 @@
     "min_degree": "doctor",
     "degree_rank": 3,
     "degree_level": "Doctor",
-    "domains": []
+    "domains": [],
+    "contract_months": 6,
+    "contract_months_max": 24
   },
   {
     "id": "PolyU_260616002",
@@ -24096,7 +25598,9 @@
       "biomedical",
       "physics",
       "health"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260615012",
@@ -24116,7 +25620,9 @@
     "degree_level": "Doctor",
     "domains": [
       "math-stats"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260615010",
@@ -24137,7 +25643,9 @@
     "domains": [
       "computer-science",
       "math-stats"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260615014",
@@ -24158,7 +25666,9 @@
     "degree_level": "Doctor",
     "domains": [
       "math-stats"
-    ]
+    ],
+    "contract_months": 1,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260615013",
@@ -24179,7 +25689,9 @@
     "domains": [
       "mechanical",
       "math-stats"
-    ]
+    ],
+    "contract_months": 1,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260612013",
@@ -24197,7 +25709,10 @@
     "min_degree": "doctor",
     "degree_rank": 3,
     "degree_level": "Doctor",
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260615004",
@@ -24215,7 +25730,9 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260615003",
@@ -24235,7 +25752,9 @@
     "degree_level": null,
     "domains": [
       "ai-ml"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260615011",
@@ -24256,7 +25775,9 @@
     "domains": [
       "computer-science",
       "math-stats"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260615018",
@@ -24274,7 +25795,9 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260615017",
@@ -24294,7 +25817,9 @@
     "degree_level": null,
     "domains": [
       "chemistry"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260615009",
@@ -24315,7 +25840,9 @@
     "domains": [
       "physics",
       "math-stats"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260612007",
@@ -24337,7 +25864,9 @@
       "ai-ml",
       "math-stats",
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260603002",
@@ -24355,7 +25884,9 @@
     "min_degree": "master",
     "degree_rank": 2,
     "degree_level": "Master",
-    "domains": []
+    "domains": [],
+    "contract_months": 2,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260612001",
@@ -24376,7 +25907,10 @@
     "domains": [
       "civil",
       "industrial"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260612010",
@@ -24397,7 +25931,9 @@
     "domains": [
       "computer-science",
       "health"
-    ]
+    ],
+    "contract_months": 1,
+    "contract_months_max": 3
   },
   {
     "id": "PolyU_260611002",
@@ -24417,7 +25953,9 @@
     "degree_level": "Doctor",
     "domains": [
       "math-stats"
-    ]
+    ],
+    "contract_months": 1,
+    "contract_months_max": 24
   },
   {
     "id": "PolyU_260611001",
@@ -24435,7 +25973,9 @@
     "min_degree": "master",
     "degree_rank": 2,
     "degree_level": "Master",
-    "domains": []
+    "domains": [],
+    "contract_months": 3,
+    "contract_months_max": 3
   },
   {
     "id": "PolyU_260611003",
@@ -24455,7 +25995,9 @@
     "degree_level": null,
     "domains": [
       "math-stats"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260605019",
@@ -24473,7 +26015,9 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260612009",
@@ -24491,7 +26035,9 @@
     "min_degree": "doctor",
     "degree_rank": 3,
     "degree_level": "Doctor",
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260611008",
@@ -24511,7 +26057,9 @@
     "degree_level": "Doctor",
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260610003",
@@ -24532,7 +26080,9 @@
     "domains": [
       "ai-ml",
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260610005",
@@ -24554,7 +26104,10 @@
       "ai-ml",
       "math-stats",
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260610014",
@@ -24576,7 +26129,9 @@
       "computer-science",
       "biomedical",
       "life-science"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260610015",
@@ -24594,7 +26149,10 @@
     "min_degree": "master",
     "degree_rank": 2,
     "degree_level": "Master",
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260610011",
@@ -24616,7 +26174,9 @@
       "electronics",
       "physics",
       "environment"
-    ]
+    ],
+    "contract_months": 7,
+    "contract_months_max": 16
   },
   {
     "id": "PolyU_260610018",
@@ -24636,7 +26196,9 @@
     "degree_level": null,
     "domains": [
       "ai-ml"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 3
   },
   {
     "id": "PolyU_260610007",
@@ -24656,7 +26218,9 @@
     "degree_level": null,
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260609012",
@@ -24677,7 +26241,9 @@
     "domains": [
       "electronics",
       "biomedical"
-    ]
+    ],
+    "contract_months": 4,
+    "contract_months_max": 20
   },
   {
     "id": "PolyU_260609007",
@@ -24697,7 +26263,9 @@
     "degree_level": null,
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 2,
+    "contract_months_max": 2
   },
   {
     "id": "PolyU_260526007",
@@ -24715,7 +26283,9 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260609010",
@@ -24736,7 +26306,9 @@
     "domains": [
       "civil",
       "industrial"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260609014",
@@ -24757,7 +26329,9 @@
     "domains": [
       "ai-ml",
       "industrial"
-    ]
+    ],
+    "contract_months": 4,
+    "contract_months_max": 4
   },
   {
     "id": "PolyU_260604002",
@@ -24778,7 +26352,9 @@
     "degree_level": "Doctor",
     "domains": [
       "math-stats"
-    ]
+    ],
+    "contract_months": 1,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260609002",
@@ -24798,7 +26374,10 @@
     "degree_level": "Doctor",
     "domains": [
       "environment"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260609001",
@@ -24818,7 +26397,10 @@
     "degree_level": "Doctor",
     "domains": [
       "environment"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260608002",
@@ -24838,7 +26420,9 @@
     "degree_level": "Master",
     "domains": [
       "industrial"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 24
   },
   {
     "id": "PolyU_260608012",
@@ -24859,7 +26443,9 @@
     "domains": [
       "mechanical",
       "chemistry"
-    ]
+    ],
+    "contract_months": 20,
+    "contract_months_max": 20
   },
   {
     "id": "PolyU_260608003",
@@ -24879,7 +26465,9 @@
     "degree_level": null,
     "domains": [
       "industrial"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260608004",
@@ -24900,7 +26488,9 @@
     "domains": [
       "ai-ml",
       "computer-science"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260608006",
@@ -24922,7 +26512,10 @@
       "computer-science",
       "life-science",
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260608007",
@@ -24942,7 +26535,9 @@
     "degree_level": null,
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260603003",
@@ -24961,7 +26556,9 @@
     "degree_level": null,
     "domains": [
       "robotics"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260605007",
@@ -24982,7 +26579,9 @@
     "domains": [
       "data",
       "industrial"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260605006",
@@ -25003,7 +26602,9 @@
     "domains": [
       "ai-ml",
       "industrial"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260605012",
@@ -25023,7 +26624,9 @@
     "degree_level": "Bachelor",
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260605016",
@@ -25048,7 +26651,9 @@
       "mechanical",
       "biomedical",
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260605013",
@@ -25068,7 +26673,9 @@
     "degree_level": null,
     "domains": [
       "physics"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260605020",
@@ -25089,7 +26696,10 @@
     "domains": [
       "ai-ml",
       "computer-science"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260605002",
@@ -25112,7 +26722,9 @@
       "biomedical",
       "physics",
       "health"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260603009",
@@ -25132,7 +26744,9 @@
     "degree_level": null,
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 4,
+    "contract_months_max": 4
   },
   {
     "id": "PolyU_260603008",
@@ -25153,7 +26767,9 @@
     "domains": [
       "ai-ml",
       "computer-science"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260603007",
@@ -25174,7 +26790,9 @@
     "domains": [
       "ai-ml",
       "computer-science"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 24
   },
   {
     "id": "PolyU_260603006",
@@ -25194,7 +26812,9 @@
     "degree_level": null,
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260603005",
@@ -25214,7 +26834,9 @@
     "degree_level": null,
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 3
   },
   {
     "id": "PolyU_260528003",
@@ -25234,7 +26856,9 @@
     "degree_level": null,
     "domains": [
       "robotics"
-    ]
+    ],
+    "contract_months": 13,
+    "contract_months_max": 13
   },
   {
     "id": "PolyU_260602013",
@@ -25255,7 +26879,9 @@
     "domains": [
       "chemistry",
       "materials"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260602015",
@@ -25275,7 +26901,9 @@
     "degree_level": "Master",
     "domains": [
       "mechanical"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260602010",
@@ -25295,7 +26923,10 @@
     "degree_level": "Master",
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260602006",
@@ -25315,7 +26946,10 @@
     "degree_level": "Master",
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260602011",
@@ -25335,7 +26969,10 @@
     "degree_level": null,
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260602005",
@@ -25355,7 +26992,10 @@
     "degree_level": null,
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260602012",
@@ -25373,7 +27013,10 @@
     "min_degree": "master",
     "degree_rank": 2,
     "degree_level": "Master",
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260602007",
@@ -25393,7 +27036,9 @@
     "degree_level": null,
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 3
   },
   {
     "id": "PolyU_260601005",
@@ -25414,7 +27059,9 @@
     "domains": [
       "ai-ml",
       "math-stats"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260601012",
@@ -25435,7 +27082,9 @@
     "domains": [
       "ai-ml",
       "computer-science"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260601002",
@@ -25453,7 +27102,9 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 6,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260601001",
@@ -25471,7 +27122,10 @@
     "min_degree": "master",
     "degree_rank": 2,
     "degree_level": "Master",
-    "domains": []
+    "domains": [],
+    "contract_months": 2,
+    "contract_months_max": 2,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260601013",
@@ -25491,7 +27145,9 @@
     "degree_level": "Doctor",
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 5,
+    "contract_months_max": 5
   },
   {
     "id": "PolyU_260601007",
@@ -25515,7 +27171,9 @@
       "biomedical",
       "life-science",
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260601011",
@@ -25536,7 +27194,9 @@
     "domains": [
       "ai-ml",
       "computer-science"
-    ]
+    ],
+    "contract_months": 7,
+    "contract_months_max": 7
   },
   {
     "id": "PolyU_260529006",
@@ -25556,7 +27216,9 @@
     "degree_level": "Master",
     "domains": [
       "electronics"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 24
   },
   {
     "id": "PolyU_260529001",
@@ -25577,7 +27239,9 @@
     "domains": [
       "computer-science",
       "math-stats"
-    ]
+    ],
+    "contract_months": 4,
+    "contract_months_max": 20
   },
   {
     "id": "PolyU_260529012",
@@ -25599,7 +27263,9 @@
       "ai-ml",
       "mechanical",
       "environment"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260529007",
@@ -25620,7 +27286,9 @@
     "domains": [
       "electronics",
       "chemistry"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260528004",
@@ -25640,7 +27308,9 @@
     "degree_level": "Doctor",
     "domains": [
       "math-stats"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260528012",
@@ -25660,7 +27330,9 @@
     "degree_level": "Doctor",
     "domains": [
       "industrial"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260528013",
@@ -25681,7 +27353,9 @@
     "domains": [
       "civil",
       "industrial"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260528001",
@@ -25701,7 +27375,9 @@
     "degree_level": null,
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260528008",
@@ -25721,7 +27397,9 @@
     "degree_level": "Doctor",
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 1,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260528009",
@@ -25742,7 +27420,9 @@
     "domains": [
       "ai-ml",
       "life-science"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260527008",
@@ -25763,7 +27443,10 @@
     "domains": [
       "ai-ml",
       "health"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260527012",
@@ -25784,7 +27467,10 @@
     "domains": [
       "math-stats",
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260527009",
@@ -25805,7 +27491,10 @@
     "domains": [
       "ai-ml",
       "health"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "HKUST_11099",
@@ -25868,7 +27557,9 @@
     "degree_level": null,
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260527016",
@@ -25888,7 +27579,9 @@
     "degree_level": null,
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260527010",
@@ -25908,7 +27601,9 @@
     "degree_level": null,
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260527003",
@@ -25930,7 +27625,9 @@
       "mechanical",
       "materials",
       "health"
-    ]
+    ],
+    "contract_months": 2,
+    "contract_months_max": 2
   },
   {
     "id": "PolyU_260527011",
@@ -25950,7 +27647,9 @@
     "degree_level": "Master",
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 8,
+    "contract_months_max": 8
   },
   {
     "id": "PolyU_260527001",
@@ -25970,7 +27669,9 @@
     "degree_level": null,
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260526006",
@@ -25990,7 +27691,9 @@
     "degree_level": "Bachelor",
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 11,
+    "contract_months_max": 11
   },
   {
     "id": "PolyU_260526002",
@@ -26008,7 +27711,10 @@
     "min_degree": "master",
     "degree_rank": 2,
     "degree_level": "Master",
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260526005",
@@ -26028,7 +27734,9 @@
     "degree_level": "Master",
     "domains": [
       "ai-ml"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260526003",
@@ -26051,7 +27759,10 @@
       "computer-science",
       "data",
       "civil"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260518004",
@@ -26071,7 +27782,9 @@
     "degree_level": "Master",
     "domains": [
       "data"
-    ]
+    ],
+    "contract_months": 18,
+    "contract_months_max": 18
   },
   {
     "id": "PolyU_260522015",
@@ -26091,7 +27804,9 @@
     "degree_level": "Master",
     "domains": [
       "ai-ml"
-    ]
+    ],
+    "contract_months": 7,
+    "contract_months_max": 7
   },
   {
     "id": "PolyU_260522013",
@@ -26113,7 +27828,10 @@
       "ai-ml",
       "computer-science",
       "data"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 3,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260522002",
@@ -26131,7 +27849,10 @@
     "min_degree": "master",
     "degree_rank": 2,
     "degree_level": "Master",
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260522010",
@@ -26151,7 +27872,9 @@
     "degree_level": "Doctor",
     "domains": [
       "mechanical"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 36
   },
   {
     "id": "PolyU_260522009",
@@ -26171,7 +27894,9 @@
     "degree_level": null,
     "domains": [
       "mechanical"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260521014",
@@ -26194,7 +27919,9 @@
       "robotics",
       "mechanical",
       "materials"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260521009",
@@ -26214,7 +27941,9 @@
     "degree_level": "Doctor",
     "domains": [
       "civil"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 18
   },
   {
     "id": "PolyU_260521013",
@@ -26234,7 +27963,9 @@
     "degree_level": "Doctor",
     "domains": [
       "electronics"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260520002",
@@ -26254,7 +27985,10 @@
     "degree_level": null,
     "domains": [
       "industrial"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260519006",
@@ -26272,7 +28006,9 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260520001",
@@ -26293,7 +28029,10 @@
     "domains": [
       "civil",
       "industrial"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260519020",
@@ -26313,7 +28052,9 @@
     "degree_level": "Doctor",
     "domains": [
       "physics"
-    ]
+    ],
+    "contract_months": 4,
+    "contract_months_max": 20
   },
   {
     "id": "PolyU_260518012",
@@ -26334,7 +28075,9 @@
     "domains": [
       "ai-ml",
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260518002",
@@ -26355,7 +28098,9 @@
     "domains": [
       "ai-ml",
       "industrial"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 24
   },
   {
     "id": "PolyU_260518007",
@@ -26375,7 +28120,9 @@
     "degree_level": null,
     "domains": [
       "industrial"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260519017",
@@ -26393,7 +28140,9 @@
     "min_degree": "bachelor",
     "degree_rank": 1,
     "degree_level": "Bachelor",
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260519009",
@@ -26413,7 +28162,10 @@
     "degree_level": null,
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 2,
+    "contract_months_max": 2,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260518001",
@@ -26431,7 +28183,9 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260519010",
@@ -26454,7 +28208,10 @@
       "computer-science",
       "data",
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260519015",
@@ -26474,7 +28231,9 @@
     "degree_level": "Doctor",
     "domains": [
       "math-stats"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260519016",
@@ -26492,7 +28251,9 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260519005",
@@ -26510,7 +28271,10 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260519004",
@@ -26530,7 +28294,10 @@
     "degree_level": null,
     "domains": [
       "ai-ml"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 3,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260518008",
@@ -26551,7 +28318,9 @@
     "domains": [
       "data",
       "industrial"
-    ]
+    ],
+    "contract_months": 2,
+    "contract_months_max": 2
   },
   {
     "id": "PolyU_260519002",
@@ -26571,7 +28340,9 @@
     "degree_level": "Doctor",
     "domains": [
       "electronics"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260519003",
@@ -26594,7 +28365,9 @@
       "robotics",
       "mechanical",
       "materials"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 3
   },
   {
     "id": "PolyU_260515010",
@@ -26614,7 +28387,10 @@
     "degree_level": "Master",
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260515013",
@@ -26635,7 +28411,9 @@
     "domains": [
       "mechanical",
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260515009",
@@ -26655,7 +28433,9 @@
     "degree_level": null,
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260514010",
@@ -26675,7 +28455,9 @@
     "degree_level": "Master",
     "domains": [
       "electronics"
-    ]
+    ],
+    "contract_months": 4,
+    "contract_months_max": 20
   },
   {
     "id": "PolyU_260514002",
@@ -26697,7 +28479,9 @@
       "ai-ml",
       "computer-science",
       "data"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260514012",
@@ -26720,7 +28504,9 @@
       "data",
       "electronics",
       "math-stats"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 24
   },
   {
     "id": "PolyU_260514011",
@@ -26741,7 +28527,9 @@
     "domains": [
       "ai-ml",
       "electronics"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260514009",
@@ -26762,7 +28550,10 @@
     "domains": [
       "ai-ml",
       "industrial"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260513010",
@@ -26782,7 +28573,9 @@
     "degree_level": "Doctor",
     "domains": [
       "industrial"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260513019",
@@ -26805,7 +28598,9 @@
       "data",
       "biomedical",
       "life-science"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 4
   },
   {
     "id": "PolyU_260513023",
@@ -26823,7 +28618,10 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 6,
+    "contract_months_max": 6,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260513024",
@@ -26844,7 +28642,9 @@
     "domains": [
       "electronics",
       "environment"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260513007",
@@ -26864,7 +28664,9 @@
     "degree_level": "Doctor",
     "domains": [
       "industrial"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260513012",
@@ -26885,7 +28687,9 @@
     "domains": [
       "mechanical",
       "industrial"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260512015",
@@ -26905,7 +28709,9 @@
     "degree_level": "Doctor",
     "domains": [
       "math-stats"
-    ]
+    ],
+    "contract_months": 1,
+    "contract_months_max": 24
   },
   {
     "id": "PolyU_260513021",
@@ -26926,7 +28732,9 @@
     "domains": [
       "electronics",
       "math-stats"
-    ]
+    ],
+    "contract_months": 2,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260512022",
@@ -26947,7 +28755,9 @@
     "domains": [
       "math-stats",
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260513022",
@@ -26968,7 +28778,9 @@
     "domains": [
       "mechanical",
       "math-stats"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 3
   },
   {
     "id": "PolyU_260512020",
@@ -26990,7 +28802,9 @@
       "ai-ml",
       "computer-science",
       "materials"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260512023",
@@ -27011,7 +28825,9 @@
     "domains": [
       "computer-science",
       "health"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 3
   },
   {
     "id": "PolyU_260512019",
@@ -27031,7 +28847,9 @@
     "degree_level": "Doctor",
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260512012",
@@ -27051,7 +28869,9 @@
     "degree_level": "Doctor",
     "domains": [
       "industrial"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260512018",
@@ -27071,7 +28891,10 @@
     "degree_level": null,
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 3,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260511009",
@@ -27093,7 +28916,9 @@
       "ai-ml",
       "computer-science",
       "math-stats"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260511010",
@@ -27114,7 +28939,9 @@
     "domains": [
       "ai-ml",
       "computer-science"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260508007",
@@ -27135,7 +28962,10 @@
     "domains": [
       "computer-science",
       "environment"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260508001",
@@ -27156,7 +28986,9 @@
     "domains": [
       "materials",
       "environment"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260508008",
@@ -27176,7 +29008,9 @@
     "degree_level": null,
     "domains": [
       "ai-ml"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260508003",
@@ -27196,7 +29030,9 @@
     "degree_level": "Master",
     "domains": [
       "mechanical"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260507002",
@@ -27218,7 +29054,9 @@
       "ai-ml",
       "data",
       "electronics"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 24
   },
   {
     "id": "PolyU_260507007",
@@ -27238,7 +29076,9 @@
     "degree_level": "Doctor",
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260507004",
@@ -27259,7 +29099,9 @@
     "domains": [
       "computer-science",
       "data"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260507005",
@@ -27279,7 +29121,9 @@
     "degree_level": "Doctor",
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260506010",
@@ -27302,7 +29146,9 @@
       "robotics",
       "mechanical",
       "civil"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260506015",
@@ -27322,7 +29168,9 @@
     "degree_level": null,
     "domains": [
       "civil"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 3
   },
   {
     "id": "PolyU_260506006",
@@ -27342,7 +29190,9 @@
     "degree_level": "Doctor",
     "domains": [
       "industrial"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260505004",
@@ -27387,7 +29237,9 @@
       "ai-ml",
       "computer-science",
       "industrial"
-    ]
+    ],
+    "contract_months": 2,
+    "contract_months_max": 2
   },
   {
     "id": "PolyU_260505014",
@@ -27408,7 +29260,9 @@
     "domains": [
       "ai-ml",
       "computer-science"
-    ]
+    ],
+    "contract_months": 3,
+    "contract_months_max": 3
   },
   {
     "id": "PolyU_260505006",
@@ -27428,7 +29282,9 @@
     "degree_level": "Doctor",
     "domains": [
       "computer-science"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260505002",
@@ -27450,7 +29306,9 @@
       "computer-science",
       "math-stats",
       "health"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260504002",
@@ -27468,7 +29326,9 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 3,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260504001",
@@ -27488,47 +29348,9 @@
     "degree_level": null,
     "domains": [
       "electronics"
-    ]
-  },
-  {
-    "id": "HKBU_26270203",
-    "title": "Research Assistant Professor,Centre for Chinese Herbal Medicine Drug Development",
-    "close_date": "2026-05-10",
-    "url": "https://fa-ewqq-saasfaprod1.fa.ocs.oraclecloud.com/hcmUI/CandidateExperience/en/sites/hkbu/job/26270203",
-    "source": "HKBU",
-    "department": "Centre for Chinese Herbal Medicine Drug Development",
-    "date_type": "deadline",
-    "possibly_stale": false,
-    "scraped_at": "2026-11-10T13:57:06",
-    "summary": "- Dept: Centre for Chinese Herbal Medicine Drug Development\n- Requirements: a Ph.D. degree in a relevant biomedical field (e; conducting clinical trials as a study leader or senior clinical scientist, especially with\n- Closing: 2026-05-10",
-    "work_type": null,
-    "min_degree": "doctor",
-    "degree_rank": 3,
-    "degree_level": "Doctor",
-    "domains": [
-      "biomedical",
-      "health"
-    ]
-  },
-  {
-    "id": "HKBU_26270087",
-    "title": "Research Assistant Professor,Centre for Chinese Herbal Medicine Drug Development",
-    "close_date": "2026-05-10",
-    "url": "https://fa-ewqq-saasfaprod1.fa.ocs.oraclecloud.com/hcmUI/CandidateExperience/en/sites/hkbu/job/26270087",
-    "source": "HKBU",
-    "department": "Centre for Chinese Herbal Medicine Drug Development",
-    "date_type": "deadline",
-    "possibly_stale": false,
-    "scraped_at": "2026-11-10T13:57:06",
-    "summary": "- Dept: Centre for Chinese Herbal Medicine Drug Development\n- Role focus: Conduct high-quality and innovative research on the phytochemistry, formulation\n- Requirements: a Ph.D. degree in Pharmaceuticals, Medicinal Chemistry, Natural Product Chemistry, Pharmacology, or related disciplines, with postdoctoral research experience preferred\n- Closing: 2026-05-10",
-    "work_type": null,
-    "min_degree": "doctor",
-    "degree_rank": 3,
-    "degree_level": "Doctor",
-    "domains": [
-      "chemistry",
-      "health"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_260420006",
@@ -27546,7 +29368,9 @@
     "min_degree": "bachelor",
     "degree_rank": 1,
     "degree_level": "Bachelor",
-    "domains": []
+    "domains": [],
+    "contract_months": 6,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260414005",
@@ -27566,7 +29390,9 @@
     "degree_level": "Doctor",
     "domains": [
       "industrial"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260414010",
@@ -27584,7 +29410,9 @@
     "min_degree": "master",
     "degree_rank": 2,
     "degree_level": "Master",
-    "domains": []
+    "domains": [],
+    "contract_months": 4,
+    "contract_months_max": 4
   },
   {
     "id": "PolyU_260414009",
@@ -27604,7 +29432,9 @@
     "degree_level": null,
     "domains": [
       "health"
-    ]
+    ],
+    "contract_months": 4,
+    "contract_months_max": 4
   },
   {
     "id": "PolyU_260330003",
@@ -27624,7 +29454,9 @@
     "degree_level": "Doctor",
     "domains": [
       "industrial"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260312007",
@@ -27646,7 +29478,9 @@
       "mechanical",
       "materials",
       "industrial"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "CUHK_26000063",
@@ -27687,7 +29521,10 @@
     "degree_level": "Master",
     "domains": [
       "industrial"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_260121012",
@@ -27709,7 +29546,9 @@
       "ai-ml",
       "materials",
       "industrial"
-    ]
+    ],
+    "contract_months": 12,
+    "contract_months_max": 12
   },
   {
     "id": "PolyU_260114012",
@@ -27730,7 +29569,9 @@
     "domains": [
       "ai-ml",
       "industrial"
-    ]
+    ],
+    "contract_months": 9,
+    "contract_months_max": 9
   },
   {
     "id": "PolyU_251230006",
@@ -27751,7 +29592,10 @@
     "domains": [
       "industrial",
       "health"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "PolyU_251216002",
@@ -27773,7 +29617,9 @@
       "mechanical",
       "materials",
       "industrial"
-    ]
+    ],
+    "contract_months": 4,
+    "contract_months_max": 4
   },
   {
     "id": "PolyU_251121017",
@@ -27791,7 +29637,9 @@
     "min_degree": "unspecified",
     "degree_rank": 0,
     "degree_level": null,
-    "domains": []
+    "domains": [],
+    "contract_months": 6,
+    "contract_months_max": 6
   },
   {
     "id": "PolyU_251114014",
@@ -27812,7 +29660,10 @@
     "domains": [
       "computer-science",
       "industrial"
-    ]
+    ],
+    "contract_months": 6,
+    "contract_months_max": 12,
+    "contract_renewable": true
   },
   {
     "id": "HKUST_10867",
