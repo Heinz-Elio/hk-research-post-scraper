@@ -17,3 +17,8 @@ def test_cards_show_ref_date_kind_and_stale_badge():
     assert "Possibly stale" in HTML
     assert "badge-stale" in HTML
     assert '"health": "Health"' in HTML
+    assert 'id="filter-contract"' in HTML
+    assert 'id="filter-place"' in HTML
+    assert 'id="filter-deadline"' in HTML
+    assert "contractMatches" in HTML
+    assert "Closing within 30 days" in HTML

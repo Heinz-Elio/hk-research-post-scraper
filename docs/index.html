@@ -288,6 +288,35 @@
         </select>
       </div>
       <div>
+        <label>Contract</label>
+        <select id="filter-contract">
+          <option value="">Any</option>
+          <option value="le6">6 months or less</option>
+          <option value="6-12">6–12 months</option>
+          <option value="12-24">12–24 months</option>
+          <option value="gt24">More than 24 months</option>
+          <option value="unknown">Unknown</option>
+        </select>
+      </div>
+      <div>
+        <label>Place</label>
+        <select id="filter-place">
+          <option value="">Any</option>
+          <option value="Hong Kong">Hong Kong</option>
+          <option value="Guangzhou">Guangzhou</option>
+          <option value="unknown">Unknown</option>
+        </select>
+      </div>
+      <div>
+        <label>Deadline</label>
+        <select id="filter-deadline">
+          <option value="">Any</option>
+          <option value="has">Has a closing date</option>
+          <option value="soon">Closing within 30 days</option>
+          <option value="none">No hard deadline</option>
+        </select>
+      </div>
+      <div>
         <label>Sort by</label>
         <select id="sort-by">
           <option value="close_date">Closing date</option>
@@ -503,6 +532,12 @@
             return false;
           }
         }
+        const contract = document.getElementById("filter-contract").value;
+        if (contract && !contractMatches(p, contract)) return false;
+        const place = document.getElementById("filter-place").value;
+        if (place && postPlace(p) !== place) return false;
+        const deadline = document.getElementById("filter-deadline").value;
+        if (deadline && !deadlineMatches(p, deadline)) return false;
         if (selectedDomains.size) {
           const ds = new Set(p.domains || []);
           let hit = false;
@@ -585,7 +620,7 @@
             </div>
             <div class="tags">${metaTags}${domainTags}</div>
             ${summaryHtml(p.summary)}
-            <div class="card-footer">${dateFooter(p)}</div>
+            <div class="card-footer">${dateFooter(p)}${contractFooter(p)}</div>
           </article>
         `;
       }).join("");
@@ -623,6 +658,54 @@
       return `${text}${stale}${note}`;
     }
 
+    function postPlace(p) {
+      if (!p.source) return "unknown";
+      return p.source === "HKUST-GZ" ? "Guangzhou" : "Hong Kong";
+    }
+
+    function contractSpan(p) {
+      const low = Number.isFinite(p.contract_months) ? p.contract_months : null;
+      const high = Number.isFinite(p.contract_months_max) ? p.contract_months_max : null;
+      if (low == null && high == null) return null;
+      const lo = low == null ? high : low;
+      const hi = high == null ? low : high;
+      return { lo, hi };
+    }
+
+    function contractMatches(p, bucket) {
+      const span = contractSpan(p);
+      if (!span) return bucket === "unknown";
+      if (bucket === "unknown") return false;
+      const { lo, hi } = span;
+      if (bucket === "le6") return hi <= 6;
+      if (bucket === "6-12") return lo <= 12 && hi > 6;
+      if (bucket === "12-24") return lo <= 24 && hi > 12;
+      if (bucket === "gt24") return hi > 24;
+      return true;
+    }
+
+    function contractFooter(p) {
+      const span = contractSpan(p);
+      if (!span) return "";
+      const { lo, hi } = span;
+      const length = lo === hi ? `${lo} months` : `${lo}–${hi} months`;
+      const renew = p.contract_renewable ? ", renewable" : "";
+      return ` · Contract: ${length}${renew}`;
+    }
+
+    function deadlineMatches(p, mode) {
+      const hard = (p.date_type || "") === "deadline" && !!p.close_date;
+      if (mode === "has") return hard;
+      if (mode === "none") return !hard;
+      if (mode === "soon") {
+        if (!hard) return false;
+        const end = new Date(`${p.close_date}T00:00:00`);
+        const days = (end - new Date()) / 86400000;
+        return days >= 0 && days <= 30;
+      }
+      return true;
+    }
+
     function degreeLabel(p) {
       const md = p.min_degree;
       if (md && md !== "unspecified") {
@@ -655,7 +738,7 @@
       render();
     }
 
-    ["filter-source", "filter-work", "filter-held", "filter-requires", "sort-by"]
+    ["filter-source", "filter-work", "filter-held", "filter-requires", "filter-contract", "filter-place", "filter-deadline", "sort-by"]
       .forEach((id) => {
         document.getElementById(id).addEventListener("change", resetPageAndRender);
       });
