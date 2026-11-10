@@ -35,6 +35,7 @@ from sources.base import (
     listing_counts,
     set_listing_hash_path,
 )
+from contract import attach_contract
 from summary import fact_summary, salvage_summary, summarize as build_summary, summary_needs_repair
 from taxonomy import enrich_classification
 
@@ -229,6 +230,7 @@ def backfill_posts(posts: Dict[str, dict]) -> None:
                 date_type=post.get("date_type") or "",
             )
         enrich_classification(post)
+        attach_contract(post)
 
 
 # ==================================================================

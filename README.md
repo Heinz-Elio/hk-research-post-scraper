@@ -32,6 +32,7 @@ After Pages is on, the site is typically:
 | Domain tags | Controlled tags (AI/ML, CS, health, …). SPSS, "research materials", and bioinformatics are not tagged as computer science |
 | Summaries | Short extractive lines (dept, role, requirements, terms, date, contact). A local model is optional and off |
 | Dates | Hard deadlines expire; a review-start or "open until filled" post stays active while it is listed |
+| Browse filters | Optional: work type, degree, contract length, Hong Kong vs Guangzhou, and closing within 30 days. All default to off |
 | Storage | `research_posts.json` (active), `outdated_posts.json` |
 | Embeddings | Quantized vectors in `docs/embeddings.json` (not in the listing JSON) |
 | Semantic search | Pages: MiniLM in the browser; CLI: `python main.py --search "..."` |
