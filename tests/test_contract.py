@@ -39,6 +39,22 @@ def test_lengths_from_real_appointment_lines():
     assert (wide["contract_months"], wide["contract_months_max"]) == (12, 36)
 
 
+def test_hyphenated_number_words_are_one_number():
+    # PolyU_260925022 and PolyU_261026012: "each for twenty-four months"
+    # used to be read as a range from 4 to 20.
+    single = parse_contract("each for twenty-four months")
+    assert (single["contract_months"], single["contract_months_max"]) == (24, 24)
+    spaced = parse_contract("each for twenty four months")
+    assert (spaced["contract_months"], spaced["contract_months_max"]) == (24, 24)
+    ranged = parse_contract("twelve to twenty-four months")
+    assert (ranged["contract_months"], ranged["contract_months_max"]) == (12, 24)
+    longer = parse_contract("twenty-four to forty-eight months")
+    assert (longer["contract_months"], longer["contract_months_max"]) == (24, 48)
+    assert parse_contract("thirty-six months")["contract_months"] == 36
+    assert contract_overlaps(single, "12-24")
+    assert not contract_overlaps(single, "le6")
+
+
 def test_salary_and_experience_are_not_a_contract():
     blank = parse_contract("Negotiable based on qualifications and experience.")
     assert blank["contract_months"] is None

@@ -57,6 +57,50 @@ _SINGLE = re.compile(
     rf"(?P<a>{_NUM})\s*-?\s*(?P<u>{_UNIT})",
     re.I,
 )
+_TENS = {
+    "twenty": 20,
+    "thirty": 30,
+    "forty": 40,
+    "fifty": 50,
+    "sixty": 60,
+    "seventy": 70,
+    "eighty": 80,
+    "ninety": 90,
+}
+_ONES = {
+    "one": 1,
+    "two": 2,
+    "three": 3,
+    "four": 4,
+    "five": 5,
+    "six": 6,
+    "seven": 7,
+    "eight": 8,
+    "nine": 9,
+}
+
+
+def _normalize_compounds(text: str) -> str:
+    """Turn 'twenty-four' and 'twenty four' into 24 before range matching.
+
+    The hyphen in a compound is not a range. 'twelve to twenty-four' stays a
+    range because 'to' is the separator and the compound is already one number.
+    """
+
+    def replace(match: re.Match) -> str:
+        tens = _TENS[match.group(1).lower()]
+        ones = _ONES[match.group(2).lower()] if match.group(2) else 0
+        return str(tens + ones)
+
+    return re.sub(
+        r"\b(twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety)"
+        r"(?:[-\s]+(one|two|three|four|five|six|seven|eight|nine))?\b",
+        replace,
+        text,
+        flags=re.I,
+    )
+
+
 _RENEW = re.compile(
     r"\brenewable\b|possibility of renewal|possibility of further appointment|"
     r"with the possibility of renewal|further appointment",
@@ -107,7 +151,7 @@ def _appointment_text(title: str = "", summary: str = "", content: str = "") -> 
 
 def parse_contract(text: str) -> dict:
     """Return contract_months, contract_months_max, and contract_renewable."""
-    raw = re.sub(r"\s+", " ", text or "").strip()
+    raw = _normalize_compounds(re.sub(r"\s+", " ", text or "").strip())
     renewable = bool(_RENEW.search(raw)) if raw else None
     if renewable is False:
         renewable = None
