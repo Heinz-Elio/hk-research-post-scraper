@@ -89,7 +89,7 @@
       align-items: center;
     }
 
-    label { font-size: 0.8rem; color: var(--muted); margin-right: 0.25rem; }
+    label, #domains-label { font-size: 0.8rem; color: var(--muted); margin-right: 0.25rem; }
 
     select, input[type="search"] {
       padding: 0.35rem 0.6rem;
@@ -171,6 +171,35 @@
       background: #fef3c7;
       color: #92400e;
       margin-left: 0.35rem;
+    }
+    .badge-new {
+      background: #dcfce7;
+      color: #166534;
+    }
+    .card-actions {
+      display: flex;
+      gap: 0.4rem;
+      margin-top: 0.55rem;
+    }
+    .card-actions button {
+      font: inherit;
+      font-size: 0.78rem;
+      border: 1px solid var(--border);
+      background: #fff;
+      border-radius: 999px;
+      padding: 0.2rem 0.65rem;
+      cursor: pointer;
+    }
+    .card-actions button.on {
+      background: var(--chip-on);
+      color: #fff;
+      border-color: var(--chip-on);
+    }
+    .search-status {
+      font-size: 0.78rem;
+      color: var(--muted);
+      min-height: 1.1rem;
+      margin-top: 0.3rem;
     }
     .date-note {
       display: block;
@@ -254,22 +283,23 @@
   <section class="filters">
     <div class="filter-row">
       <div>
-        <label>Source</label>
+        <label for="filter-source">Source</label>
         <select id="filter-source">
           <option value="">All</option>
         </select>
       </div>
       <div>
-        <label>Work type</label>
+        <label for="filter-work">Work type</label>
         <select id="filter-work">
           <option value="">All</option>
           <option value="Full-time">Full-time</option>
           <option value="Part-time">Part-time</option>
           <option value="Full-time/Part-time">Full-time/Part-time</option>
+          <option value="unspecified">Unspecified</option>
         </select>
       </div>
       <div>
-        <label>I hold</label>
+        <label for="filter-held">I hold</label>
         <select id="filter-held">
           <option value="">Any</option>
           <option value="1">Bachelor</option>
@@ -278,7 +308,7 @@
         </select>
       </div>
       <div>
-        <label>Post requires</label>
+        <label for="filter-requires">Post requires</label>
         <select id="filter-requires">
           <option value="">All</option>
           <option value="bachelor">Bachelor</option>
@@ -288,7 +318,7 @@
         </select>
       </div>
       <div>
-        <label>Contract</label>
+        <label for="filter-contract">Contract</label>
         <select id="filter-contract">
           <option value="">Any</option>
           <option value="le6">6 months or less</option>
@@ -299,7 +329,7 @@
         </select>
       </div>
       <div>
-        <label>Place</label>
+        <label for="filter-place">Place</label>
         <select id="filter-place">
           <option value="">Any</option>
           <option value="Hong Kong">Hong Kong</option>
@@ -308,7 +338,7 @@
         </select>
       </div>
       <div>
-        <label>Deadline</label>
+        <label for="filter-deadline">Deadline</label>
         <select id="filter-deadline">
           <option value="">Any</option>
           <option value="has">Has a closing date</option>
@@ -317,9 +347,9 @@
         </select>
       </div>
       <div>
-        <label>Sort by</label>
+        <label for="sort-by">Sort by</label>
         <select id="sort-by">
-          <option value="close_date">Closing date</option>
+          <option value="close_date">Upcoming first</option>
           <option value="scraped_at">Newest scraped</option>
           <option value="title">Title</option>
           <option value="relevance">Relevance</option>
@@ -327,11 +357,27 @@
       </div>
     </div>
     <div class="filter-row">
-      <input type="search" id="search" placeholder="Search by meaning, title, domain, or summary..." />
+      <div>
+        <label for="search">Search</label>
+        <input type="search" id="search" placeholder="Search by meaning, title, domain, or summary..." />
+        <div class="search-status" id="search-status" aria-live="polite"></div>
+      </div>
+      <div>
+        <label for="filter-shortlist">
+          <input type="checkbox" id="filter-shortlist" />
+          Shortlisted only
+        </label>
+      </div>
+      <div>
+        <label for="filter-hide-applied">
+          <input type="checkbox" id="filter-hide-applied" />
+          Hide applied
+        </label>
+      </div>
     </div>
     <div>
-      <label>Domains</label>
-      <div class="chip-row" id="domain-chips"></div>
+      <span id="domains-label">Domains</span>
+      <div class="chip-row" id="domain-chips" role="group" aria-labelledby="domains-label"></div>
     </div>
   </section>
 
@@ -376,7 +422,41 @@
     let lastQuery = "";
     let embedder = null;
     let semanticReady = false;
+    let semanticStarted = false;
     let searchTimer = null;
+    const STORE_SEEN = "hkrps-seen-scraped-at";
+    const STORE_SHORT = "hkrps-shortlist";
+    const STORE_APPLIED = "hkrps-applied";
+
+    function readJson(key, fallback) {
+      try {
+        const raw = localStorage.getItem(key);
+        return raw == null ? fallback : JSON.parse(raw);
+      } catch (err) {
+        return fallback;
+      }
+    }
+
+    let seenBefore = "";
+    try { seenBefore = localStorage.getItem(STORE_SEEN) || ""; } catch (err) { seenBefore = ""; }
+    const shortlist = new Set(Array.isArray(readJson(STORE_SHORT, [])) ? readJson(STORE_SHORT, []) : []);
+    const applied = new Set(Array.isArray(readJson(STORE_APPLIED, [])) ? readJson(STORE_APPLIED, []) : []);
+
+    function saveSets() {
+      try {
+        localStorage.setItem(STORE_SHORT, JSON.stringify([...shortlist]));
+        localStorage.setItem(STORE_APPLIED, JSON.stringify([...applied]));
+      } catch (err) { /* private mode */ }
+    }
+
+    function rememberVisit(posts) {
+      let newest = "";
+      posts.forEach((p) => {
+        if (p.scraped_at && p.scraped_at > newest) newest = p.scraped_at;
+      });
+      if (!newest) return;
+      try { localStorage.setItem(STORE_SEEN, newest); } catch (err) { /* private mode */ }
+    }
 
     function degreeRank(post) {
       if (typeof post.degree_rank === "number") return post.degree_rank;
@@ -414,6 +494,141 @@
       if (!parts.length) return 0;
       const hits = parts.filter((w) => hay.includes(w)).length;
       return hits / parts.length;
+    }
+
+    /* BROWSE_PURE_START */
+    function todayISO(now) {
+      const d = now || new Date();
+      const z = (n) => String(n).padStart(2, "0");
+      return `${d.getFullYear()}-${z(d.getMonth() + 1)}-${z(d.getDate())}`;
+    }
+
+    function isUpcoming(post, today) {
+      const close = post.close_date || "";
+      if (!close || close < today) return false;
+      const kind = post.date_type || "";
+      if (kind === "deadline" || kind === "review_start") return true;
+      if (!kind) return true;
+      return false;
+    }
+
+    function sortPosts(list, sortBy, today) {
+      const copy = list.slice();
+      const day = today || todayISO();
+      copy.sort((a, b) => {
+        if (sortBy === "title") return (a.title || "").localeCompare(b.title || "");
+        if (sortBy === "scraped_at") return (b.scraped_at || "").localeCompare(a.scraped_at || "");
+        const pa = isUpcoming(a, day);
+        const pb = isUpcoming(b, day);
+        if (pa !== pb) return pa ? -1 : 1;
+        if (pa) return (a.close_date || "").localeCompare(b.close_date || "");
+        return (b.scraped_at || "").localeCompare(a.scraped_at || "");
+      });
+      return copy;
+    }
+
+    function workMatches(post, work) {
+      const value = post.work_type || "";
+      if (!work) return true;
+      if (work === "unspecified") return !value;
+      if (work === "Full-time") return value === "Full-time" || value === "Full-time/Part-time";
+      return value === work;
+    }
+
+    function encodeBrowseState(state) {
+      const params = new URLSearchParams();
+      const put = (key, value) => { if (value) params.set(key, value); };
+      put("src", state.src);
+      put("work", state.work);
+      put("held", state.held);
+      put("req", state.req);
+      put("contract", state.contract);
+      put("place", state.place);
+      put("deadline", state.deadline);
+      if (state.sort && state.sort !== "close_date") params.set("sort", state.sort);
+      put("q", state.q);
+      if (state.page && Number(state.page) > 1) params.set("page", String(state.page));
+      if (state.domains && state.domains.length) params.set("domains", state.domains.join(","));
+      if (state.short) params.set("short", "1");
+      if (state.hideApplied) params.set("hideApplied", "1");
+      const qs = params.toString();
+      return qs ? `?${qs}` : "";
+    }
+
+    function decodeBrowseState(search) {
+      const raw = String(search || "");
+      const params = new URLSearchParams(raw.startsWith("?") ? raw.slice(1) : raw);
+      const page = Number(params.get("page") || "1");
+      return {
+        src: params.get("src") || "",
+        work: params.get("work") || "",
+        held: params.get("held") || "",
+        req: params.get("req") || "",
+        contract: params.get("contract") || "",
+        place: params.get("place") || "",
+        deadline: params.get("deadline") || "",
+        sort: params.get("sort") || "close_date",
+        sortSet: params.has("sort"),
+        q: params.get("q") || "",
+        page: Number.isFinite(page) && page > 0 ? page : 1,
+        domains: (params.get("domains") || "").split(",").filter(Boolean),
+        short: params.get("short") === "1",
+        hideApplied: params.get("hideApplied") === "1",
+      };
+    }
+    /* BROWSE_PURE_END */
+
+    function currentBrowseState() {
+      return {
+        src: document.getElementById("filter-source").value,
+        work: document.getElementById("filter-work").value,
+        held: document.getElementById("filter-held").value,
+        req: document.getElementById("filter-requires").value,
+        contract: document.getElementById("filter-contract").value,
+        place: document.getElementById("filter-place").value,
+        deadline: document.getElementById("filter-deadline").value,
+        sort: document.getElementById("sort-by").value,
+        q: document.getElementById("search").value.trim(),
+        page: currentPage,
+        domains: [...selectedDomains].sort(),
+        short: document.getElementById("filter-shortlist").checked,
+        hideApplied: document.getElementById("filter-hide-applied").checked,
+      };
+    }
+
+    function writeBrowseUrl() {
+      const next = `${location.pathname}${encodeBrowseState(currentBrowseState())}`;
+      if (`${location.pathname}${location.search}` !== next) {
+        history.replaceState(null, "", next);
+      }
+    }
+
+    function setSelect(id, value) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const ok = [...el.options].some((opt) => opt.value === value);
+      el.value = ok ? value : (el.options[0] ? el.options[0].value : "");
+    }
+
+    function applyBrowseState(state) {
+      setSelect("filter-source", state.src);
+      setSelect("filter-work", state.work);
+      setSelect("filter-held", state.held);
+      setSelect("filter-requires", state.req);
+      setSelect("filter-contract", state.contract);
+      setSelect("filter-place", state.place);
+      setSelect("filter-deadline", state.deadline);
+      setSelect("sort-by", state.sort || "close_date");
+      document.getElementById("search").value = state.q || "";
+      document.getElementById("filter-shortlist").checked = !!state.short;
+      document.getElementById("filter-hide-applied").checked = !!state.hideApplied;
+      selectedDomains.clear();
+      (state.domains || []).forEach((id) => selectedDomains.add(id));
+      document.querySelectorAll("#domain-chips .chip").forEach((btn) => {
+        btn.classList.toggle("on", selectedDomains.has(btn.dataset.domain));
+      });
+      if (state.sortSet) document.getElementById("sort-by").dataset.user = "1";
+      currentPage = state.page || 1;
     }
 
     async function loadData() {
@@ -461,8 +676,10 @@
         document.getElementById("last-updated").textContent =
           latest ? `Last scraped: ${latest.replace("T", " ").slice(0, 16)}` : "No data yet";
 
+        applyBrowseState(decodeBrowseState(location.search));
         render();
-        initSemantic();
+        rememberVisit(allPosts);
+        if (document.getElementById("search").value.trim()) startSemantic();
       } catch (err) {
         document.getElementById("results-info").textContent =
           "Could not load posts. Make sure research_posts.json exists on the main branch.";
@@ -470,8 +687,15 @@
       }
     }
 
+    function startSemantic() {
+      if (semanticStarted) return;
+      semanticStarted = true;
+      document.getElementById("search-status").textContent = "Loading semantic search…";
+      initSemantic();
+    }
+
     async function initSemantic() {
-      const info = document.getElementById("last-updated");
+      const status = document.getElementById("search-status");
       try {
         const res = await fetch(EMBED_URL);
         if (!res.ok) throw new Error("no embeddings");
@@ -479,18 +703,19 @@
         embedItems = data.items || data;
         if (!Object.keys(embedItems).length) throw new Error("empty embeddings");
 
+        status.textContent = "Loading semantic model…";
         const { pipeline, env } = await import("https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2");
         env.allowLocalModels = false;
         embedder = await pipeline("feature-extraction", "Xenova/all-MiniLM-L6-v2");
         semanticReady = true;
-        info.textContent += " · Semantic search ready";
+        status.textContent = "Semantic search ready";
         if (document.getElementById("search").value.trim()) {
           await updateQueryVector();
           render();
         }
       } catch (err) {
         semanticReady = false;
-        info.textContent += " · Keyword search";
+        status.textContent = "Keyword search only";
         console.info("Semantic search unavailable", err);
       }
     }
@@ -518,7 +743,9 @@
 
       let list = allPosts.filter((p) => {
         if (source && p.source !== source) return false;
-        if (work && p.work_type !== work) return false;
+        if (!workMatches(p, work)) return false;
+        if (document.getElementById("filter-shortlist").checked && !shortlist.has(p.id)) return false;
+        if (document.getElementById("filter-hide-applied").checked && applied.has(p.id)) return false;
         if (heldRank) {
           const rank = degreeRank(p);
           if (rank > heldRank) return false;
@@ -561,22 +788,10 @@
           .sort((a, b) => b.score - a.score)
           .map((x) => x.post);
       } else {
-        list = sortList(list, sortBy === "relevance" ? "close_date" : sortBy);
+        list = sortPosts(list, sortBy === "relevance" ? "close_date" : sortBy);
       }
 
       return list;
-    }
-
-    function sortList(list, sortBy) {
-      const copy = list.slice();
-      copy.sort((a, b) => {
-        if (sortBy === "title") return (a.title || "").localeCompare(b.title || "");
-        if (sortBy === "scraped_at") return (b.scraped_at || "").localeCompare(a.scraped_at || "");
-        const da = a.close_date || "9999-12-31";
-        const db = b.close_date || "9999-12-31";
-        return da.localeCompare(db);
-      });
-      return copy;
     }
 
     function render() {
@@ -596,6 +811,7 @@
       document.getElementById("page-info").textContent = `Page ${currentPage} of ${totalPages}`;
       document.getElementById("prev-page").disabled = currentPage <= 1;
       document.getElementById("next-page").disabled = currentPage >= totalPages;
+      writeBrowseUrl();
 
       if (pagePosts.length === 0) {
         container.innerHTML = `<div class="empty">No matching posts</div>`;
@@ -603,10 +819,15 @@
       }
 
       container.innerHTML = pagePosts.map((p) => {
+        const fresh = seenBefore && p.scraped_at && p.scraped_at > seenBefore
+          ? `<span class="tag badge-new">New</span>`
+          : "";
         const metaTags = [p.id, p.source, p.work_type, degreeLabel(p), p.department]
           .filter(Boolean)
           .map((t) => `<span class="tag">${escapeHtml(t)}</span>`)
-          .join("");
+          .join("") + fresh;
+        const shortOn = shortlist.has(p.id);
+        const appliedOn = applied.has(p.id);
         const domainTags = (p.domains || [])
           .map((id) => `<button type="button" class="tag" data-domain="${escapeHtml(id)}">${escapeHtml(domainLabel(id))}</button>`)
           .join("");
@@ -621,9 +842,24 @@
             <div class="tags">${metaTags}${domainTags}</div>
             ${summaryHtml(p.summary)}
             <div class="card-footer">${dateFooter(p)}${contractFooter(p)}</div>
+            <div class="card-actions">
+              <button type="button" class="pin${shortOn ? " on" : ""}" data-act="short" data-id="${escapeHtml(p.id || "")}">${shortOn ? "Shortlisted" : "Shortlist"}</button>
+              <button type="button" class="pin${appliedOn ? " on" : ""}" data-act="applied" data-id="${escapeHtml(p.id || "")}">${appliedOn ? "Applied" : "Mark applied"}</button>
+            </div>
           </article>
         `;
       }).join("");
+
+      container.querySelectorAll("button.pin").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const id = btn.getAttribute("data-id");
+          const set = btn.getAttribute("data-act") === "short" ? shortlist : applied;
+          if (set.has(id)) set.delete(id);
+          else set.add(id);
+          saveSets();
+          render();
+        });
+      });
 
       container.querySelectorAll("button.tag[data-domain]").forEach((btn) => {
         btn.addEventListener("click", () => {
@@ -738,7 +974,7 @@
       render();
     }
 
-    ["filter-source", "filter-work", "filter-held", "filter-requires", "filter-contract", "filter-place", "filter-deadline", "sort-by"]
+    ["filter-source", "filter-work", "filter-held", "filter-requires", "filter-contract", "filter-place", "filter-deadline", "sort-by", "filter-shortlist", "filter-hide-applied"]
       .forEach((id) => {
         document.getElementById(id).addEventListener("change", resetPageAndRender);
       });
@@ -753,6 +989,7 @@
       if (!sort.dataset.user) {
         sort.value = q ? "relevance" : "close_date";
       }
+      if (q) startSemantic();
       clearTimeout(searchTimer);
       searchTimer = setTimeout(async () => {
         await updateQueryVector();

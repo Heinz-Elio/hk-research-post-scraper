@@ -461,9 +461,10 @@ def domain_label(domain_id: str) -> str:
 
 
 def extract_work_type(title: str, text: str = "") -> Optional[str]:
+    """Read an explicit full-time or part-time phrase. Never guess from the job title."""
     combined = f"{title} {text}".lower()
-    has_full = bool(re.search(r"\bfull[-\s]?time\b", combined))
-    has_part = bool(re.search(r"\bpart[-\s]?time\b", combined))
+    has_full = bool(re.search(r"\bfull[-\s]?time\b|全職|全职", combined))
+    has_part = bool(re.search(r"\bpart[-\s]?time\b|兼職|兼职", combined))
     has_fractional = bool(re.search(r"\bfractional\b", combined))
     has_hourly = bool(re.search(r"\bhourly[-\s]?paid\b", combined))
     if has_full and has_part:
