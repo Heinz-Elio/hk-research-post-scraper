@@ -100,7 +100,7 @@ pip install sentence-transformers numpy
 
 Set `USE_EMBEDDINGS = True` in `main.py` before a scrape that should write new vectors. Existing float embeddings are migrated into `docs/embeddings.json` with `--migrate-only` (no model required).
 
-The Pages UI loads `Xenova/all-MiniLM-L6-v2` in the browser to embed the query.
+The Pages UI embeds a query with `Xenova/all-MiniLM-L6-v2` only after the first search. Until that model loads, search is keyword-only. The default browse order lists future deadlines and future review-start dates first, then open-ended posts by newest scrape.
 
 ## Config (`main.py`)
 
