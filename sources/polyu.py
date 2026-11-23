@@ -11,6 +11,7 @@ from sources.base import (
     job_content,
     make_post,
     note_counts,
+    note_detail,
     parse_date,
     prepare_posts,
     safe_text,
@@ -27,10 +28,13 @@ def scrape() -> List[dict]:
     posts: List[dict] = []
     soup = fetch(url)
     if not soup:
-        note_counts(KEY, 0, 0)
+        note_counts(KEY, 0, None, state="failed", reason="listing unavailable")
         return posts
 
     rows_on_page = soup.select("tr.ITS_clickableTableRow")
+    if not rows_on_page:
+        note_counts(KEY, 0, None, state="failed", reason="no research rows; could not verify listing")
+        return posts
     jobs = []
     for row in rows_on_page:
         tds = row.select("td")
@@ -69,6 +73,7 @@ def scrape() -> List[dict]:
         detail = fetch(detail_url)
         body = job_content(detail)
         body = re.sub(r"\nApply Now\s*Posting date:.*\Z", "", body, flags=re.S).strip()
+        note_detail(KEY, body)
         content = f"Department: {dept}\nProject Title: {project}\n\n{body}".strip()
 
         posts.append(

@@ -13,6 +13,7 @@ from urllib.parse import quote
 
 from sources.base import (
     REQUEST_DELAY,
+    CountedListing,
     ListingUnchanged,
     api_request,
     finish_listing,
@@ -20,6 +21,7 @@ from sources.base import (
     is_research_related,
     make_post,
     note_counts,
+    note_detail,
     parse_date,
     prepare_posts,
     same_listing,
@@ -95,38 +97,25 @@ def _closing_date(api_value: Optional[str], description: str) -> Optional[str]:
     return parse_date(match.group(1))
 
 
-def _load_requisitions() -> Optional[List[dict]]:
-    collected: List[dict] = []
+def _load_requisitions() -> List[dict]:
+    listing = CountedListing("Id")
     offset = 0
-    total = None
     while offset < 5000:
         data = api_request("GET", _list_url(offset))
-        items = (data or {}).get("items") if isinstance(data, dict) else None
-        if not items:
-            return None if offset == 0 else collected
-        block = items[0] if isinstance(items[0], dict) else {}
-        rows = block.get("requisitionList") or []
-        if not isinstance(rows, list):
-            return None if offset == 0 else collected
-        try:
-            total = int(block.get("TotalJobsCount") or 0)
-        except (TypeError, ValueError):
-            total = 0
-        collected.extend(row for row in rows if isinstance(row, dict))
-        if not rows or len(collected) >= total:
-            break
-        offset += len(rows)
+        items = data.get("items") if isinstance(data, dict) else None
+        if not isinstance(items, list) or not items or not isinstance(items[0], dict):
+            listing.fail(f"offset {offset}: Oracle listing unavailable or invalid")
+        block = items[0]
+        if listing.add_page(block.get("requisitionList"), block.get("TotalJobsCount"), f"offset {offset}"):
+            return listing.rows
+        offset = len(listing.rows)
         time.sleep(REQUEST_DELAY)
-    return collected
+    listing.fail(f"Oracle pagination limit reached (offset {offset})")
 
 
 def scrape() -> List[dict]:
     posts: List[dict] = []
     rows = _load_requisitions()
-    if rows is None:
-        print("  [HKBU] Oracle job search returned no data")
-        note_counts(KEY, 0, 0)
-        return posts
 
     chosen = []
     for row in rows:
@@ -154,7 +143,9 @@ def scrape() -> List[dict]:
         if items and isinstance(items[0], dict):
             item = items[0]
         html = item.get("ExternalDescriptionStr") or ""
-        body = html_to_text(html) or short
+        body = html_to_text(html)
+        note_detail(KEY, body)
+        body = body or short
         if not dept:
             dept = _department(item.get("Title") or title, item.get("ShortDescriptionStr") or short)
         content = f"Department: {dept}\n\n{body}".strip() if dept else body

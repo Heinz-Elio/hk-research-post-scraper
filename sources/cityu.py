@@ -12,6 +12,7 @@ from sources.base import (
     job_content,
     make_post,
     note_counts,
+    note_detail,
     parse_date,
     prepare_posts,
     safe_text,
@@ -28,12 +29,12 @@ def scrape() -> List[dict]:
     posts: List[dict] = []
     soup = fetch(url)
     if not soup:
-        note_counts(KEY, 0, 0)
+        note_counts(KEY, 0, None, state="failed", reason="listing unavailable")
         return posts
 
     table = soup.find("table", id="MainContent_gvJobResearch")
     if not table:
-        note_counts(KEY, 0, 0)
+        note_counts(KEY, 0, None, state="failed", reason="research results table missing")
         return posts
 
     data_rows = table.find_all("tr")[1:]
@@ -68,6 +69,7 @@ def scrape() -> List[dict]:
         time.sleep(REQUEST_DELAY)
         detail = fetch(detail_url)
         body = job_content(detail)
+        note_detail(KEY, body)
         if not body and not warned_blocked:
             print("  [CityU] job description page was blocked; keeping listing fields only")
             warned_blocked = True

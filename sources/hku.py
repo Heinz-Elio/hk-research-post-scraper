@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 
 from sources.base import (
     REQUEST_DELAY,
+    ListingFetchError,
     ListingUnchanged,
     fetch,
     finish_listing,
@@ -13,6 +14,7 @@ from sources.base import (
     job_content,
     make_post,
     note_counts,
+    note_detail,
     parse_date,
     prepare_posts,
     safe_text,
@@ -26,6 +28,7 @@ NAME = "University of Hong Kong"
 # search-results table is read. Page size 500 returns the full board in one
 # response (about 400 rows); a "More Jobs" link is followed if the site caps it.
 _PAGE = "https://jobs.hku.hk/en/listing/?page={page}&page-items=500"
+_MAX_PAGES = 8
 
 
 def _jobs_from_table(soup: BeautifulSoup, base: str) -> Optional[List[tuple]]:
@@ -65,23 +68,17 @@ def scrape() -> List[dict]:
     collected = []
     seen_refs = set()
     listed = 0
+    pages = 0
     page = 1
-    while page <= 8:
+    while True:
         soup = fetch(_PAGE.format(page=page), wait_for="tbody#search-results-content")
-        if not soup:
-            if page == 1:
-                print("  [HKU] listing page was not readable")
-                note_counts(KEY, 0, 0)
-                return posts
-            break
-        jobs = _jobs_from_table(soup, base)
+        jobs = _jobs_from_table(soup, base) if soup else None
         if jobs is None:
-            if page == 1:
-                print("  [HKU] job table not in the listing HTML")
-                note_counts(KEY, 0, 0)
+            reason = f"page {page}: " + ("results table missing" if soup else "listing unavailable")
+            if not pages:
+                note_counts(KEY, 0, None, state="failed", reason=reason)
                 return posts
-            break
-        listed += len(jobs)
+            raise ListingFetchError(reason, pages=pages, listed=listed)
         fresh = []
         for job in jobs:
             ref = job[0] or job[4]
@@ -89,11 +86,20 @@ def scrape() -> List[dict]:
                 continue
             seen_refs.add(ref)
             fresh.append(job)
+        more = soup.select_one("a.more-link")
+        if not fresh and (pages or more):
+            raise ListingFetchError(f"page {page}: no new listing rows", pages=pages, listed=listed)
+        listed += len(jobs)
+        pages += 1
         collected.extend(fresh)
-        more = soup.select_one("a.more-link[data-page]")
-        next_page = int(more.get("data-page") or 0) if more else 0
-        if not fresh or next_page <= page:
+        if not more:
             break
+        raw_next = more.get("data-page", "")
+        next_page = int(raw_next) if raw_next.isascii() and raw_next.isdecimal() else 0
+        if next_page != page + 1:
+            raise ListingFetchError(f"page {page}: invalid next page", pages=pages, listed=listed)
+        if next_page > _MAX_PAGES:
+            raise ListingFetchError(f"page {page}: pagination limit reached", pages=pages, listed=listed)
         page = next_page
         time.sleep(REQUEST_DELAY)
 
@@ -117,6 +123,7 @@ def scrape() -> List[dict]:
         time.sleep(REQUEST_DELAY)
         detail = fetch(detail_url)
         content = job_content(detail)
+        note_detail(KEY, content)
         posts.append(
             make_post(
                 source=KEY,

@@ -30,7 +30,7 @@ After Pages is on, the site is typically:
 | Research grades | Keeps research appointments in any discipline; drops clerks, executive officers, admissions, HR, and finance |
 | Min degree | Lowest stated requirement; UI **I hold** hides posts above your level |
 | Domain tags | Controlled tags (AI/ML, CS, health, …). SPSS, "research materials", and bioinformatics are not tagged as computer science |
-| Summaries | Short extractive lines (dept, role, requirements, terms, date, contact). A local model is optional and off |
+| Summaries | Short extractive lines (dept, role, requirements, terms, date). For contact details, follow the original job link |
 | Dates | Hard deadlines expire; a review-start or "open until filled" post stays active while it is listed |
 | Browse filters | Optional: work type, degree, contract length, Hong Kong vs Guangzhou, and closing within 30 days. All default to off |
 | Storage | `research_posts.json` (active), `outdated_posts.json` |
@@ -98,9 +98,9 @@ Default model: `Qwen/Qwen2.5-1.5B-Instruct` (change in `main.py`).
 pip install sentence-transformers numpy
 ```
 
-Set `USE_EMBEDDINGS = True` in `main.py` before a scrape that should write new vectors. Existing float embeddings are migrated into `docs/embeddings.json` with `--migrate-only` (no model required).
+Set `USE_EMBEDDINGS = True` in `main.py` to write new vectors. To rebuild them without scraping, run `python main.py --migrate-only` with the model installed. Old vectors without the current input version are discarded because their input may have contained contact details.
 
-The Pages UI embeds a query with `Xenova/all-MiniLM-L6-v2` only after the first search. Until that model loads, search is keyword-only. The default browse order lists future deadlines and future review-start dates first, then open-ended posts by newest scrape.
+The Pages UI shows exact-word keyword matches immediately, giving extra weight to titles, projects, and requirements. When `Xenova/all-MiniLM-L6-v2` is ready, search also includes a limited number of sufficiently similar posts. Short terms like `R` and `C++` use literal matches. Changing sort order only reorders the matches; it does not bring back unrelated posts. With no query, the default browse order lists future deadlines and review-start dates first, then open-ended posts by newest scrape.
 
 ## Config (`main.py`)
 
@@ -117,7 +117,7 @@ python main.py                      # all registered sources
 python main.py --sources HKU,PolyU
 python main.py --force              # ignore listing hashes (--ignore-hashes)
 python main.py --dry-run            # scrape into a temp directory; repo JSON is not touched
-python main.py --migrate-only       # re-tag stored posts; split embeddings
+python main.py --migrate-only       # re-tag stored posts; refresh embeddings
 python main.py --search "vision transformer medical imaging"
 ```
 
@@ -130,14 +130,42 @@ run()  # all sources
 results = semantic_search("machine learning research assistant", top_k=5)
 ```
 
+### Fetch status
+
+The CLI prints a `Fetch` status for each source and appends one JSON record per
+source per run to `fetch_status.jsonl` beside `research_posts.json`. The log is
+local (ignored by Git); `--dry-run` and `--data-dir` keep it with those outputs.
+Records include a timestamp, listing counts when available, any failure reason,
+and how many detail requests yielded no description. Zero detail attempts can
+mean details were skipped or the source includes them in its listing.
+
+- `complete`: the adapter verified the listing. A verified but empty result is not used to retire stored jobs.
+- `unchanged`: the verified listing matched its saved hash, so details were skipped.
+- `partial`: some pages were read, but the listing could not be completed.
+- `failed`: no listing page could be verified. `error` indicates an unexpected exception.
+- `unverified`: the plugin did not report validation. `skipped` indicates an unknown source key.
+
+Incomplete listings are discarded; they do not retire jobs based on absence or
+replace a saved hash. The usual deadline expiry still applies. Run with
+`--force` to retry details even if the listing is unchanged.
+
 ## Output shape
+
+The Pages feed includes only listing fields the site uses. Contact lines, email
+addresses, and recognizable phone numbers in summaries are removed from the
+current active and archived files. Older commits are not changed.
+
+**Copy filter link** shares general browse filters in the link fragment. Search
+text, “I hold,” and personal shortlist/application filters are not saved to the
+URL or included in the copied link. General filters stay in the current tab
+session; shortlist and applied marks remain in the browser as before.
 
 ```json
 {
   "id": "HKU_537585",
   "title": "Research Assistant ...",
   "close_date": "2026-12-12",
-  "summary": "- Dept: Department of Computer Science\n- Role focus: ...\n- Requirements: ...\n- Contact: name@hku.hk",
+  "summary": "- Dept: Department of Computer Science\n- Role focus: ...\n- Requirements: ...",
   "date_type": "deadline",
   "possibly_stale": false,
   "work_type": "Full-time",

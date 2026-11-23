@@ -1,9 +1,11 @@
 """HKU lists every job twice and paginates. Read one table and follow pages."""
 
+import json
 from unittest.mock import patch
 
 from bs4 import BeautifulSoup
 
+import main
 from sources.hku import scrape
 
 
@@ -71,3 +73,50 @@ def test_hku_missing_table_does_not_store_a_hash(tmp_path, monkeypatch):
         assert scrape() == []
     finish.assert_not_called()
     assert not (tmp_path / "listing_hashes.json").exists()
+
+
+def test_hku_fetch_history_and_incomplete_listing_preserve_posts(tmp_path, monkeypatch, capsys):
+    monkeypatch.setattr(main, "ACTIVE_FILE", tmp_path / "research_posts.json")
+    monkeypatch.setattr(main, "OUTDATED_FILE", tmp_path / "outdated_posts.json")
+    monkeypatch.setattr(main, "PUBLIC_FILE", tmp_path / "docs" / "research_posts.json")
+    monkeypatch.setattr(main, "EMBED_FILE", tmp_path / "docs" / "embeddings.json")
+    hashes = tmp_path / "listing_hashes.json"
+    monkeypatch.setattr("sources.base._LISTING_HASH_PATH", hashes)
+    pages = {1: PAGE_1.replace("2026-", "2099-"), 2: PAGE_2.replace("2026-", "2099-")}
+    details = []
+
+    def fake_fetch(url, **kwargs):
+        if "/listing/" in url:
+            page = 1 if "page=1" in url else 2
+            return BeautifulSoup(pages[page], "lxml") if page in pages else None
+        details.append(url)
+        if "537776" in url:
+            return None
+        description = "Support sociology research and review relevant publications. " * 4
+        return BeautifulSoup(f'<div id="job-content">{description}</div>', "lxml")
+
+    with patch("sources.hku.fetch", side_effect=fake_fetch), patch("sources.hku.time.sleep"):
+        main.run(sources=["HKU"], generate_embeddings=False)
+        old_hash = hashes.read_text(encoding="utf-8")
+        main.run(sources=["HKU"], generate_embeddings=False)
+        del pages[2]
+        main.run(sources=["HKU"], generate_embeddings=False)
+        del pages[1]
+        main.run(sources=["HKU"], generate_embeddings=False)
+
+    records = [
+        json.loads(line)
+        for line in (tmp_path / "fetch_status.jsonl").read_text(encoding="utf-8").splitlines()
+    ]
+    assert [record["state"] for record in records] == ["complete", "unchanged", "partial", "failed"]
+    assert all(record["source"] == "HKU" and record["run_started_at"] for record in records)
+    assert records[0]["detail_attempts"] == 2
+    assert records[0]["detail_missing"] == 1
+    assert records[1]["detail_attempts"] == 0
+    assert records[2]["pages_read"] == 1
+    assert records[2]["reason"] == "page 2: listing unavailable"
+    assert len(details) == 2
+    assert "HKU_537776" in main.load_json(main.PUBLIC_FILE)
+    assert "HKU_537776" not in main.load_json(main.OUTDATED_FILE)
+    assert hashes.read_text(encoding="utf-8") == old_hash
+    assert "HKU        partial" in capsys.readouterr().out

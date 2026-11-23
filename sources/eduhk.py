@@ -32,13 +32,12 @@ def scrape() -> List[dict]:
     posts: List[dict] = []
     soup = fetch(url)
     if not soup:
-        note_counts(KEY, 0, 0)
+        note_counts(KEY, 0, None, state="failed", reason="listing unavailable")
         return posts
 
     items = soup.select("div.job__item")
     if not items:
-        print("  [EdUHK] no div.job__item on the listing page")
-        note_counts(KEY, 0, 0)
+        note_counts(KEY, 0, None, state="failed", reason="no job cards; could not verify listing")
         return posts
 
     seen = set()

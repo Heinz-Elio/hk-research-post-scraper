@@ -14,7 +14,7 @@ import time
 from typing import List, Optional
 from urllib.parse import quote, unquote
 
-from sources.base import REQUEST_DELAY, api_request, html_to_text
+from sources.base import REQUEST_DELAY, CountedListing, api_request, html_to_text
 
 _MAX_PAGES = 40
 
@@ -49,32 +49,25 @@ def detail_url(host: str, section: str, contest_no: str, lang: str = "en") -> st
 def search_jobs(host: str, portal: str, lang: str = "en") -> Optional[List[dict]]:
     """Every requisition row, paging until ``totalCount`` is reached.
 
-    Returns None when the first page cannot be read.
+    Returns None when the first request returns no response.
     """
     url = search_url(host, portal, lang=lang)
     headers = {"Content-Type": "application/json", "tz": "GMT+08:00"}
-    collected: List[dict] = []
-    total = None
+    listing = CountedListing("contestNo")
     for page in range(1, _MAX_PAGES + 1):
         body = dict(_SEARCH_BODY)
         body["pageNo"] = page
         data = api_request("POST", url, json_body=body, extra_headers=headers)
+        if data is None and page == 1:
+            return None
         if not isinstance(data, dict):
-            return None if page == 1 else collected
-        rows = data.get("requisitionList") or []
-        if not isinstance(rows, list):
-            return None if page == 1 else collected
-        paging = data.get("pagingData") or {}
-        if total is None:
-            try:
-                total = int(paging.get("totalCount") or 0)
-            except (TypeError, ValueError):
-                total = 0
-        collected.extend(row for row in rows if isinstance(row, dict))
-        if not rows or (total is not None and len(collected) >= total):
-            break
+            listing.fail(f"page {page}: Taleo listing unavailable or invalid")
+        paging = data.get("pagingData")
+        total = paging.get("totalCount") if isinstance(paging, dict) else None
+        if listing.add_page(data.get("requisitionList"), total, f"page {page}"):
+            return listing.rows
         time.sleep(REQUEST_DELAY)
-    return collected
+    listing.fail(f"Taleo pagination limit reached ({_MAX_PAGES} pages)")
 
 
 def _unescape(value: str) -> str:

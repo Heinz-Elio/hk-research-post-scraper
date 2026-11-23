@@ -12,6 +12,7 @@ from sources.base import (
     job_content,
     make_post,
     note_counts,
+    note_detail,
     parse_date,
     prepare_posts,
     same_listing,
@@ -59,13 +60,12 @@ def scrape() -> List[dict]:
     posts: List[dict] = []
     soup = fetch(list_url)
     if not soup:
-        note_counts(KEY, 0, 0)
+        note_counts(KEY, 0, None, state="failed", reason="listing unavailable")
         return posts
 
     cards = soup.select("div.job-card")
     if not cards:
-        print("  [HKUST] no div.job-card on the listing page")
-        note_counts(KEY, 0, 0)
+        note_counts(KEY, 0, None, state="failed", reason="no job cards; could not verify listing")
         return posts
 
     seen = set()
@@ -112,6 +112,7 @@ def scrape() -> List[dict]:
         time.sleep(REQUEST_DELAY)
         detail = fetch(detail_url)
         body = job_content(detail)
+        note_detail(KEY, body)
         content = body or card_text
 
         posts.append(

@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="referrer" content="strict-origin" />
   <title>HK Research Posts</title>
   <style>
     :root {
@@ -359,7 +360,7 @@
     <div class="filter-row">
       <div>
         <label for="search">Search</label>
-        <input type="search" id="search" placeholder="Search by meaning, title, domain, or summary..." />
+        <input type="search" id="search" autocomplete="off" placeholder="Search by meaning, title, domain, or summary..." />
         <div class="search-status" id="search-status" aria-live="polite"></div>
       </div>
       <div>
@@ -373,6 +374,10 @@
           <input type="checkbox" id="filter-hide-applied" />
           Hide applied
         </label>
+      </div>
+      <div>
+        <button class="chip" type="button" id="copy-filter-link" aria-describedby="filter-link-status">Copy filter link</button>
+        <span class="meta" id="filter-link-status" role="status">Excludes search and personal filters.</span>
       </div>
     </div>
     <div>
@@ -391,8 +396,8 @@
   </nav>
 
   <script type="module">
-    const DATA_URL = "./research_posts.json";
-    const EMBED_URL = "./embeddings.json";
+    const DATA_URL = "./research_posts.json?v=2";
+    const EMBED_URL = "./embeddings.json?v=2";
 
     const DOMAIN_LABELS = {
       "ai-ml": "AI / ML",
@@ -415,11 +420,12 @@
 
     const PAGE_SIZE = 20;
     let allPosts = [];
+    let searchIndex = new Map();
     let currentPage = 1;
     const selectedDomains = new Set();
     let embedItems = {};
-    let queryVector = null;
-    let lastQuery = "";
+    let queryEmbedding = null;
+    let pendingQuery = null;
     let embedder = null;
     let semanticReady = false;
     let semanticStarted = false;
@@ -427,6 +433,7 @@
     const STORE_SEEN = "hkrps-seen-scraped-at";
     const STORE_SHORT = "hkrps-shortlist";
     const STORE_APPLIED = "hkrps-applied";
+    const STORE_FILTERS = `hkrps-public-filters:${location.pathname}`;
 
     function readJson(key, fallback) {
       try {
@@ -468,12 +475,7 @@
       return DOMAIN_LABELS[id] || id;
     }
 
-    function dequantize(item) {
-      if (!item || !item.q) return null;
-      const scale = item.scale || 0;
-      return item.q.map((v) => v * scale);
-    }
-
+    /* BROWSE_PURE_START */
     function cosine(a, b) {
       if (!a || !b || a.length !== b.length) return 0;
       let dot = 0, na = 0, nb = 0;
@@ -485,18 +487,72 @@
       return dot / (Math.sqrt(na) * Math.sqrt(nb) + 1e-9);
     }
 
-    function keywordScore(post, q) {
-      if (!q) return 0;
-      const domains = (post.domains || []).map(domainLabel).join(" ");
-      const hay = `${post.title || ""} ${post.summary || ""} ${post.department || ""} ${domains}`.toLowerCase();
-      if (hay.includes(q)) return 1;
-      const parts = q.split(/\s+/).filter(Boolean);
-      if (!parts.length) return 0;
-      const hits = parts.filter((w) => hay.includes(w)).length;
-      return hits / parts.length;
+    const SEARCH_STOP_WORDS = new Set("a an and by for in of on or the to using with".split(" "));
+    const SEMANTIC_MIN_SIMILARITY = 0.30;
+    const HAN_SEMANTIC_MIN_SIMILARITY = 0.22;
+    const SEMANTIC_ONLY_LIMIT = 40;
+    const HAN = /\p{Script=Han}/u;
+
+    function tokenizeSearch(text) {
+      return String(text || "").normalize("NFKC").toLowerCase()
+        .replace(/(\p{Script=Han}+)/gu, " $1 ")
+        .match(/[\p{L}\p{M}\p{N}]+(?:\+\+|#)?/gu) || [];
     }
 
-    /* BROWSE_PURE_START */
+    function parseSearchQuery(query) {
+      const tokens = tokenizeSearch(query);
+      const terms = [...new Set(tokens.filter((token) => !SEARCH_STOP_WORDS.has(token)))];
+      // Short codes and language names like R and C++ need literal matches.
+      const literalOnly = terms.length === 1 && /^(?:[a-z0-9]{1,2}|[a-z](?:\+\+|#))$/.test(terms[0]);
+      return { terms, phrase: tokens.join(" "), literalOnly };
+    }
+
+    function buildSearchIndex(posts, label = (id) => id) {
+      return new Map(posts.map((post) => {
+        const summary = post.summary || "";
+        const requirements = Array.from(summary.matchAll(/^\s*-\s*Requirements:\s*([^\n]+)/gim), (m) => m[1]).join(" ");
+        const prose = summary.replace(/^[ \t]*-[ \t]*[^:\n]+:/gm, "");
+        const domains = (post.domains || []).map((id) => label(id)).join(" ");
+        const fields = [
+          [post.id, 1], [post.title, 1], [post.project, 0.95], [requirements, 0.85],
+          [post.department, 0.55], [domains, 0.55], [prose, 0.45],
+        ].filter(([text]) => text).map(([text, weight]) => [` ${tokenizeSearch(text).join(" ")} `, weight]);
+        return [post.id, fields];
+      }));
+    }
+
+    function matchWeight(fields, term) {
+      // Han text doesn't use spaces between words; keep phrase matches inside it.
+      const needle = `${HAN.test(term[0]) ? "" : " "}${term}${HAN.test(term.at(-1)) ? "" : " "}`;
+      return fields.find(([field]) => field.includes(needle))?.[1] || 0;
+    }
+
+    function searchPosts(posts, query, { sortBy = "relevance", index, vectors = {}, queryVector = null, today } = {}) {
+      if (!query.trim()) return sortPosts(posts, sortBy, today);
+      const { terms, phrase, literalOnly } = parseSearchQuery(query);
+      if (!terms.length) return [];
+      index = index || buildSearchIndex(posts);
+      const semantic = queryVector && !literalOnly;
+      const scored = posts.map((post) => {
+        const fields = index.get(post.id) || [];
+        const exact = terms.reduce((sum, term) => sum + matchWeight(fields, term), 0) / terms.length;
+        const keyword = exact + (terms.length > 1 ? 0.25 * matchWeight(fields, phrase) : 0);
+        const packed = semantic ? vectors[post.id] : null;
+        // The positive quantization scale cancels out in cosine similarity.
+        const similarity = packed?.scale > 0 ? cosine(queryVector, packed.q) : 0;
+        return { post, keyword, similarity, score: keyword + 0.7 * Math.max(0, similarity) };
+      });
+      const matches = scored.filter((row) => row.keyword > 0);
+      if (semantic) {
+        // MiniLM produces lower scores for Han queries in this English-heavy index.
+        const minimum = HAN.test(phrase) ? HAN_SEMANTIC_MIN_SIMILARITY : SEMANTIC_MIN_SIMILARITY;
+        matches.push(...scored.filter((row) => !row.keyword && row.similarity >= minimum)
+          .sort((a, b) => b.similarity - a.similarity).slice(0, SEMANTIC_ONLY_LIMIT));
+      }
+      const ranked = matches.sort((a, b) => b.score - a.score).map((row) => row.post);
+      return sortBy === "relevance" ? ranked : sortPosts(ranked, sortBy, today);
+    }
+
     function todayISO(now) {
       const d = now || new Date();
       const z = (n) => String(n).padStart(2, "0");
@@ -540,67 +596,58 @@
       const put = (key, value) => { if (value) params.set(key, value); };
       put("src", state.src);
       put("work", state.work);
-      put("held", state.held);
       put("req", state.req);
       put("contract", state.contract);
       put("place", state.place);
       put("deadline", state.deadline);
-      if (state.sort && state.sort !== "close_date") params.set("sort", state.sort);
-      put("q", state.q);
-      if (state.page && Number(state.page) > 1) params.set("page", String(state.page));
+      if (["scraped_at", "title"].includes(state.sort)) params.set("sort", state.sort);
       if (state.domains && state.domains.length) params.set("domains", state.domains.join(","));
-      if (state.short) params.set("short", "1");
-      if (state.hideApplied) params.set("hideApplied", "1");
       const qs = params.toString();
-      return qs ? `?${qs}` : "";
+      return qs ? `#${qs}` : "";
     }
 
     function decodeBrowseState(search) {
       const raw = String(search || "");
-      const params = new URLSearchParams(raw.startsWith("?") ? raw.slice(1) : raw);
-      const page = Number(params.get("page") || "1");
+      const params = new URLSearchParams(raw.replace(/^[?#]/, ""));
+      const sort = params.get("sort");
       return {
         src: params.get("src") || "",
         work: params.get("work") || "",
-        held: params.get("held") || "",
         req: params.get("req") || "",
         contract: params.get("contract") || "",
         place: params.get("place") || "",
         deadline: params.get("deadline") || "",
-        sort: params.get("sort") || "close_date",
-        sortSet: params.has("sort"),
-        q: params.get("q") || "",
-        page: Number.isFinite(page) && page > 0 ? page : 1,
+        sort: ["scraped_at", "title"].includes(sort) ? sort : "close_date",
         domains: (params.get("domains") || "").split(",").filter(Boolean),
-        short: params.get("short") === "1",
-        hideApplied: params.get("hideApplied") === "1",
       };
     }
     /* BROWSE_PURE_END */
 
-    function currentBrowseState() {
+    function shareableFilters() {
       return {
         src: document.getElementById("filter-source").value,
         work: document.getElementById("filter-work").value,
-        held: document.getElementById("filter-held").value,
         req: document.getElementById("filter-requires").value,
         contract: document.getElementById("filter-contract").value,
         place: document.getElementById("filter-place").value,
         deadline: document.getElementById("filter-deadline").value,
         sort: document.getElementById("sort-by").value,
-        q: document.getElementById("search").value.trim(),
-        page: currentPage,
         domains: [...selectedDomains].sort(),
-        short: document.getElementById("filter-shortlist").checked,
-        hideApplied: document.getElementById("filter-hide-applied").checked,
       };
     }
 
-    function writeBrowseUrl() {
-      const next = `${location.pathname}${encodeBrowseState(currentBrowseState())}`;
-      if (`${location.pathname}${location.search}` !== next) {
-        history.replaceState(null, "", next);
-      }
+    function initialFilters() {
+      const legacy = location.search;
+      // Old links can have private query parameters; drop them before fetching data.
+      if (legacy) history.replaceState(null, "", location.pathname + location.hash);
+      if (location.hash || legacy) return decodeBrowseState(location.hash || legacy);
+      try { return decodeBrowseState(sessionStorage.getItem(STORE_FILTERS)); }
+      catch (err) { return decodeBrowseState(""); }
+    }
+
+    function rememberFilters() {
+      try { sessionStorage.setItem(STORE_FILTERS, encodeBrowseState(shareableFilters())); }
+      catch (err) { /* storage disabled */ }
     }
 
     function setSelect(id, value) {
@@ -613,30 +660,28 @@
     function applyBrowseState(state) {
       setSelect("filter-source", state.src);
       setSelect("filter-work", state.work);
-      setSelect("filter-held", state.held);
       setSelect("filter-requires", state.req);
       setSelect("filter-contract", state.contract);
       setSelect("filter-place", state.place);
       setSelect("filter-deadline", state.deadline);
       setSelect("sort-by", state.sort || "close_date");
-      document.getElementById("search").value = state.q || "";
-      document.getElementById("filter-shortlist").checked = !!state.short;
-      document.getElementById("filter-hide-applied").checked = !!state.hideApplied;
       selectedDomains.clear();
-      (state.domains || []).forEach((id) => selectedDomains.add(id));
       document.querySelectorAll("#domain-chips .chip").forEach((btn) => {
-        btn.classList.toggle("on", selectedDomains.has(btn.dataset.domain));
+        const on = state.domains.includes(btn.dataset.domain);
+        if (on) selectedDomains.add(btn.dataset.domain);
+        btn.classList.toggle("on", on);
       });
-      if (state.sortSet) document.getElementById("sort-by").dataset.user = "1";
-      currentPage = state.page || 1;
+      if (state.sort !== "close_date") document.getElementById("sort-by").dataset.user = "1";
     }
 
     async function loadData() {
       try {
+        const filters = initialFilters();
         const res = await fetch(DATA_URL);
         if (!res.ok) throw new Error("Failed to load data");
         allPosts = await res.json();
         if (!Array.isArray(allPosts)) allPosts = Object.values(allPosts);
+        searchIndex = buildSearchIndex(allPosts, domainLabel);
 
         const sources = [...new Set(allPosts.map((p) => p.source).filter(Boolean))].sort();
         const sourceSelect = document.getElementById("filter-source");
@@ -676,10 +721,9 @@
         document.getElementById("last-updated").textContent =
           latest ? `Last scraped: ${latest.replace("T", " ").slice(0, 16)}` : "No data yet";
 
-        applyBrowseState(decodeBrowseState(location.search));
+        applyBrowseState(filters);
         render();
         rememberVisit(allPosts);
-        if (document.getElementById("search").value.trim()) startSemantic();
       } catch (err) {
         document.getElementById("results-info").textContent =
           "Could not load posts. Make sure research_posts.json exists on the main branch.";
@@ -701,7 +745,7 @@
         if (!res.ok) throw new Error("no embeddings");
         const data = await res.json();
         embedItems = data.items || data;
-        if (!Object.keys(embedItems).length) throw new Error("empty embeddings");
+        if (data.input_version !== 2 || !Object.keys(embedItems).length) throw new Error("no current embeddings");
 
         status.textContent = "Loading semantic model…";
         const { pipeline, env } = await import("https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2");
@@ -709,10 +753,7 @@
         embedder = await pipeline("feature-extraction", "Xenova/all-MiniLM-L6-v2");
         semanticReady = true;
         status.textContent = "Semantic search ready";
-        if (document.getElementById("search").value.trim()) {
-          await updateQueryVector();
-          render();
-        }
+        await updateQueryVector();
       } catch (err) {
         semanticReady = false;
         status.textContent = "Keyword search only";
@@ -722,13 +763,27 @@
 
     async function updateQueryVector() {
       const q = document.getElementById("search").value.trim();
-      lastQuery = q;
-      if (!q || !semanticReady || !embedder) {
-        queryVector = null;
-        return;
+      const { terms, literalOnly } = parseSearchQuery(q);
+      if (!semanticReady || !terms.length || literalOnly || queryEmbedding?.text === q || pendingQuery?.text === q) return;
+      const task = { text: q };
+      pendingQuery = task;
+      try {
+        const out = await embedder(q, { pooling: "mean", normalize: true });
+        if (pendingQuery !== task) return;
+        queryEmbedding = { text: q, vector: Array.from(out.data) };
+        document.getElementById("search-status").textContent = "Semantic search ready";
+        render();
+      } catch (err) {
+        if (pendingQuery !== task) return;
+        document.getElementById("search-status").textContent = "Keyword search only";
+        console.info("Could not encode search query", err);
+      } finally {
+        if (pendingQuery === task) pendingQuery = null;
       }
-      const out = await embedder(q, { pooling: "mean", normalize: true });
-      queryVector = Array.from(out.data);
+    }
+
+    function vectorForQuery(q) {
+      return queryEmbedding?.text === q ? queryEmbedding.vector : null;
     }
 
     function getFiltered() {
@@ -736,12 +791,11 @@
       const work = document.getElementById("filter-work").value;
       const held = document.getElementById("filter-held").value;
       const requires = document.getElementById("filter-requires").value;
-      const q = document.getElementById("search").value.trim().toLowerCase();
+      const q = document.getElementById("search").value.trim();
       const sortBy = document.getElementById("sort-by").value;
       const heldRank = held ? Number(held) : 0;
-      const useSemantic = Boolean(q && semanticReady && queryVector);
 
-      let list = allPosts.filter((p) => {
+      const list = allPosts.filter((p) => {
         if (source && p.source !== source) return false;
         if (!workMatches(p, work)) return false;
         if (document.getElementById("filter-shortlist").checked && !shortlist.has(p.id)) return false;
@@ -771,27 +825,12 @@
           selectedDomains.forEach((d) => { if (ds.has(d)) hit = true; });
           if (!hit) return false;
         }
-        if (q && !useSemantic && keywordScore(p, q) <= 0) return false;
         return true;
       });
 
-      if (q && useSemantic && sortBy === "relevance") {
-        list = list.map((p) => {
-          const packed = embedItems[p.id];
-          const vec = dequantize(packed);
-          const sem = vec ? cosine(queryVector, vec) : 0;
-          const kw = keywordScore(p, q);
-          return { post: p, score: 0.75 * sem + 0.25 * kw };
-        }).sort((a, b) => b.score - a.score).map((x) => x.post);
-      } else if (q && sortBy === "relevance") {
-        list = list.map((p) => ({ post: p, score: keywordScore(p, q) }))
-          .sort((a, b) => b.score - a.score)
-          .map((x) => x.post);
-      } else {
-        list = sortPosts(list, sortBy === "relevance" ? "close_date" : sortBy);
-      }
-
-      return list;
+      return searchPosts(list, q, {
+        sortBy, index: searchIndex, vectors: embedItems, queryVector: vectorForQuery(q),
+      });
     }
 
     function render() {
@@ -805,13 +844,13 @@
       const start = (currentPage - 1) * PAGE_SIZE;
       const pagePosts = list.slice(start, start + PAGE_SIZE);
 
-      const mode = q && semanticReady && queryVector ? "semantic + filters" : "filters";
+      const mode = vectorForQuery(q) ? "semantic + keyword" : q ? "keyword" : "filters";
       info.textContent = `${list.length} post${list.length !== 1 ? "s" : ""} (${mode})`;
 
       document.getElementById("page-info").textContent = `Page ${currentPage} of ${totalPages}`;
       document.getElementById("prev-page").disabled = currentPage <= 1;
       document.getElementById("next-page").disabled = currentPage >= totalPages;
-      writeBrowseUrl();
+      rememberFilters();
 
       if (pagePosts.length === 0) {
         container.innerHTML = `<div class="empty">No matching posts</div>`;
@@ -989,12 +1028,14 @@
       if (!sort.dataset.user) {
         sort.value = q ? "relevance" : "close_date";
       }
-      if (q) startSemantic();
+      pendingQuery = null;
       clearTimeout(searchTimer);
-      searchTimer = setTimeout(async () => {
-        await updateQueryVector();
-        resetPageAndRender();
-      }, 280);
+      resetPageAndRender();
+      const { terms, literalOnly } = parseSearchQuery(q);
+      if (terms.length && !literalOnly) {
+        startSemantic();
+        searchTimer = setTimeout(updateQueryVector, 280);
+      }
     });
 
     function showPage(page) {
@@ -1010,6 +1051,17 @@
     document.getElementById("next-page").addEventListener("click", () => {
       const totalPages = Math.max(1, Math.ceil(getFiltered().length / PAGE_SIZE));
       if (currentPage < totalPages) showPage(currentPage + 1);
+    });
+
+    document.getElementById("copy-filter-link").addEventListener("click", async () => {
+      const status = document.getElementById("filter-link-status");
+      const url = location.origin + location.pathname + encodeBrowseState(shareableFilters());
+      try {
+        await navigator.clipboard.writeText(url);
+        status.textContent = "Filter link copied. Search and personal filters were not included.";
+      } catch (err) {
+        status.textContent = "Could not copy the filter link.";
+      }
     });
 
     loadData();

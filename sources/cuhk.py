@@ -14,6 +14,7 @@ from sources.base import (
     is_research_related,
     make_post,
     note_counts,
+    note_detail,
     parse_date,
     prepare_posts,
     same_listing,
@@ -32,8 +33,7 @@ def scrape() -> List[dict]:
     posts: List[dict] = []
     rows = search_jobs(_HOST, _PORTAL)
     if rows is None:
-        print("  [CUHK] Taleo job search returned no data")
-        note_counts(KEY, 0, 0)
+        note_counts(KEY, 0, None, state="failed", reason="Taleo listing unavailable")
         return posts
 
     jobs = []
@@ -61,6 +61,7 @@ def scrape() -> List[dict]:
         detail = fetch_detail(url) or {}
         close_date = parse_date(detail.get("unposting_date") or "")
         content = detail.get("description") or ""
+        note_detail(KEY, content)
         if not dept:
             dept = detail.get("organization") or ""
         posts.append(

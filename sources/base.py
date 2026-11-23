@@ -20,7 +20,7 @@ import ssl
 import time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import List, Optional, Protocol
+from typing import List, NoReturn, Optional, Protocol
 from urllib.parse import urljoin
 
 import requests
@@ -63,6 +63,52 @@ class ListingUnchanged:
     """The job list hash matches the last successful scrape, so detail pages were skipped."""
 
 
+class ListingFetchError(Exception):
+    """The listing could not be verified; do not reconcile or cache it."""
+
+    def __init__(self, reason: str, *, pages: int = 0, listed: int = 0):
+        super().__init__(reason)
+        self.pages = pages
+        self.listed = listed
+
+
+class CountedListing:
+    """Validate paginated APIs against their advertised count before filtering."""
+
+    def __init__(self, id_field: str):
+        self.id_field = id_field
+        self.rows: List[dict] = []
+        self.pages = 0
+        self.total: Optional[int] = None
+        self.ids: set = set()
+
+    def fail(self, reason: str) -> NoReturn:
+        raise ListingFetchError(reason, pages=self.pages, listed=len(self.rows))
+
+    def add_page(self, rows, raw_total, location: str) -> bool:
+        if not isinstance(rows, list) or not all(isinstance(row, dict) for row in rows):
+            self.fail(f"{location}: invalid listing rows")
+        total = self.total
+        if raw_total is not None or total is None:
+            try:
+                total = int(str(raw_total))
+            except ValueError:
+                self.fail(f"{location}: invalid or missing listing total")
+        if self.total is not None and total != self.total:
+            self.fail(f"{location}: listing total changed ({self.total} to {total})")
+        count = len(self.rows) + len(rows)
+        if count > total or (not rows and count < total):
+            self.fail(f"{location}: found {count} of {total} listing rows")
+        ids = [str(row[self.id_field]) for row in rows if row.get(self.id_field)]
+        if len(set(ids)) != len(ids) or self.ids.intersection(ids):
+            self.fail(f"{location}: repeated listing IDs")
+        self.ids.update(ids)
+        self.rows.extend(rows)
+        self.pages += 1
+        self.total = total
+        return count == total
+
+
 def set_listing_hash_path(path: Path) -> None:
     """Point the hash file somewhere other than the repo (dry-run / tests)."""
     global _LISTING_HASH_PATH
@@ -85,9 +131,22 @@ def configure_run(*, force: bool = False, sources_with_no_posts=None) -> None:
     _LISTING_COUNTS.clear()
 
 
-def note_counts(source: str, listed: int, kept: int) -> None:
-    """How many listing rows were seen, and how many passed the research filter."""
-    _LISTING_COUNTS[source] = {"listed": int(listed), "kept": int(kept)}
+def note_counts(
+    source: str, listed: int, kept: Optional[int], *, state: str = "complete", reason: str = ""
+) -> None:
+    """Report listing validation and row counts before fetching details."""
+    _LISTING_COUNTS[source] = {
+        "state": state, "reason": reason, "listed": listed, "kept": kept,
+        "detail_attempts": 0, "detail_missing": 0,
+    }
+
+
+def note_detail(source: str, description: str) -> None:
+    """Count unavailable or empty descriptions, even when listing text is used instead."""
+    stats = _LISTING_COUNTS[source]
+    stats["detail_attempts"] += 1
+    if not description.strip():
+        stats["detail_missing"] += 1
 
 
 def listing_counts() -> dict:
@@ -141,18 +200,22 @@ def finish_listing(source: str, posts: List[dict]) -> None:
     _READY_LISTING[source] = fingerprint
 
 
-def commit_listing_hashes() -> None:
+def commit_listing_hashes(sources: Optional[set] = None) -> None:
     """Write hashes for listings whose posts were just saved."""
-    if not _READY_LISTING:
+    ready = {
+        source: fingerprint for source, fingerprint in _READY_LISTING.items()
+        if sources is None or source in sources
+    }
+    _READY_LISTING.clear()
+    if not ready:
         return
     data = _read_listing_hashes()
-    data.update(_READY_LISTING)
+    data.update(ready)
     _LISTING_HASH_PATH.parent.mkdir(parents=True, exist_ok=True)
     _LISTING_HASH_PATH.write_text(
         json.dumps(data, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )
-    _READY_LISTING.clear()
 
 
 def prepare_posts(posts: List[dict]) -> List[dict]:

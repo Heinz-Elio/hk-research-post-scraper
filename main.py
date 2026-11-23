@@ -22,12 +22,12 @@ from embeddings_store import (
     dequantize,
     load_embeddings,
     save_embeddings,
-    take_post_embedding,
     text_for_embed,
     upsert_vector,
 )
 from sources import SCRAPERS, SOURCE_NAMES
 from sources.base import (
+    ListingFetchError,
     ListingUnchanged,
     commit_listing_hashes,
     configure_run,
@@ -36,7 +36,14 @@ from sources.base import (
     set_listing_hash_path,
 )
 from contract import attach_contract
-from summary import fact_summary, salvage_summary, summarize as build_summary, summary_needs_repair
+from summary import (
+    fact_summary,
+    redact_contact_values,
+    salvage_summary,
+    strip_contact_details,
+    summarize as build_summary,
+    summary_needs_repair,
+)
 from taxonomy import enrich_classification
 
 # ==================================================================
@@ -143,12 +150,20 @@ if USE_EMBEDDINGS:
         print("[Info] sentence-transformers not installed → embeddings disabled")
 
 
-def get_embedding(text: str) -> Optional[List[float]]:
-    if not HAS_EMBED or not text:
-        return None
-    text = text[:3000]
-    emb = EMBED_MODEL.encode(text, show_progress_bar=False)
-    return emb.tolist()
+def refresh_embeddings(posts: Dict[str, dict], store: dict, previous_text: Dict[str, str],
+                       *, generate: bool = True) -> None:
+    texts = {pid: text_for_embed(post)[:3000] for pid, post in posts.items()}
+    store["items"] = {
+        pid: item for pid, item in store.get("items", {}).items()
+        if pid in texts and previous_text.get(pid) == texts[pid]
+    }
+    if not generate or not HAS_EMBED:
+        return
+    missing = [pid for pid, text in texts.items() if text and pid not in store["items"]]
+    if missing:
+        vectors = EMBED_MODEL.encode([texts[pid] for pid in missing], show_progress_bar=False)
+        for pid, vec in zip(missing, vectors.tolist()):
+            upsert_vector(store, pid, vec)
 
 
 # ==================================================================
@@ -160,7 +175,16 @@ OUTDATED_FILE = DATA_DIR / "outdated_posts.json"
 PUBLIC_FILE = DATA_DIR / "docs" / "research_posts.json"
 EMBED_FILE = DATA_DIR / "docs" / "embeddings.json"
 
-DROP_FROM_STORE = {"embedding", "content"}
+DROP_FROM_STORE = {
+    "embedding", "content", "contact", "contact_name", "contact_email", "contact_phone",
+    "email", "phone", "telephone", "mobile", "fax",
+}
+PUBLIC_POST_FIELDS = {
+    "id", "title", "url", "source", "summary", "department", "project", "work_type",
+    "min_degree", "degree_rank", "degree_level", "domains", "close_date", "date_type",
+    "open_date", "open_date_approximate", "date_note", "possibly_stale", "scraped_at",
+    "contract_months", "contract_months_max", "contract_renewable",
+}
 
 
 def load_json(path: Path) -> Dict[str, dict]:
@@ -173,8 +197,20 @@ def load_json(path: Path) -> Dict[str, dict]:
     return data
 
 
-def _clean_post(post: dict) -> dict:
-    return {k: v for k, v in post.items() if k not in DROP_FROM_STORE}
+def _clean_post(post: dict, *, public: bool = False) -> dict:
+    clean = {
+        k: v for k, v in post.items()
+        if (k in PUBLIC_POST_FIELDS if public else k not in DROP_FROM_STORE)
+    }
+    if isinstance(clean.get("summary"), str):
+        clean["summary"] = strip_contact_details(clean["summary"])
+    for key in ("title", "department", "project", "date_note"):
+        value = clean.get(key)
+        if isinstance(value, str):
+            redacted = redact_contact_values(value)
+            if redacted != value:
+                clean[key] = redacted.strip()
+    return clean
 
 
 def save_json(path: Path, data: Dict[str, dict]):
@@ -189,16 +225,9 @@ def save_json(path: Path, data: Dict[str, dict]):
 
 def save_public_json(data: Dict[str, dict]):
     PUBLIC_FILE.parent.mkdir(parents=True, exist_ok=True)
-    public_posts = [_clean_post(post) for post in data.values()]
+    public_posts = [_clean_post(post, public=True) for post in data.values()]
     with open(PUBLIC_FILE, "w", encoding="utf-8") as f:
         json.dump(public_posts, f, ensure_ascii=False)
-
-
-def harvest_embeddings(posts: Dict[str, dict], store: dict) -> None:
-    for pid, post in posts.items():
-        vec = take_post_embedding(post)
-        if vec:
-            upsert_vector(store, pid, vec)
 
 
 def backfill_posts(posts: Dict[str, dict]) -> None:
@@ -207,7 +236,9 @@ def backfill_posts(posts: Dict[str, dict]) -> None:
         # before date_type existed. A passed review date must not retire them.
         if post.get("source") == "PolyU" and not post.get("date_type"):
             post["date_type"] = "review_start" if post.get("close_date") else "open_until_filled"
-        summary = post.get("summary") or ""
+        summary = strip_contact_details(post.get("summary") or "")
+        if "summary" in post:
+            post["summary"] = summary
         if post.get("content"):
             post["summary"] = summarize(
                 post.get("content") or "",
@@ -291,7 +322,8 @@ def run(
     if sources is None:
         sources = list(SCRAPERS.keys())
 
-    print(f"[{datetime.now():%Y-%m-%d %H:%M:%S}] Starting {'scrape' if scrape else 'migrate'}")
+    started_at = datetime.now().astimezone()
+    print(f"[{started_at:%Y-%m-%d %H:%M:%S}] Starting {'scrape' if scrape else 'migrate'}")
     if scrape:
         print(f"  Sources     : {sources}")
     if force:
@@ -304,8 +336,10 @@ def run(
     active = load_json(ACTIVE_FILE)
     outdated = load_json(OUTDATED_FILE)
     embed_store = load_embeddings(EMBED_FILE)
-    harvest_embeddings(active, embed_store)
-    harvest_embeddings(outdated, embed_store)
+    previous_text = {
+        pid: text_for_embed(active[pid])[:3000]
+        for pid in embed_store.get("items", {}) if pid in active
+    }
     today = date.today().isoformat()
 
     stored_active = {}
@@ -325,21 +359,26 @@ def run(
         for name in sources:
             if name not in SCRAPERS:
                 print(f"  [Skip] Unknown source: {name}")
+                run_stats[name] = {"state": "skipped", "reason": "unknown source"}
                 continue
 
             print(f"\n→ Scraping {name} ...")
+            phase = "scrape"
             try:
                 posts = SCRAPERS[name]()
+                phase = "processing"
                 if isinstance(posts, ListingUnchanged):
                     print("  Listing unchanged; kept the stored posts")
-                    run_stats[name] = {"unchanged": True}
+                    run_stats[name] = {"state": "unchanged", "returned": 0}
                     continue
                 print(f"  Found {len(posts)} research-related posts")
+                listing = listing_counts().get(name, {})
+                state = listing.get("state", "unverified")
+                run_stats[name] = {"state": state, "returned": len(posts)}
                 if not posts:
-                    run_stats[name] = {"returned": 0}
                     continue
 
-                fresh_ids[name] = set()
+                seen_ids = set()
                 for p in posts:
                     pid = p["id"]
                     p["scraped_at"] = datetime.now().isoformat(timespec="seconds")
@@ -354,19 +393,6 @@ def run(
                     p = enrich_classification(p)
                     p.pop("content", None)
 
-                    if generate_embeddings and HAS_EMBED:
-                        old = active.get(pid) or outdated.get(pid)
-                        text_emb = text_for_embed(p)
-                        need_embed = (
-                            not old
-                            or old.get("summary") != p.get("summary")
-                            or pid not in embed_store.get("items", {})
-                        )
-                        if need_embed:
-                            vec = get_embedding(text_emb)
-                            if vec:
-                                upsert_vector(embed_store, pid, vec)
-
                     if pid in active:
                         updated_count += 1
                     else:
@@ -374,29 +400,34 @@ def run(
                     # Back on the live board: it is active again.
                     outdated.pop(pid, None)
                     active[pid] = p
-                    fresh_ids[name].add(pid)
+                    seen_ids.add(pid)
 
-                returned = [active[pid] for pid in fresh_ids[name]]
-                run_stats[name] = {
+                returned = [active[pid] for pid in seen_ids]
+                run_stats[name].update({
                     "returned": len(returned),
                     "empty_close": sum(1 for post in returned if not post.get("close_date")),
                     "stale": sum(1 for post in returned if post.get("possibly_stale")),
                     "review": sum(1 for post in returned if post.get("date_type") == "review_start"),
+                })
+                if state == "complete":
+                    fresh_ids[name] = seen_ids
+            except ListingFetchError as e:
+                run_stats[name] = {
+                    "state": "partial" if e.pages else "failed",
+                    "reason": str(e),
+                    "pages_read": e.pages,
+                    "listed": e.listed,
                 }
             except Exception as e:
                 print(f"  [Error] {name}: {e}")
-                run_stats[name] = {"error": str(e)}
+                run_stats[name] = {"state": "error", "reason": f"{phase}: {type(e).__name__}"}
+
+        counts = listing_counts()
+        run_stats = {name: {**counts.get(name, {}), **stats} for name, stats in run_stats.items()}
+        _log_fetch_status(started_at, run_stats)
 
     backfill_posts(active)
     backfill_posts(outdated)
-
-    if generate_embeddings and HAS_EMBED:
-        for pid, post in active.items():
-            if pid in embed_store.get("items", {}):
-                continue
-            vec = get_embedding(text_for_embed(post))
-            if vec:
-                upsert_vector(embed_store, pid, vec)
 
     # A stored project-assistant ad can be clerical even when the listing
     # hash has not changed, because the grade is only in the description.
@@ -414,8 +445,7 @@ def run(
             del active[pid]
             moved_count += 1
 
-    # A fresh listing replaces that source's active set. Posts no longer
-    # listed move to outdated. An empty or failed scrape does not.
+    # Only a verified, non-empty listing replaces that source's active set.
     for pid, post in list(active.items()):
         src = post.get("source")
         if src in fresh_ids and pid not in fresh_ids[src]:
@@ -436,18 +466,14 @@ def run(
             del active[pid]
             moved_count += 1
 
-    embed_store["items"] = {
-        pid: item
-        for pid, item in embed_store.get("items", {}).items()
-        if pid in active
-    }
+    refresh_embeddings(active, embed_store, previous_text, generate=generate_embeddings)
 
     save_json(ACTIVE_FILE, active)
     save_json(OUTDATED_FILE, outdated)
     save_public_json(active)
     save_embeddings(EMBED_FILE, embed_store)
     if scrape:
-        commit_listing_hashes()
+        commit_listing_hashes(set(fresh_ids))
 
     print("\n" + "=" * 50)
     print(f"[{datetime.now():%H:%M:%S}] Finished")
@@ -461,13 +487,27 @@ def run(
     print("=" * 50)
 
 
+def _log_fetch_status(started_at: datetime, run_stats: Dict[str, dict]) -> None:
+    if not run_stats:
+        return
+    path = ACTIVE_FILE.with_name("fetch_status.jsonl")
+    timestamp = started_at.isoformat(timespec="seconds")
+    try:
+        with path.open("a", encoding="utf-8") as log:
+            for source, stats in run_stats.items():
+                record = {"run_started_at": timestamp, "source": source, **stats}
+                log.write(json.dumps(record) + "\n")
+        print(f"  Fetch log     : {path}")
+    except OSError as e:
+        print(f"  [Warning] Could not write fetch log: {e}")
+
+
 def _print_source_report(active: Dict[str, dict], outdated: Dict[str, dict], run_stats: Dict[str, dict]) -> None:
-    counts = listing_counts()
-    names = sorted(set(counts) | set(run_stats) | {p.get("source") for p in active.values()} | {p.get("source") for p in outdated.values()})
+    names = sorted(set(run_stats) | {p.get("source") for p in active.values()} | {p.get("source") for p in outdated.values()})
     names = [name for name in names if name]
     if not names:
         return
-    print(f"  {'Source':<10} {'Listed':>7} {'Kept':>6} {'Active':>7} {'Outdated':>9} {'No close':>9} {'Stale':>6} {'Review':>7}")
+    print(f"  {'Source':<10} {'Fetch':<11} {'Listed':>7} {'Kept':>6} {'Active':>7} {'Outdated':>9} {'No close':>9} {'Stale':>6} {'Review':>7}")
     active_by = {}
     outdated_by = {}
     for post in active.values():
@@ -475,27 +515,28 @@ def _print_source_report(active: Dict[str, dict], outdated: Dict[str, dict], run
     for post in outdated.values():
         outdated_by[post.get("source")] = outdated_by.get(post.get("source"), 0) + 1
     for name in names:
-        listed = counts.get(name, {}).get("listed", "")
-        kept = counts.get(name, {}).get("kept", "")
         stat = run_stats.get(name) or {}
-        if stat.get("unchanged"):
-            kept = kept if kept != "" else "skip"
+        state = stat.get("state", "-")
+        listed = stat.get("listed", "")
+        kept = stat.get("kept")
         no_close = stat.get("empty_close", "")
         stale = stat.get("stale", "")
         review = stat.get("review", "")
-        if stat.get("error"):
-            kept = "ERR"
         print(
-            f"  {name:<10} {str(listed):>7} {str(kept):>6} {active_by.get(name, 0):>7} "
+            f"  {name:<10} {state:<11} {listed:>7} {kept if kept is not None else '-':>6} {active_by.get(name, 0):>7} "
             f"{outdated_by.get(name, 0):>9} {str(no_close):>9} {str(stale):>6} {str(review):>7}"
         )
+        if stat.get("reason"):
+            print(f"    {stat['reason']}")
+        if stat.get("detail_missing"):
+            print(f"    Missing descriptions: {stat['detail_missing']}/{stat['detail_attempts']}")
 
 
 def semantic_search(query: str, top_k: int = 8) -> List[dict]:
     store = load_embeddings(EMBED_FILE)
     items = store.get("items") or {}
     if not items:
-        print("Embeddings not available (run with USE_EMBEDDINGS or migrate existing vectors)")
+        print("Embeddings not available (run with USE_EMBEDDINGS to generate them)")
         return []
 
     q_emb: Optional[List[float]] = None
@@ -546,7 +587,7 @@ def parse_args():
     parser.add_argument(
         "--migrate-only",
         action="store_true",
-        help="Re-enrich stored posts and split embeddings; do not scrape",
+        help="Re-enrich stored posts and refresh embeddings; do not scrape",
     )
     parser.add_argument(
         "--force",

@@ -1,8 +1,8 @@
 """Short extractive summaries for the job cards.
 
 Each post becomes a few labelled lines: department, project, one sentence of
-role focus, degree plus a few skills, appointment terms, a closing or review
-date, and a contact (email, or a name when there is no email). Lines are
+role focus, degree plus a few skills, appointment terms, and a closing or
+review date. Contact details are left on the original advertisement. Lines are
 capped and boilerplate is dropped. The university is not repeated; the card
 already shows the source.
 
@@ -29,7 +29,6 @@ _CANONICAL = {
     "appointment": "Appointment",
     "closing": "Closing",
     "review": "Review",
-    "contact": "Contact",
 }
 _ALLOWED = set(_CANONICAL)
 
@@ -55,8 +54,18 @@ _END_LINE = re.compile(
     r"^(?:advertised\b|applications close\b|back to search results\b|whatsapp\b|facebook\b|linkedin\b)",
     re.I,
 )
-_EMAIL_RE = re.compile(r"[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}")
-_PHONE_RE = re.compile(r"(?:\+?\d[\d\s().\-]{6,}\d)")
+_EMAIL_RE = re.compile(r"(?:mailto:)?[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}", re.I)
+_PHONE_RE = re.compile(
+    r"(?:\b(?:tel(?:ephone)?|phone|fax|mobile|whatsapp|call)\.?(?:[ \t]+(?:at|on))?"
+    r"[ \t:：]*(?:\+?\(?[0-9]{1,4}\)?[ .-]+)?|\+(?:852|86)[ .-]*)"
+    r"(?:[0-9][ .()-]*){7,14}[0-9](?![0-9])",
+    re.I,
+)
+_CONTACT_HEADING = re.compile(
+    r"^\s*(?:[-*]\s*)?(?:contacts?|enquir(?:y|ies)|how to apply|e-?mail|"
+    r"tel(?:ephone)?|phone|fax|mobile|whatsapp)\s*[:：]",
+    re.I,
+)
 _SKIP_LINE = re.compile(
     r"^(apply now|printable version|skip to|posting date|share\b|menu\b|return to previous page)\b",
     re.I,
@@ -136,17 +145,30 @@ _SKILL = re.compile(
     r"background in|skills? in|command of)\s+(\S.{3,90})",
     re.I,
 )
-_NAME = re.compile(
-    r"\b((?:Prof(?:essor)?|Dr|Mr|Ms|Mrs)\.?\s+[A-Z][A-Za-z.'\-]+(?:\s+[A-Z][A-Za-z.'\-]+){0,2})"
-)
 _APPT_HINT = re.compile(
     r"month|year|contract|full-time|part-time|salary|remuneration|hk\$|¥|rmb|usd",
     re.I,
 )
 
 
+def redact_contact_values(text: str) -> str:
+    """Remove emails and recognizable phone numbers without touching dates or job IDs."""
+    return _PHONE_RE.sub("", _EMAIL_RE.sub("", text))
+
+
+def strip_contact_details(summary: str) -> str:
+    """Omit legacy contact sections, including name-only lines, from saved summaries."""
+    lines = []
+    for line in summary.splitlines():
+        if not _CONTACT_HEADING.match(line):
+            clean = redact_contact_values(line).rstrip()
+            if clean:
+                lines.append(clean)
+    return "\n".join(lines)
+
+
 def _clean_line(text: str) -> str:
-    text = re.sub(r"https?://\S+", "", text or "")
+    text = redact_contact_values(re.sub(r"https?://\S+", "", text or ""))
     return re.sub(r"\s+", " ", text).strip(" \t:-")
 
 
@@ -445,29 +467,6 @@ def _narrative(text: str, title: str) -> str:
     return prose
 
 
-def _emails(text: str) -> List[str]:
-    found = []
-    for email in _EMAIL_RE.findall(text or ""):
-        lowered = email.lower()
-        if lowered.endswith((".png", ".jpg", ".gif")) or "example.com" in lowered or email.startswith("["):
-            continue
-        if email not in found:
-            found.append(email)
-    return found
-
-
-def _contact_value(section: str, text: str) -> str:
-    """Email only, or a person's name when the ad gives no email. Never a phone number."""
-    for blob in (section, text):
-        emails = _emails(blob or "")
-        if emails:
-            return emails[0]
-    name = _NAME.search(section or "")
-    if name:
-        return name.group(1)
-    return ""
-
-
 _REF_FRAGMENT = re.compile(r"\(Ref\.?:", re.I)
 _REQUIREMENT_SENTENCE = re.compile(
     r"applicants should|they should|should possess|should have|must (?:have|possess)|degree in|honours degree",
@@ -632,12 +631,12 @@ def fact_summary(
     url: str = "",
     date_type: str = "",
 ) -> str:
-    """Short labelled lines taken from the scrape. Does not invent a contact or a date.
+    """Short labelled lines taken from the scrape, excluding contact details.
 
     ``university`` is accepted so older callers keep working. It is not printed:
     the source tag on the card already names the university.
     """
-    del university, url  # the card shows the source; a URL is not a contact
+    del university, url  # the card links to the original advertisement
     sections = _split_sections(text)
     department = _clean_line(department) or sections.get("Department", "")
     project = _clean_line(project) or sections.get("Project", "")
@@ -674,9 +673,6 @@ def fact_summary(
     dated = _date_line(close_date, date_type)
     if dated:
         items.append(dated)
-    contact = _contact_value(sections.get("Contact", ""), text)
-    if contact and not _PHONE_RE.fullmatch(contact):
-        items.append(("Contact", contact))
     if not items and title:
         items.append(("Role focus", _clip(title, soft=240, hard=360)))
     return _render(items)
@@ -715,12 +711,8 @@ def validate_llm_summary(text: str) -> Optional[str]:
         key = label.lower()
         if key not in _ALLOWED or key in seen_labels:
             return None
-        if key == "contact":
-            emails = _emails(value)
-            if emails:
-                value = emails[0]
-            elif _PHONE_RE.search(value):
-                continue
+        if redact_contact_values(value) != value:
+            return None
         if not value:
             continue
         seen_labels.add(key)
@@ -756,7 +748,7 @@ def salvage_summary(summary: str) -> str:
     """Drop shouted, invented, or repeated lines from a stored summary and cap the rest."""
     items: List[Tuple[str, str]] = []
     seen = set()
-    for line in (summary or "").splitlines():
+    for line in strip_contact_details(summary or "").splitlines():
         match = re.match(r"^-\s*([^:]+):\s*(.+)$", line.strip())
         if not match:
             continue
@@ -776,9 +768,9 @@ def salvage_summary(summary: str) -> str:
 
 def _prompt(facts: str) -> str:
     return f"""Rewrite these job facts as a short bullet list.
-Use only these labels: Dept, Project, Role focus, Requirements, Appointment, Closing, Review, Contact.
+Use only these labels: Dept, Project, Role focus, Requirements, Appointment, Closing, Review.
 One fact per line, each line starting with "- ".
-Do not invent fields, names, dates, or a University line. Do not use all-caps labels.
+Do not include contact details or invent fields, names, dates, or a University line. Do not use all-caps labels.
 
 {facts}
 

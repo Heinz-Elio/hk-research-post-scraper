@@ -1,9 +1,11 @@
 """Active posts follow the live listing; a review date does not retire them."""
 
 import json
+from types import SimpleNamespace
 
 import main
-from sources.base import finish_listing, make_post, prepare_posts, same_listing
+from embeddings_store import EMBED_INPUT_VERSION
+from sources.base import finish_listing, make_post, note_counts, prepare_posts, same_listing
 
 
 def _bind(tmp_path, monkeypatch):
@@ -68,6 +70,7 @@ def test_fresh_list_drops_missing_ids_and_keeps_review_and_listed_deadlines(tmp_
     main.save_json(main.OUTDATED_FILE, {})
 
     def scrape_polyu():
+        note_counts("PolyU", 1, 1)
         same_listing("PolyU", ["keep|Research Assistant"])
         posts = [
             make_post(
@@ -91,6 +94,7 @@ def test_fresh_list_drops_missing_ids_and_keeps_review_and_listed_deadlines(tmp_
         return posts
 
     def scrape_cityu():
+        note_counts("CityU", 1, 1)
         same_listing("CityU", ["live|Research Assistant"])
         posts = [
             make_post(
@@ -142,3 +146,43 @@ def test_force_flag_is_accepted():
         assert args.force is True and args.dry_run is True
     finally:
         sys.argv = old
+
+
+def test_migration_strips_contacts_and_rebuilds_old_vectors(tmp_path, monkeypatch):
+    _bind(tmp_path, monkeypatch)
+    active = {
+        "id": "CityU_1", "source": "CityU", "title": "Research Assistant",
+        "url": "https://example.org/jobs/1", "date_type": "open_until_filled",
+        "summary": "- Role focus: Catalogue records. Tel: 3917 1234\n- Contact: Dr. Doe",
+        "contact_email": "contact@example.org", "embedding": [0.75, 0.25],
+        "internal_flag": "not a listing field",
+    }
+    old = {**active, "id": "CityU_2", "summary": "- Requirements: Archive work. Write to contact@example.org."}
+    main.ACTIVE_FILE.write_text(json.dumps([active]), encoding="utf-8")
+    main.OUTDATED_FILE.write_text(json.dumps([old]), encoding="utf-8")
+    main.EMBED_FILE.parent.mkdir()
+    main.EMBED_FILE.write_text(json.dumps({
+        "items": {active["id"]: {"scale": 1, "q": [1, 1]}},
+    }), encoding="utf-8")
+    encoded = []
+
+    def encode(texts, **_kwargs):
+        encoded.extend(texts)
+        return SimpleNamespace(tolist=lambda: [[1.0, -1.0]])
+
+    monkeypatch.setattr(main, "HAS_EMBED", True)
+    monkeypatch.setattr(main, "EMBED_MODEL", SimpleNamespace(encode=encode))
+    main.run(scrape=False)
+
+    for path in (main.ACTIVE_FILE, main.OUTDATED_FILE, main.PUBLIC_FILE):
+        saved = next(iter(main.load_json(path).values()))
+        assert saved["url"] == active["url"]
+        assert "contact_email" not in saved and "embedding" not in saved
+        assert not any(token in saved["summary"] for token in ("3917", "Dr. Doe", "@example.org", "Contact:"))
+    public = main.load_json(main.PUBLIC_FILE)[active["id"]]
+    assert "internal_flag" not in public
+    assert len(encoded) == 1 and "Catalogue records." in encoded[0]
+    assert "3917" not in encoded[0] and "Dr. Doe" not in encoded[0]
+    store = json.loads(main.EMBED_FILE.read_text(encoding="utf-8"))
+    assert store["input_version"] == EMBED_INPUT_VERSION
+    assert store["items"][active["id"]]["q"] == [127, -127]

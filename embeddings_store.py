@@ -6,8 +6,11 @@ import json
 from pathlib import Path
 from typing import Dict, List, Optional
 
+from summary import redact_contact_values, strip_contact_details
+
 EMBED_MODEL_NAME = "all-MiniLM-L6-v2"
 EMBED_DIM = 384
+EMBED_INPUT_VERSION = 2  # earlier inputs could contain contact details
 
 
 def quantize(vector: List[float]) -> dict:
@@ -31,13 +34,12 @@ def dequantize(item: dict) -> Optional[List[float]]:
 
 
 def load_embeddings(path: Path) -> dict:
-    if not path.exists():
-        return {"model": EMBED_MODEL_NAME, "dim": EMBED_DIM, "items": {}}
-    with open(path, "r", encoding="utf-8") as f:
-        data = json.load(f)
-    if "items" not in data:
-        data = {"model": EMBED_MODEL_NAME, "dim": EMBED_DIM, "items": data}
-    return data
+    if path.exists():
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        if isinstance(data, dict) and data.get("input_version") == EMBED_INPUT_VERSION:
+            return data
+    return {"model": EMBED_MODEL_NAME, "dim": EMBED_DIM, "items": {}}
 
 
 def save_embeddings(path: Path, store: dict) -> None:
@@ -45,6 +47,7 @@ def save_embeddings(path: Path, store: dict) -> None:
     payload = {
         "model": store.get("model") or EMBED_MODEL_NAME,
         "dim": store.get("dim") or EMBED_DIM,
+        "input_version": EMBED_INPUT_VERSION,
         "items": store.get("items") or {},
     }
     with open(path, "w", encoding="utf-8") as f:
@@ -54,13 +57,6 @@ def save_embeddings(path: Path, store: dict) -> None:
 def upsert_vector(store: dict, post_id: str, vector: List[float]) -> None:
     store.setdefault("items", {})
     store["items"][post_id] = quantize(vector)
-
-
-def take_post_embedding(post: dict) -> Optional[List[float]]:
-    emb = post.pop("embedding", None)
-    if isinstance(emb, list) and emb:
-        return emb
-    return None
 
 
 def cosine(a: List[float], b: List[float]) -> float:
@@ -83,6 +79,6 @@ def text_for_embed(post: dict) -> str:
         domain_text,
         post.get("department") or "",
         post.get("project") or "",
-        post.get("summary") or "",
+        strip_contact_details(post.get("summary") or ""),
     ]
-    return "\n".join(p for p in parts if p)
+    return "\n".join(redact_contact_values(p).strip() for p in parts if p).strip()

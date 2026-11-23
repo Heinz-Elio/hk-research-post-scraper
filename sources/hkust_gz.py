@@ -20,6 +20,7 @@ from sources.base import (
     is_research_related,
     make_post,
     note_counts,
+    note_detail,
     parse_date,
     prepare_posts,
     same_listing,
@@ -78,8 +79,7 @@ def scrape() -> List[dict]:
     posts: List[dict] = []
     rows = _load_list()
     if rows is None:
-        print("  [HKUST-GZ] career list returned no data")
-        note_counts(KEY, 0, 0)
+        note_counts(KEY, 0, None, state="failed", reason="career listing unavailable or invalid")
         return posts
 
     jobs = []
@@ -111,6 +111,7 @@ def scrape() -> List[dict]:
         if not isinstance(detail, dict):
             detail = {}
         body = _description(detail)
+        note_detail(KEY, body)
         # Some Technical Officer ads publish a title and department only.
         content = body or f"Department: {dept}\nJob ID: {job_id}".strip()
         posted = parse_date(_clean(detail.get("onlineDate") or detail.get("publicDate")))

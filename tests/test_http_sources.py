@@ -5,7 +5,9 @@ Network calls are mocked. Fixtures follow responses captured on 2026-11-05.
 
 from unittest.mock import patch
 
-from sources.base import ListingUnchanged, is_research_related
+import pytest
+
+from sources.base import ListingFetchError, ListingUnchanged, is_research_related
 from sources.hkbu import _closing_date, _department, _detail_url, scrape as scrape_hkbu
 from sources.hkmu import scrape as scrape_hkmu
 from sources.hkust_gz import _close_date, scrape as scrape_gz
@@ -107,6 +109,30 @@ def test_taleo_search_pages_until_total_count():
 def test_taleo_search_failure_is_none():
     with patch("sources.taleo.api_request", return_value=None):
         assert search_jobs("https://cuhk.taleo.net", "8115020119") is None
+
+
+@pytest.mark.parametrize(
+    "module, scrape, responses, reason",
+    [
+        ("taleo", scrape_cuhk,
+         [{"requisitionList": [{"contestNo": "A1"}], "pagingData": {"totalCount": 2}}, None],
+         "page 2"),
+        ("hkbu", scrape_hkbu,
+         [{"items": [{"requisitionList": [{"Id": "A1"}], "TotalJobsCount": 2}]}, None],
+         "offset 1"),
+        ("lingnan", scrape_lingnan,
+         ['{"token": "fixture"}',
+          {"data": {"requisitions": [{"requisitionId": 1}], "totalCount": 2}}, None],
+         "page 2"),
+    ],
+)
+def test_paginated_apis_reject_incomplete_listings(module, scrape, responses, reason):
+    with patch(f"sources.{module}.api_request", side_effect=responses), \
+         patch(f"sources.{module}.time.sleep"), \
+         pytest.raises(ListingFetchError, match=reason) as error:
+        scrape()
+    assert error.value.pages == 1
+    assert error.value.listed == 1
 
 
 def test_cuhk_scrape_keeps_research_posts_in_any_discipline():
@@ -474,4 +500,3 @@ def test_modules_do_not_require_playwright():
         assert not hasattr(module, "sync_playwright")
         source = open(module.__file__, encoding="utf-8").read()
         assert "playwright" not in source.lower()
-

@@ -14,6 +14,7 @@ from typing import List, Optional
 
 from sources.base import (
     REQUEST_DELAY,
+    CountedListing,
     ListingUnchanged,
     api_request,
     finish_listing,
@@ -57,13 +58,11 @@ def _token_and_cloud() -> Optional[tuple]:
     return token.group(1), base if base.endswith("/") else base + "/"
 
 
-def _search(token: str, cloud: str) -> Optional[List[dict]]:
+def _search(token: str, cloud: str) -> List[dict]:
     url = cloud + "rec-job-search/external/jobs"
     headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
-    collected: List[dict] = []
-    page = 1
-    total = None
-    while page <= 20:
+    listing = CountedListing("requisitionId")
+    for page in range(1, 21):
         body = {
             "careerSiteId": 4,
             "careerSitePageId": 4,
@@ -83,22 +82,13 @@ def _search(token: str, cloud: str) -> Optional[List[dict]]:
             "customFieldRadios": [],
         }
         data = api_request("POST", url, json_body=body, extra_headers=headers)
-        block = (data or {}).get("data") if isinstance(data, dict) else None
+        block = data.get("data") if isinstance(data, dict) else None
         if not isinstance(block, dict):
-            return None if page == 1 else collected
-        rows = block.get("requisitions") or []
-        if not isinstance(rows, list):
-            return None if page == 1 else collected
-        try:
-            total = int(block.get("totalCount") or 0)
-        except (TypeError, ValueError):
-            total = 0
-        collected.extend(row for row in rows if isinstance(row, dict))
-        if not rows or len(collected) >= total:
-            break
-        page += 1
+            listing.fail(f"page {page}: CSOD listing unavailable or invalid")
+        if listing.add_page(block.get("requisitions"), block.get("totalCount"), f"page {page}"):
+            return listing.rows
         time.sleep(REQUEST_DELAY)
-    return collected
+    listing.fail("CSOD pagination limit reached (20 pages)")
 
 
 def _department(title: str) -> str:
@@ -111,17 +101,12 @@ def scrape() -> List[dict]:
     posts: List[dict] = []
     opened = _token_and_cloud()
     if not opened:
-        print("  [Lingnan] CSOD careers page returned no data")
-        note_counts(KEY, 0, 0)
+        note_counts(KEY, 0, None, state="failed", reason="CSOD careers page or token unavailable")
         return posts
     token, cloud = opened
     # The token page is the only hit on lingnan.csod.com. Further calls
     # go to the API host. A later HTML fetch must wait out Crawl-delay: 10.
     rows = _search(token, cloud)
-    if rows is None:
-        print("  [Lingnan] CSOD job search returned no data")
-        note_counts(KEY, 0, 0)
-        return posts
 
     jobs = []
     seen = set()

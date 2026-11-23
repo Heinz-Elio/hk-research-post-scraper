@@ -2,7 +2,7 @@
 
 import re
 
-from summary import fact_summary, summarize, summary_needs_repair, validate_llm_summary
+from summary import fact_summary, strip_contact_details, summarize, summary_needs_repair, validate_llm_summary
 
 
 POLYU = """
@@ -12,7 +12,7 @@ Duties: Assist the project leader in conducting literature reviews, organizing r
 Requirements: An honours degree or above in Computer Science or Data Science, with experience in Python, knowledge of cryptography, and a command of written English. The University is an equal opportunity employer. Applicants not invited for interview will not be notified.
 Appointment: 12 months, renewable
 Salary: HK$20,000 per month
-Contact: Ms Ada Chan, tel 2766 1234, yijia.chang@polyu.edu.hk
+Contact: Ms Ada Chan, tel 2766 1234, contact@example.org
 """
 
 HKU_DOUBLED = (
@@ -46,14 +46,14 @@ def test_summary_is_short_labelled_and_drops_boilerplate():
     assert "equal opportunity" not in summary.lower()
     assert "not invited" not in summary.lower()
     assert "2766" not in summary
-    assert "yijia.chang@polyu.edu.hk" in summary
+    assert "contact@example.org" not in summary
     assert "- Review: 2026-11-15 (open until filled)" in summary
     assert "HK$20,000" in summary or "12 months" in summary
     assert len(summary) <= 1100
     for line in _lines(summary):
         assert len(line) <= 520
         label = line.split(":", 1)[0].replace("- ", "")
-        assert label in {"Dept", "Project", "Role focus", "Requirements", "Appointment", "Review", "Closing", "Contact"}
+        assert label in {"Dept", "Project", "Role focus", "Requirements", "Appointment", "Review", "Closing"}
 
 
 def test_prose_heading_and_job_ref_do_not_leak_into_the_summary():
@@ -183,11 +183,24 @@ def test_requirements_stop_at_a_clause_not_mid_word():
     assert not re.search(r"[A-Za-z]\.\.\.$", requirements)
 
 
-def test_contact_without_email_is_a_name_not_a_phone():
+def test_contact_name_and_phone_are_not_republished():
     text = "Duties: Collect archival sources for the history project and draft a working paper.\nContact: Please call Professor Ada Chan on 3917 1234."
     summary = fact_summary(text, title="Research Assistant", department="Department of History")
     assert "3917" not in summary
-    assert "Professor Ada Chan" in summary
+    assert "Professor Ada Chan" not in summary
+    assert "Contact:" not in summary
+
+
+def test_legacy_summary_scrubs_inline_contacts_but_keeps_other_facts():
+    summary = (
+        "- Role focus: Catalogue records. Email mailto:contact@example.org or Tel. (852) 3917 1234\n"
+        "- Contact: Professor Ada Chan\n"
+        "- Closing: 2026-12-01"
+    )
+    clean = strip_contact_details(summary)
+    assert "Catalogue records." in clean
+    assert "- Closing: 2026-12-01" in clean
+    assert not any(value in clean for value in ("mailto:", "@example.org", "3917", "Ada Chan", "Contact:"))
 
 
 def test_llm_rewrite_must_use_the_allowlist():
@@ -201,11 +214,17 @@ def test_llm_rewrite_must_use_the_allowlist():
     assert validate_llm_summary("- Role focus: Work.\n- Gender Identity: Non-binary") is None
     assert validate_llm_summary("- Dept: A\n- Dept: B\n- Role focus: Work.") is None
     assert validate_llm_summary("- Project Domain: Finance\n- Role focus: Work.") is None
+    assert validate_llm_summary("- Contact: Dr. Doe\n- Role focus: Work.") is None
+    assert validate_llm_summary("- Role focus: Call 3917 1234 or contact@example.org.") is None
 
-    def rewrite(_prompt: str) -> str:
-        return "- CONTACT: yijia.chang@polyu.edu.hk\n- Gender Identity: Non-binary\n- MAIN DUTIES: Literature"
+    prompts = []
+
+    def rewrite(prompt: str) -> str:
+        prompts.append(prompt)
+        return "- CONTACT: contact@example.org\n- Gender Identity: Non-binary\n- MAIN DUTIES: Literature"
 
     fallback = summarize(POLYU, title="Research Assistant", department="Department of Computing", model=rewrite)
+    assert len(prompts) == 1 and "contact@example.org" not in prompts[0]
     assert "Gender" not in fallback
     assert "CONTACT" not in fallback
     assert "- Dept: Department of Computing" in fallback
