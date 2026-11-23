@@ -30,7 +30,7 @@ After Pages is on, the site is typically:
 | Research grades | Keeps research appointments in any discipline; drops clerks, executive officers, admissions, HR, and finance |
 | Min degree | Lowest stated requirement; UI **I hold** hides posts above your level |
 | Domain tags | Controlled tags (AI/ML, CS, health, …). SPSS, "research materials", and bioinformatics are not tagged as computer science |
-| Summaries | Short extractive lines (dept, role, requirements, terms, date). For contact details, follow the original job link |
+| Summaries | Cards show a compact brief for the project, work, and background where available. Expand **Listing excerpts** for the supporting text, or open the original job link for contact details |
 | Dates | Hard deadlines expire; a review-start or "open until filled" post stays active while it is listed |
 | Browse filters | Optional: work type, degree, contract length, Hong Kong vs Guangzhou, and closing within 30 days. All default to off |
 | Storage | `research_posts.json` (active), `outdated_posts.json` |

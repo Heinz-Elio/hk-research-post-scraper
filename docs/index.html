@@ -211,17 +211,24 @@
     }
     button.tag:hover { background: #dbe4ff; }
 
-    .summary, .summary-list {
+    .card-brief {
+      display: grid;
+      gap: 0.25rem;
       font-size: 0.9rem;
       color: #333;
       margin-bottom: 0.5rem;
     }
-    .summary { white-space: pre-wrap; }
-    .summary-list {
-      margin: 0 0 0.5rem 1.1rem;
-      display: grid;
-      gap: 0.25rem;
+    .card-brief > div { display: grid; grid-template-columns: 8rem minmax(0, 1fr); gap: 0.5rem; }
+    .card-brief dt { color: var(--muted); font-weight: 600; }
+    .card-brief dd { overflow-wrap: anywhere; }
+    .listing-excerpts {
+      margin: 0.2rem 0 0.55rem;
+      font-size: 0.825rem;
+      color: var(--muted);
     }
+    .listing-excerpts > summary { cursor: pointer; }
+    .listing-excerpts ul { margin: 0.35rem 0 0 1.25rem; }
+    .listing-excerpts li + li { margin-top: 0.25rem; }
 
     .card-footer {
       font-size: 0.8rem;
@@ -241,6 +248,7 @@
         align-items: stretch;
       }
       input[type="search"] { min-width: 0; }
+      .card-brief > div { grid-template-columns: minmax(0, 1fr); gap: 0; }
     }
 
     #results { scroll-margin-top: 12px; }
@@ -621,6 +629,81 @@
         domains: (params.get("domains") || "").split(",").filter(Boolean),
       };
     }
+    const DUTY_HIGHLIGHTS = [
+      ["Literature reviews", /\b(?:literature|systematic|scoping) reviews?\b/i],
+      ["Data collection", /\b(?:data collection|collect(?:s|ing)? (?:[\w-]+ ){0,2}data)\b/i],
+      ["Data analysis", /\b(?:data analys[ei]s|analy[sz](?:e|es|ing) (?:[\w-]+ ){0,2}data)\b/i],
+      ["Fieldwork", /\b(?:fieldwork|field surveys?)\b/i],
+      ["Interviews", /\b(?:conduct|run)(?:s|ing)? (?:[\w-]+ ){0,2}interviews\b/i],
+      ["Clinical trials", /\bclinical trials?\b/i],
+      ["Laboratory work", /\b(?:laboratory|lab) (?:work|experiments?)\b/i],
+      ["Software development", /\b(?:software development|develop(?:s|ing)? (?:[\w-]+ ){0,2}software)\b/i],
+      ["Event coordination", /\b(?:organi[sz](?:e|es|ing)|coordinat(?:e|es|ing)) (?:[\w-]+ ){0,3}(?:events|workshops|seminars)\b/i],
+      ["Report writing", /\b(?:writ(?:e|es|ing)|draft(?:s|ing)?|prepar(?:e|es|ing)) (?:[\w-]+ ){0,2}reports?\b/i],
+    ];
+    const SKILL_HIGHLIGHTS = [
+      ["Python", /\bPython\b/i], ["R", /\bR(?:Studio\b|(?= programming\b|[ \t]*(?:[,;/.)]|\band\b|$)))/],
+      ["MATLAB", /\bMATLAB\b/i], ["SPSS", /\bSPSS\b/i], ["Stata", /\bStata\b/i], ["SQL", /\bSQL\b/i],
+      ["GIS", /\b(?:GIS|geographic information systems?)\b/i], ["NVivo", /\bNVivo\b/i],
+      ["C++", /(?:^|[^\w])C\+\+(?![\w+])/i], ["PyTorch", /\bPyTorch\b/i], ["TensorFlow", /\bTensorFlow\b/i],
+      ["Machine learning", /\bmachine learning\b/i], ["Deep learning", /\bdeep learning\b/i],
+      ["Qualitative research", /\bqualitative (?:research|methods|analysis)\b/i],
+      ["Bioinformatics", /\bbioinformatics\b/i], ["Clinical research", /\bclinical research\b/i],
+    ];
+
+    function compactText(text, limit) {
+      if (text.length <= limit) return text;
+      const prefix = text.slice(0, limit);
+      const boundary = prefix.lastIndexOf(" ");
+      return `${prefix.slice(0, boundary > limit / 2 ? boundary : limit).replace(/[,;:\s]+$/, "")}...`;
+    }
+
+    function buildCardBrief(post) {
+      const facts = {};
+      for (const line of (post.summary || "").split(/\r?\n/)) {
+        const match = line.match(/^\s*-?\s*(Project|Role focus|Requirements|Appointment)\s*:\s*(\S.*)$/i);
+        if (match) facts[match[1].toLowerCase()] ||= match[2].trim();
+      }
+      const normal = (s) => tokenizeSearch(s).join(" ");
+      const title = normal(post.title);
+      const projectTitle = (post.project || facts.project || "").trim();
+      const projectKey = normal(projectTitle);
+      const placeholder = /^(?:(?:research|job) )?(?:project|duties|tasks?|responsibilities|description|overview)$/.test(projectKey);
+      const project = projectKey && projectKey !== title && !placeholder ? projectTitle : "";
+      const rawDuty = facts["role focus"] || "";
+      const duty = rawDuty
+        .replace(/^(?:the )?(?:appointees?(?:\(s\))?|successful (?:candidates?|applicants?)|post[- ]?holders?)\s+(?:will|shall|(?:is|are) expected to)\s+/i, "")
+        .replace(/^(?:be responsible for|(?:the )?(?:main )?duties include)\s*[:\-]?\s*/i, "")
+        .replace(/^\([a-z0-9]+\)\s*/i, "").trim();
+      const dutyKey = normal(duty);
+      const projectLead = projectKey && dutyKey.endsWith(projectKey) ? dutyKey.slice(0, -projectKey.length).trim() : null;
+      const redundantDuty = dutyKey === title || projectLead === "" || Boolean(projectLead &&
+        /^(?:assist|support) (?:the )?(?:project (?:leader|team) (?:in|with) )?(?:(?:conducting|undertaking) )?(?:the )?(?:research )?project$/.test(projectLead));
+      const work = redundantDuty ? "" : DUTY_HIGHLIGHTS.filter(([, pattern]) => pattern.test(duty))
+        .slice(0, 3).map(([label]) => label).join(", ");
+      const firstClause = duty.split(/[;；。]|[.!?]\s+(?=[A-Z])/u, 1)[0].replace(/[.!?]+$/, "").trim();
+      const genericDuty = /\b(?:under (?:the )?supervision|report(?:s|ing)? to|duties as assigned)\b/i.test(firstClause);
+      const focus = !redundantDuty && !work && !genericDuty && firstClause.length <= 125 && !/\.{3}$/.test(duty)
+        ? firstClause.replace(/^[a-z]/, (letter) => letter.toUpperCase()) : "";
+      const req = facts.requirements || "";
+      const discipline = (req.match(/\b(?:degree|ph\.?d\.?|mphil)\s+in\s+([^.;\n]+)/i)?.[1] || "")
+        .replace(/\s*\([^)]*$/, "").trim();
+      const genericField = /^(?:(?:a|an|any) )?(?:relevant|related|appropriate) (?:field|discipline|subject)s?$/i.test(discipline);
+      const background = discipline.length <= 95 && !genericField ? discipline : "";
+      const skills = SKILL_HIGHLIGHTS.filter(([, pattern]) => pattern.test(req)).slice(0, 4)
+        .map(([label]) => label).join(", ");
+      const projectPreview = compactText(project, 152);
+
+      return {
+        items: [["Project", projectPreview], ["Work", work || focus], ["Study background", background], ["Skills mentioned", skills]]
+          .filter(([, value]) => value),
+        excerpts: [
+          ["Project", projectPreview !== project ? project : ""],
+          ["Duties", !redundantDuty && normal(rawDuty) !== normal(focus) ? rawDuty : ""],
+          ["Requirements", req], ["Appointment", facts.appointment],
+        ].filter(([, value]) => value),
+      };
+    }
     /* BROWSE_PURE_END */
 
     function shareableFilters() {
@@ -879,7 +962,7 @@
               </a>
             </div>
             <div class="tags">${metaTags}${domainTags}</div>
-            ${summaryHtml(p.summary)}
+            ${briefHtml(p)}
             <div class="card-footer">${dateFooter(p)}${contractFooter(p)}</div>
             <div class="card-actions">
               <button type="button" class="pin${shortOn ? " on" : ""}" data-act="short" data-id="${escapeHtml(p.id || "")}">${shortOn ? "Shortlisted" : "Shortlist"}</button>
@@ -990,13 +1073,13 @@
       return p.degree_level || "";
     }
 
-    function summaryHtml(text) {
-      const lines = String(text || "").split("\n").map((line) => line.trim()).filter(Boolean);
-      const items = lines.filter((line) => line.startsWith("- "));
-      if (items.length && items.length === lines.length) {
-        return `<ul class="summary-list">${items.map((line) => `<li>${escapeHtml(line.slice(2))}</li>`).join("")}</ul>`;
-      }
-      return `<div class="summary">${escapeHtml(text || "")}</div>`;
+    function briefHtml(post) {
+      const { items, excerpts } = buildCardBrief(post);
+      const brief = items.length ? `<dl class="card-brief">${items.map(([label, value]) =>
+        `<div><dt>${label}</dt><dd>${escapeHtml(value)}</dd></div>`).join("")}</dl>` : "";
+      const more = excerpts.length ? `<details class="listing-excerpts"><summary>Listing excerpts</summary><ul>${excerpts.map(([label, value]) =>
+        `<li><strong>${label}:</strong> ${escapeHtml(value)}</li>`).join("")}</ul></details>` : "";
+      return brief + more;
     }
 
     function escapeHtml(str) {

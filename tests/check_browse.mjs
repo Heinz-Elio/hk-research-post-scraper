@@ -21,7 +21,7 @@ if (syntax.status !== 0) {
 
 const block = html.match(/\/\* BROWSE_PURE_START \*\/([\s\S]*?)\/\* BROWSE_PURE_END \*\//);
 if (!block) throw new Error("browse helpers missing");
-const pure = `${block[1]}\nexport { todayISO, isUpcoming, sortPosts, workMatches, encodeBrowseState, decodeBrowseState, searchPosts };\n`;
+const pure = `${block[1]}\nexport { todayISO, isUpcoming, sortPosts, workMatches, encodeBrowseState, decodeBrowseState, searchPosts, buildCardBrief };\n`;
 const api = await import(`data:text/javascript,${encodeURIComponent(pure)}`);
 
 const today = "2026-11-13";
@@ -92,6 +92,45 @@ assert.deepEqual(ids(api.searchPosts(rankedFields, "satellite imagery")), ["titl
 const extra = Array.from({ length: 55 }, (_, i) => ({ id: `extra-${i}`, title: "Imagery role" }));
 const extraVectors = Object.fromEntries(extra.map((row) => [row.id, { q: [100, 5], scale: 0.01 }]));
 assert.equal(api.searchPosts(extra, "geospatial", { queryVector: [1, 0], vectors: extraVectors }).length, 40);
+
+const briefFixture = {
+  title: "Research Assistant",
+  department: "Department of History",
+  summary: [
+    "- Dept: Department of History",
+    "- Role focus: The appointee will be responsible for conducting literature reviews and writing research reports.",
+    "- Requirements: A bachelor's degree in history or related disciplines; Python is preferred.",
+    "- Appointment: 12 months, renewable",
+    "- Closing: 2026-12-01",
+  ].join("\n"),
+};
+const brief = api.buildCardBrief(briefFixture);
+assert.deepEqual(brief.items, [
+  ["Work", "Literature reviews, Report writing"],
+  ["Study background", "history or related disciplines"],
+  ["Skills mentioned", "Python"],
+]);
+assert.ok(brief.excerpts.some(([label, text]) => label === "Requirements" && text.includes("Python is preferred.")));
+assert.ok(!brief.excerpts.some(([label]) => label === "Closing" || label === "Dept"));
+assert.equal(api.searchPosts([{ ...briefFixture, id: "brief" }], "renewable").length, 1);
+
+const projectTitle = "Community-led documentation of architectural heritage, archival records, and changing patterns of public space and cultural participation in neighbourhoods across the city";
+const projectBrief = api.buildCardBrief({
+  title: "Research Assistant",
+  project: projectTitle,
+  summary: `- Project: ${projectTitle}\n- Role focus: The appointee will assist the project leader in the research project - "${projectTitle}".`,
+});
+assert.deepEqual(projectBrief.items.map(([label]) => label), ["Project"]);
+assert.ok(projectBrief.items[0][1].length < projectTitle.length);
+assert.deepEqual(projectBrief.excerpts, [["Project", projectTitle]]);
+assert.deepEqual(api.buildCardBrief({
+  title: "Research Assistant",
+  summary: "- Dept: History\n- Role focus: Research Assistant\n- Closing: 2026-12-01",
+}), { items: [], excerpts: [] });
+assert.deepEqual(api.buildCardBrief({
+  title: "Research Assistant",
+  summary: "- Project: Tasks\n- Role focus: Work under the supervision of the head of the unit.\n- Requirements: a degree in a relevant field (e.g. engineering); Python",
+}).items, [["Skills mentioned", "Python"]]);
 
 const state = {
   src: "HKUST",
